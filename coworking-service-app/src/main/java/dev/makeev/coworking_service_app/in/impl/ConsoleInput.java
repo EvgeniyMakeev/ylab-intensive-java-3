@@ -1,4 +1,6 @@
-package dev.makeev.coworking_service_app.in;
+package dev.makeev.coworking_service_app.in.impl;
+
+import dev.makeev.coworking_service_app.in.Input;
 
 import java.util.Scanner;
 
@@ -12,6 +14,9 @@ public class ConsoleInput implements Input {
      */
     private final Scanner input = new Scanner(System.in);
 
+    /**
+     * {@inheritdoc}
+     */
     @Override
     public int getInt(int minValue, int maxValue) {
         String optionString;
@@ -35,11 +40,17 @@ public class ConsoleInput implements Input {
         return option;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     @Override
     public String getString() {
         return input.nextLine();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     @Override
     public Double getDouble() {
         String str = "";
@@ -59,6 +70,9 @@ public class ConsoleInput implements Input {
         return result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     @Override
     public Integer getInteger(int maxLength, int minValue, int maxValue) {
         String str = "";

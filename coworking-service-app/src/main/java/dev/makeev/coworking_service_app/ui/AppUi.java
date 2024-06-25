@@ -1,28 +1,36 @@
 package dev.makeev.coworking_service_app.ui;
 
-import dev.makeev.coworking_service_app.dao.BookingDAOInMemory;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
-import dev.makeev.coworking_service_app.dao.SpaceDAOInMemory;
-import dev.makeev.coworking_service_app.dao.UserDAOInMemory;
-import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailablException;
-import dev.makeev.coworking_service_app.in.ConsoleInput;
+import dev.makeev.coworking_service_app.dao.UserDAO;
+import dev.makeev.coworking_service_app.dao.impl.BookingDAOInMemory;
+import dev.makeev.coworking_service_app.dao.impl.SpaceDAOInMemory;
+import dev.makeev.coworking_service_app.dao.impl.UserDAOInMemory;
+import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
+import dev.makeev.coworking_service_app.in.impl.ConsoleInput;
 import dev.makeev.coworking_service_app.in.Input;
 import dev.makeev.coworking_service_app.model.Space;
-import dev.makeev.coworking_service_app.out.ConsoleOutput;
+import dev.makeev.coworking_service_app.out.impl.ConsoleOutput;
 import dev.makeev.coworking_service_app.service.BookingService;
 import dev.makeev.coworking_service_app.service.SpaceService;
 import dev.makeev.coworking_service_app.service.UserService;
+import dev.makeev.coworking_service_app.util.InitDb;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The main user interface class for the coworking service application.
+ */
 public final class AppUi {
-    private final UserService userService = new UserService(new UserDAOInMemory());
+
+    private final UserDAO userDAO = new UserDAOInMemory();
+    private final UserService userService = new UserService(userDAO);
     private final SpaceDAO spaceDAO = new SpaceDAOInMemory();
     private final BookingService bookingService = new BookingService(new BookingDAOInMemory(), spaceDAO);
     private final SpaceService spaceService = new SpaceService(spaceDAO, bookingService);
+    private final InitDb initDb = new InitDb(userDAO, spaceService, bookingService);
 
     private final Input input = new ConsoleInput();
     private final Messages console = new Messages(new ConsoleOutput());
@@ -30,10 +38,13 @@ public final class AppUi {
 
     private Optional<Space> currentSpace = Optional.empty();
 
-    public void run() throws SpaceIsNotAvailablException {
-        userService.init();
-        spaceService.init();
-        bookingService.init();
+    /**
+     * Runs the application user interface.
+     *
+     * @throws SpaceIsNotAvailableException if the space is not available for booking
+     */
+    public void run() throws SpaceIsNotAvailableException {
+        initDb.initDb();
 
         while (true) {
             loginMenu();
@@ -47,6 +58,9 @@ public final class AppUi {
         }
     }
 
+    /**
+     * Displays the login menu and handles user login and registration.
+     */
     private void loginMenu() {
         console.welcomeMessage();
         while (loginOfCurrentUser.equals("login failed")) {
@@ -62,7 +76,7 @@ public final class AppUi {
                 }
             } else {
                 console.notRegisteredMassage();
-                if (input.getInt(1,2) == 1) {
+                if (input.getInt(1, 2) == 1) {
                     console.newPasswordMessage();
                     userService.addUser(login, input.getString());
                     console.print("Account was created!");
@@ -74,6 +88,9 @@ public final class AppUi {
         }
     }
 
+    /**
+     * Displays the user menu and handles user actions.
+     */
     private void userMenu() {
         console.greetingMessage(loginOfCurrentUser);
         console.showUserMenu();
@@ -88,6 +105,9 @@ public final class AppUi {
         }
     }
 
+    /**
+     * Displays the available slots for booking.
+     */
     private void showAvailableSlots() {
         List<Space> spaces = spaceService.getSpaces();
         console.printSpaces(spaces);
@@ -96,6 +116,9 @@ public final class AppUi {
         console.printAvailableSlotsForBooking(currentSpace.orElseThrow());
     }
 
+    /**
+     * Handles the process of making a booking.
+     */
     private void makeBooking() {
         showAvailableSlots();
 
@@ -110,32 +133,41 @@ public final class AppUi {
         int hourBookingTo = input.getInt(0, 24);
 
         try {
-            bookingService.addBooking(loginOfCurrentUser, currentSpace.orElseThrow(),
+            bookingService.addBooking(loginOfCurrentUser, currentSpace.orElseThrow().name(),
                     dateBookingFrom, hourBookingFrom,
                     dateBookingTo, hourBookingTo);
             console.successfulBooking(currentSpace.orElseThrow().name(), dateBookingFrom, dateBookingTo,
                     hourBookingFrom, hourBookingTo);
-        } catch (SpaceIsNotAvailablException e) {
+        } catch (SpaceIsNotAvailableException e) {
             console.print(e.getMessage());
         }
     }
 
+    /**
+     * Handles the process of booking cancellation.
+     */
     private void bookingCancellation() {
         console.printBookings(bookingService.getAllBookingsForUser(loginOfCurrentUser));
         console.deleteBookingMessage();
         int numberOfBookingForDelete = input.getInt(0, bookingService.getAllBookingsForUser(loginOfCurrentUser).size());
         if (numberOfBookingForDelete != 0) {
-                bookingService.deleteBookingByIndex(loginOfCurrentUser,
-                        numberOfBookingForDelete - 1);
-                console.print("Booking has been cancelled.");
+            bookingService.deleteBookingByIndex(loginOfCurrentUser,
+                    numberOfBookingForDelete - 1);
+            console.print("Booking has been cancelled.");
         }
     }
 
+    /**
+     * Logs out the current user.
+     */
     private void logOut() {
         console.print("Goodbye! You are logged out.\n");
         loginOfCurrentUser = "login failed";
     }
 
+    /**
+     * Displays the admin menu and handles admin actions.
+     */
     private void adminMenu() {
         console.showAdminMenu();
         switch (input.getInt(0, 3)) {
@@ -146,6 +178,9 @@ public final class AppUi {
         }
     }
 
+    /**
+     * Displays the spaces menu and handles space-related actions.
+     */
     private void spacesMenu() {
         List<Space> spaces = spaceService.getSpaces();
         console.printSpaces(spaces);
@@ -158,6 +193,9 @@ public final class AppUi {
         }
     }
 
+    /**
+     * Handles the process of adding a new space.
+     */
     private void addNewSpace() {
         console.print("Enter the name of the new space:");
         String nameOfSpace = input.getString();
@@ -174,14 +212,18 @@ public final class AppUi {
             }
         } while (hourOfEndWorkingDay <= hourOfStartWorkingDay);
 
-
         console.print("Enter the number of days available for booking:");
         int numberOfDaysAvailableForBooking = input.getInt(0, Integer.MAX_VALUE);
 
-        spaceService.addAndUpdateSpace(nameOfSpace,hourOfStartWorkingDay, hourOfEndWorkingDay, numberOfDaysAvailableForBooking);
+        spaceService.addAndUpdateSpace(nameOfSpace, hourOfStartWorkingDay, hourOfEndWorkingDay, numberOfDaysAvailableForBooking);
         console.print(nameOfSpace + " added.");
     }
 
+    /**
+     * Handles the process of deleting a space.
+     *
+     * @param spaces the list of spaces
+     */
     private void deleteSpace(List<Space> spaces) {
         console.printSpaces(spaces);
         console.deleteSpaceMessage();
@@ -193,6 +235,9 @@ public final class AppUi {
         }
     }
 
+    /**
+     * Displays the bookings menu and handles booking-related actions.
+     */
     private void showBookings() {
         console.selectionOfBookingSorting();
         switch (input.getInt(1, 3)) {

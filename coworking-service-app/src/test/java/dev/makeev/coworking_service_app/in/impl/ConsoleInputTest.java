@@ -1,5 +1,6 @@
-package dev.makeev.coworking_service_app.in;
+package dev.makeev.coworking_service_app.in.impl;
 
+import dev.makeev.coworking_service_app.in.Input;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -26,12 +26,6 @@ public class UserService {
         this.userDAO = userDAO;
     }
 
-    public void init() {
-        userDAO.add(new User("admin", "1234", true));
-        userDAO.add(new User("User1", "pass1", false));
-        userDAO.add(new User("User2", "pass2", false));
-    }
-
     /**
      * Adds a new user with the specified login and password.
      *

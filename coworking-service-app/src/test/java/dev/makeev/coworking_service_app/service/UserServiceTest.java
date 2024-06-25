@@ -24,6 +24,8 @@ class UserServiceTest {
 
     private static final String LOGIN = "TestUser";
     private static final String PASSWORD = "TestPassword";
+    private static final User testUser = new User(LOGIN, PASSWORD, false);
+    private static final User testAmin = new User(LOGIN, PASSWORD, true);
 
     @Mock
     private UserDAO userDAO;
@@ -32,42 +34,54 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    @DisplayName("Add User - Should add new user to DAO")
+    @DisplayName("UserService test: Add User - Should add new user to DAO")
     void addUser_shouldAddUserToDAO() {
         userService.addUser(LOGIN, PASSWORD);
 
-        verify(userDAO, times(1)).add(eq(new User(LOGIN, PASSWORD, false)));
+        verify(userDAO, times(1)).add(eq(testUser));
     }
 
     @Test
-    @DisplayName("Exist By Login - Should check if user exists in DAO")
+    @DisplayName("UserService test: Exist By Login - Should check if user exists in DAO")
     void existByLogin_shouldCheckIfUserExistsInDAO() {
-        when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(new User(LOGIN, PASSWORD,false)));
+        when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(testUser));
 
-        boolean exists = userService.existByLogin(LOGIN);
-
-        assertTrue(exists);
+        assertTrue(userService.existByLogin(LOGIN));
         verify(userDAO, times(1)).getByLogin(eq(LOGIN));
     }
 
     @Test
-    @DisplayName("Is Admin - Should return true if user is admin")
-    void isAdmin_shouldReturnTrueIfUserIsAdmin() {
-        when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(new User(LOGIN, PASSWORD, true)));
+    @DisplayName("UserService test: Check user credentials - Should return the credentials of user is correct")
+    void checkCredentials_shouldCheckCredentialsOfUserIsCorrect() {
+        when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(testUser));
 
-        boolean result = userService.isAdmin(LOGIN);
-
-        assertTrue(result);
+        assertTrue(userService.checkCredentials(LOGIN,PASSWORD));
+        verify(userDAO, times(1)).getByLogin(eq(LOGIN));
     }
 
     @Test
-    @DisplayName("Is Admin - Should return false if user is not admin")
+    @DisplayName("UserService test: Check user credentials - Should return the credentials of user is incorrect")
+    void checkCredentials_shouldReturnCredentialsOfUserIsIncorrect() {
+        when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(testUser));
+
+        assertFalse(userService.checkCredentials(LOGIN,"Wrong Password"));
+        verify(userDAO, times(1)).getByLogin(eq(LOGIN));
+    }
+
+    @Test
+    @DisplayName("UserService test: Is Admin - Should return true if user is admin")
+    void isAdmin_shouldReturnTrueIfUserIsAdmin() {
+        when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(testAmin));
+
+        assertTrue(userService.isAdmin(LOGIN));
+    }
+
+    @Test
+    @DisplayName("UserService test: Is Admin - Should return false if user is not admin")
     void isAdmin_shouldReturnFalseIfUserIsNotAdmin() {
-        when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(new User(LOGIN, PASSWORD, false)));
+        when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(testUser));
 
-        boolean result = userService.isAdmin(LOGIN);
-
-        assertFalse(result);
+        assertFalse(userService.isAdmin(LOGIN));
     }
 
 }

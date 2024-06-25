@@ -1,6 +1,7 @@
-package dev.makeev.coworking_service_app.dao;
+package dev.makeev.coworking_service_app.dao.impl;
 
 
+import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.UserBooking;

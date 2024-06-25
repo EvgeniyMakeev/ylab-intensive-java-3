@@ -1,6 +1,7 @@
 package dev.makeev.coworking_service_app.service;
 
 import dev.makeev.coworking_service_app.dao.BookingDAO;
+import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.Space;
@@ -19,14 +20,24 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @DisplayName("BookingService Test")
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
 
+    private final static String LOGIN = "TestUser";
+    private final static String SPACE = "TestSpace";
+
+    private UserBooking userBooking;
+
     @Mock
     private BookingDAO bookingDAO;
+
+    @Mock
+    private SpaceDAO spaceDAO;
 
     @InjectMocks
     private BookingService bookingService;
@@ -42,8 +53,8 @@ class BookingServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        when(mockSpace.name()).thenReturn("TestSpace");
+        userBooking = new UserBooking(LOGIN, mockBooking);
+        when(mockSpace.name()).thenReturn(SPACE);
         when(mockBooking.bookingSpace()).thenReturn(mockSpace);
         when(mockBooking.bookingRange()).thenReturn(mockBookingRange);
     }
@@ -53,14 +64,15 @@ class BookingServiceTest {
     void getAllBookingsSortedByUser_shouldReturnAllBookingsSortedByUser() {
         Map<String, List<UserBooking>> allBookings = new HashMap<>();
         List<UserBooking> bookings = new ArrayList<>();
-        bookings.add(new UserBooking("TestUser", mockBooking));
-        allBookings.put("TestUser", bookings);
+        bookings.add(userBooking);
+        allBookings.put(LOGIN, bookings);
         when(bookingDAO.getAll()).thenReturn(allBookings);
 
         List<String> result = bookingService.getAllBookingsSortedByUser();
 
         assertThat(result).isNotEmpty();
-        assertThat(result.get(0)).contains("TestUser");
+        assertThat(result.get(0)).contains(LOGIN);
+        verify(bookingDAO, times(1)).getAll();
     }
 
     @Test
@@ -68,14 +80,15 @@ class BookingServiceTest {
     void getAllBookingsSortedByDate_shouldReturnAllBookingsSortedByDate() {
         Map<String, List<UserBooking>> allBookings = new HashMap<>();
         List<UserBooking> bookings = new ArrayList<>();
-        bookings.add(new UserBooking("TestUser", mockBooking));
-        allBookings.put("TestUser", bookings);
+        bookings.add(userBooking);
+        allBookings.put(LOGIN, bookings);
         when(bookingDAO.getAll()).thenReturn(allBookings);
 
         List<String> result = bookingService.getAllBookingsSortedByDate();
 
         assertThat(result).isNotEmpty();
-        assertThat(result.get(0)).contains("TestSpace");
+        assertThat(result.get(0)).contains(SPACE);
+        verify(bookingDAO, times(1)).getAll();
     }
 
     @Test
@@ -83,14 +96,14 @@ class BookingServiceTest {
     void getAllBookingsSortedBySpace_shouldReturnAllBookingsSortedBySpace() {
         Map<String, List<UserBooking>> allBookings = new HashMap<>();
         List<UserBooking> bookings = new ArrayList<>();
-        bookings.add(new UserBooking("TestUser", mockBooking));
-        allBookings.put("TestUser", bookings);
+        bookings.add(userBooking);
+        allBookings.put(LOGIN, bookings);
         when(bookingDAO.getAll()).thenReturn(allBookings);
 
         List<String> result = bookingService.getAllBookingsSortedBySpace();
 
         assertThat(result).isNotEmpty();
-        assertThat(result.get(0)).contains("TestSpace");
+        assertThat(result.get(0)).contains(SPACE);
+        verify(bookingDAO, times(1)).getAll();
     }
-
 }

@@ -1,5 +1,6 @@
-package dev.makeev.coworking_service_app.dao;
+package dev.makeev.coworking_service_app.dao.impl;
 
+import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
