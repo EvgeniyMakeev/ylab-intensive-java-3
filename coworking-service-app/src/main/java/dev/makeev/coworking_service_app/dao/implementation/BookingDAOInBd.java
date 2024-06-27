@@ -7,10 +7,8 @@ import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +28,8 @@ public final class BookingDAOInBd implements BookingDAO {
         try (var connection = connectionManager.open()) {
             connection.setAutoCommit(false);
             try {
-                addBooking(connection, newBooking);
-                bookingSlots(connection, newBooking);
+                long bookingId = addBooking(connection, newBooking);
+                bookingSlots(connection, newBooking, bookingId);
                 connection.commit();
             } catch (SQLException e) {
                 try {
@@ -52,8 +50,10 @@ public final class BookingDAOInBd implements BookingDAO {
         }
     }
 
-    private static void addBooking(Connection connection, Booking newBooking) throws SQLException {
-        try (var addSpaceStatement = connection.prepareStatement(SQLRequest.ADD_BOOKING_SQL.getQuery())) {
+    private static long addBooking(Connection connection, Booking newBooking) throws SQLException {
+        try (var addSpaceStatement = connection.prepareStatement(
+                SQLRequest.ADD_BOOKING_SQL.getQuery(),
+                Statement.RETURN_GENERATED_KEYS)) {
             addSpaceStatement.setString(1, newBooking.loginOfUser());
             addSpaceStatement.setString(2, newBooking.nameOfBookingSpace());
             addSpaceStatement.setDate(3, Date.valueOf(newBooking.bookingRange().beginningBookingDate()));
@@ -61,27 +61,37 @@ public final class BookingDAOInBd implements BookingDAO {
             addSpaceStatement.setDate(5, Date.valueOf(newBooking.bookingRange().endingBookingDate()));
             addSpaceStatement.setInt(6, newBooking.bookingRange().endingBookingHour());
             addSpaceStatement.executeUpdate();
+
+            try (ResultSet generatedId = addSpaceStatement.getGeneratedKeys()) {
+                if (generatedId.next()) {
+                    return generatedId.getLong(1);
+                } else {
+                    throw new SQLException("Creating booking failed, no ID obtained.");
+                }
+            }
         }
     }
 
-    private static void bookingSlots(Connection connection, Booking newBooking) throws SQLException {
+    private static void bookingSlots(Connection connection, Booking newBooking, Long bookingId) throws SQLException {
         try (var updateSlotsStatement = connection.prepareStatement(SQLRequest.BOOK_SLOTS_SQL.getQuery())) {
-            newBooking.bookingRange().beginningBookingDate().datesUntil(newBooking.bookingRange().endingBookingDate().plusDays(1))
-                    .forEach(date -> {
-                        for (int hour = newBooking.bookingRange().beginningBookingHour();
-                             hour <= newBooking.bookingRange().endingBookingHour();
-                             hour++) {
-                            try {
-                                updateSlotsStatement.setLong(1, newBooking.id());
-                                updateSlotsStatement.setDate(2, Date.valueOf(date));
-                                updateSlotsStatement.setInt(3, hour);
-                                updateSlotsStatement.addBatch();
-                            } catch (SQLException e) {
-                                throw new DaoException("Failed to add slot to batch", e);
-                            }
-                        }
-                    });
+            LocalDate startDate = newBooking.bookingRange().beginningBookingDate();
+            LocalDate endDate = newBooking.bookingRange().endingBookingDate();
+            int startHour = newBooking.bookingRange().beginningBookingHour();
+            int endHour = newBooking.bookingRange().endingBookingHour();
 
+            for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+                for (int hour = startHour; hour <= endHour; hour++) {
+                    try {
+                        updateSlotsStatement.setLong(1, bookingId);
+                        updateSlotsStatement.setString(2, newBooking.nameOfBookingSpace());
+                        updateSlotsStatement.setDate(3, Date.valueOf(date));
+                        updateSlotsStatement.setInt(4, hour);
+                        updateSlotsStatement.addBatch();
+                    } catch (SQLException e) {
+                        throw new DaoException("Failed to add slot to batch", e);
+                    }
+                }
+            }
             updateSlotsStatement.executeBatch();
         }
     }
@@ -169,7 +179,7 @@ public final class BookingDAOInBd implements BookingDAO {
                 throw new DaoException("SQL error occurred", e);
             } finally {
                 try {
-                    connection.setAutoCommit(false);
+                    connection.setAutoCommit(true);
                 } catch (SQLException e) {
                     throw new DaoException("Failed to set autoCommit back to true", e);
                 }
@@ -192,7 +202,7 @@ public final class BookingDAOInBd implements BookingDAO {
         try (var statementUpdateSlots =
                      connection.prepareStatement(SQLRequest.UPDATE_SLOTS_SQL.getQuery())) {
             statementUpdateSlots.setLong(1, availableForBooking);
-            statementUpdateSlots.setLong(1, idOfBooking);
+            statementUpdateSlots.setLong(2, idOfBooking);
             statementUpdateSlots.executeUpdate();
         }
     }

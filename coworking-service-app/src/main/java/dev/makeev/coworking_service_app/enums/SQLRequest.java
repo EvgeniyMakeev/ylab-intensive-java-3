@@ -14,9 +14,9 @@ public enum SQLRequest {
 
     ADD_SLOTS_SQL("""
             INSERT INTO non_public.slots_for_booking \
-            (name_of_space, date, hour, available) VALUES (?,?,?,?)"""),
+            (name_of_space, date, hour, booking_id) VALUES (?,?,?,?)"""),
 
-    BOOK_SLOTS_SQL("UPDATE non_public.slots_for_booking SET booking_id=? WHERE date=?, hour=?"),
+    BOOK_SLOTS_SQL("UPDATE non_public.slots_for_booking SET booking_id=? WHERE name_of_space=? AND date=? AND hour=?"),
 
     UPDATE_SLOTS_SQL("UPDATE non_public.slots_for_booking SET booking_id=? WHERE booking_id=?"),
 
@@ -26,9 +26,9 @@ public enum SQLRequest {
 
     DELETE_SPACE_SQL("DELETE FROM non_public.spaces WHERE name=?"),
 
-    DELETE_BOOKING_FOR_SPACE_SQL("DELETE FROM non_public.bookings WHERE space_id=?"),
+    DELETE_BOOKING_FOR_SPACE_SQL("DELETE FROM non_public.bookings WHERE name_of_space=?"),
 
-    DELETE_SLOTS_FOR_SPACE_SQL("DELETE FROM non_public.slots_for_booking WHERE space_id=?"),
+    DELETE_SLOTS_FOR_SPACE_SQL("DELETE FROM non_public.slots_for_booking WHERE name_of_space=?"),
 
     ADD_BOOKING_SQL("""
             INSERT INTO non_public.bookings \

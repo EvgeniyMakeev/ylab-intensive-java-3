@@ -33,7 +33,7 @@ public final class SpaceService {
      * @param hourOfEndingWorkingDay the endingBookingHour hour of the working day
      * @param numberOfDaysAvailableForBooking the number of days available for booking
      */
-    public void addAndUpdateSpace(
+    public void addSpace(
             String nameOfSpace, int hourOfBeginningWorkingDay, int hourOfEndingWorkingDay, int numberOfDaysAvailableForBooking) {
         WorkingHours workingHours = new WorkingHours(hourOfBeginningWorkingDay, hourOfEndingWorkingDay);
         LocalDate nowDate = LocalDate.now();

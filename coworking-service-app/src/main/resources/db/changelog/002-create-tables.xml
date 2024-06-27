@@ -114,8 +114,6 @@
                     type="BIGINT"
                     defaultValue="0"
                     remarks="Flag indicating if the hour is available for booking">
-                <constraints foreignKeyName="fk_slots_for_booking_bookings_id_booking_id"
-                             references="non_public.bookings(id)" referencedTableSchemaName="non_public"/>
             </column>
         </createTable>
     </changeSet>

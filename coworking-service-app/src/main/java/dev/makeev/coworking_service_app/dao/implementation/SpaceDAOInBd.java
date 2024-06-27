@@ -166,7 +166,7 @@ public final class SpaceDAOInBd implements SpaceDAO {
                 throw new DaoException("SQL error occurred", e);
             } finally {
                 try {
-                    connection.setAutoCommit(false);
+                    connection.setAutoCommit(true);
                 } catch (SQLException e) {
                     throw new DaoException("Failed to set autoCommit back to true", e);
                 }

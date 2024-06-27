@@ -31,18 +31,17 @@ public class InitDb {
      * If the "non_public" schema does not exist, it creates it.
      */
     public void initDb() {
-        try (var connection = connectionManager.open()) {
-            String sql = "CREATE SCHEMA IF NOT EXISTS non_public";
-            var statement = connection.createStatement();
-            statement.executeUpdate(sql);
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
+        String defaultSchemaName = "non_public";
+        String liquibaseSchemaName = "liquibase";
+
+        createSchema(defaultSchemaName);
+        createSchema(liquibaseSchemaName);
 
         try (var connection = connectionManager.open()) {
             var database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(connection));
-            database.setDefaultSchemaName("non_public");
+            database.setDefaultSchemaName(defaultSchemaName);
+            database.setLiquibaseSchemaName(liquibaseSchemaName);
             var liquibase = new Liquibase("db/changelog/changelog.xml",
                     new ClassLoaderResourceAccessor(), database);
             liquibase.update();
@@ -51,23 +50,14 @@ public class InitDb {
             System.out.println("SQL Exception in migration " + e.getMessage());
         }
     }
-}
 
-//        spaceService.addAndUpdateSpace("Workplace No. 1", 8, 20, 20);
-//        spaceService.addAndUpdateSpace("Conference hall", 10, 18, 10);
-//
-//        bookingService.addBooking("User1", "Workplace No. 1",
-//                LocalDate.now(), 8, LocalDate.now().plusDays(2), 15);
-//        bookingService.addBooking("User1", "Workplace No. 1",
-//                LocalDate.now().plusDays(5), 10, LocalDate.now().plusDays(5), 18);
-//        bookingService.addBooking("User1", "Conference hall",
-//                LocalDate.now().plusDays(1), 11, LocalDate.now().plusDays(4), 15);
-//
-//        bookingService.addBooking("User2", "Workplace No. 1",
-//                LocalDate.now().plusDays(3), 11, LocalDate.now().plusDays(3), 14);
-//        bookingService.addBooking("User2", "Workplace No. 1",
-//                LocalDate.now().plusDays(11), 8, LocalDate.now().plusDays(13), 20);
-//        bookingService.addBooking("User2", "Conference hall",
-//                LocalDate.now().plusDays(8), 11, LocalDate.now().plusDays(12), 15);
-//    }
-//}
+    private void createSchema(String liquibaseSchemaName) {
+        try (var connection = connectionManager.open()) {
+            String sql = "CREATE SCHEMA IF NOT EXISTS " + liquibaseSchemaName;
+            var statement = connection.createStatement();
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+}

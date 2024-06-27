@@ -36,6 +36,5 @@
             <column name="hour_of_beginning_working_day" value="10"/>
             <column name="hour_of_ending_working_day" value="18"/>
         </insert>
-
     </changeSet>
 </databaseChangeLog>

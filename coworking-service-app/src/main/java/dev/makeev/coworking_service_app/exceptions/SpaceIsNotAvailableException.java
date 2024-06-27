@@ -14,6 +14,6 @@ public class SpaceIsNotAvailableException extends Exception {
     public String getMessage() {
         return """
                 The space is not available for booking on these dates and times.
-                "Please choose other dates and times.""";
+                Please choose other dates and times.""";
     }
 }

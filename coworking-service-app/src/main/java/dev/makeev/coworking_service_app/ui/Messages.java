@@ -135,7 +135,13 @@ public class Messages {
 
     public void deleteBookingMessage() {
         console.output("""
-                        Enter the booking number you want to cancel.
+                        Enter the number of booking you want to cancel.
+                        To cancel deleting, press 0.""");
+    }
+
+    public void chooseSpaceMessage() {
+        console.output("""
+                        Enter the number of space you want to cancel.
                         To cancel deleting, press 0.""");
     }
 

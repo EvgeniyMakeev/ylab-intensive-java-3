@@ -68,8 +68,7 @@ public final class BookingService {
      * @return true if the space is available, false otherwise
      */
     private Boolean isSpaceAvailableForBookingOnDateAndTime(Space bookingSpace, BookingRange bookingRange, WorkingHours workingHours) {
-
-        if (isValidDateAndTimeOfBooking(bookingSpace, bookingRange, workingHours)) {
+        if (!isValidDateAndTimeOfBooking(bookingSpace, bookingRange, workingHours)) {
             return false;
         }
 
@@ -81,7 +80,7 @@ public final class BookingService {
                     int endHour = (date.equals(bookingRange.endingBookingDate())) ?
                             bookingRange.endingBookingHour() : workingHours.hourOfEndingWorkingDay();
 
-                    return IntStream.range(startHour, endHour).mapToObj(slots::get).anyMatch(bookingId -> bookingId != 0L);
+                    return IntStream.range(startHour, endHour).allMatch(hour -> slots.getOrDefault(hour, 0L) == 0L);
                 });
     }
 
@@ -94,11 +93,13 @@ public final class BookingService {
      * @return true if the date and time are valid, false otherwise
      */
     private static boolean isValidDateAndTimeOfBooking(Space bookingSpace, BookingRange bookingRange, WorkingHours workingHours) {
-        return bookingRange.beginningBookingDate().isBefore(LocalDate.now()) &&
-                (!bookingSpace.bookingSlots().containsKey(bookingRange.beginningBookingDate())) ||
-                        !bookingSpace.bookingSlots().containsKey(bookingRange.endingBookingDate()) &&
-                (bookingRange.beginningBookingHour() < workingHours.hourOfBeginningWorkingDay() ||
-                        bookingRange.endingBookingHour() > workingHours.hourOfEndingWorkingDay());
+        if (bookingRange.beginningBookingDate().isBefore(LocalDate.now())) {
+            return false;
+        } else if (bookingRange.beginningBookingHour() < workingHours.hourOfBeginningWorkingDay() ||
+                bookingRange.endingBookingHour() > workingHours.hourOfEndingWorkingDay()) {
+            return false;
+        } else return bookingSpace.bookingSlots().containsKey(bookingRange.beginningBookingDate()) &&
+                bookingSpace.bookingSlots().containsKey(bookingRange.endingBookingDate());
     }
 
     /**

@@ -100,7 +100,7 @@ public final class AppUi {
         console.showUserMenu();
         switch (input.getInt(0, 6)) {
             case 1 -> console.printSpaces(spaceService.getSpaces());
-            case 2 -> showAvailableSlotsMenu();
+            case 2 -> showAvailableSlots();
             case 3 -> makeBooking();
             case 4 -> console.printBookings(bookingService.getAllBookingsForUser(loginOfCurrentUser));
             case 5 -> bookingCancellation();
@@ -109,57 +109,59 @@ public final class AppUi {
         }
     }
 
-    private void showAvailableSlotsMenu() {
-        try {
-            showAvailableSlots();
-        } catch (NoSlotsException e) {
-            console.print(e.getMessage());
-        }
-    }
-
     /**
      * Displays the available slots for booking.
      */
-    private void showAvailableSlots() throws NoSlotsException {
+    private void showAvailableSlots() {
+        int numberOfSpace = getNumberOfSpace();
+        if (numberOfSpace != 0) {
+            nameOfCurrentSpace = spaceService.getSpaces().get(numberOfSpace - 1);
+            console.printAvailableSlotsForBooking(spaceService.getSpaceByName(nameOfCurrentSpace).orElseThrow());
+        }
+    }
+
+    private int getNumberOfSpace() {
         List<String> nameOfSpace = spaceService.getSpaces();
         if (nameOfSpace.isEmpty()) {
-            throw new NoSlotsException();
+            try {
+                throw new NoSlotsException();
+            } catch (NoSlotsException e) {
+                console.print(e.getMessage());
+            }
         }
         console.printSpaces(nameOfSpace);
-        console.print("Choose space from list.");
-        nameOfCurrentSpace = spaceService.getSpaces().get(input.getInt(0, nameOfSpace.size()) - 1);
-        console.printAvailableSlotsForBooking(spaceService.getSpaceByName(nameOfCurrentSpace).orElseThrow());
+        console.chooseSpaceMessage();
+        return input.getInt(0, nameOfSpace.size());
     }
 
     /**
      * Handles the process of making a booking.
      */
     private void makeBooking() {
-        try {
-            showAvailableSlots();
-        } catch (NoSlotsException e) {
-            console.print(e.getMessage());
-            return;
-        }
+        int numberOfSpace = getNumberOfSpace();
+        if (numberOfSpace != 0) {
+            nameOfCurrentSpace = spaceService.getSpaces().get(numberOfSpace - 1);
+            console.printAvailableSlotsForBooking(spaceService.getSpaceByName(nameOfCurrentSpace).orElseThrow());
 
-        console.print("Book space from date:");
-        LocalDate dateBookingFrom = getDate();
-        console.print("and hour:");
-        int hourBookingFrom = input.getInt(0, 24);
+            console.print("Book space from date:");
+            LocalDate dateBookingFrom = getDate();
+            console.print("and hour:");
+            int hourBookingFrom = input.getInt(0, 24);
 
-        console.print("Book space to:");
-        LocalDate dateBookingTo = getDate();
-        console.print("and hour:");
-        int hourBookingTo = input.getInt(0, 24);
+            console.print("Book space to:");
+            LocalDate dateBookingTo = getDate();
+            console.print("and hour:");
+            int hourBookingTo = input.getInt(0, 24);
 
-        try {
-            bookingService.addBooking(loginOfCurrentUser, nameOfCurrentSpace,
-                    dateBookingFrom, hourBookingFrom,
-                    dateBookingTo, hourBookingTo);
-            console.successfulBooking(nameOfCurrentSpace, dateBookingFrom, dateBookingTo,
-                    hourBookingFrom, hourBookingTo);
-        } catch (SpaceIsNotAvailableException e) {
-            console.print(e.getMessage());
+            try {
+                bookingService.addBooking(loginOfCurrentUser, nameOfCurrentSpace,
+                        dateBookingFrom, hourBookingFrom,
+                        dateBookingTo, hourBookingTo);
+                console.successfulBooking(nameOfCurrentSpace, dateBookingFrom, dateBookingTo,
+                        hourBookingFrom, hourBookingTo);
+            } catch (SpaceIsNotAvailableException e) {
+                console.print(e.getMessage());
+            }
         }
     }
 
@@ -207,7 +209,7 @@ public final class AppUi {
         console.printSpaces(namesOfSpaces);
         console.selectionActionWithSpaces();
         switch (input.getInt(0, 3)) {
-            case 1 -> showAvailableSlotsMenu();
+            case 1 -> showAvailableSlots();
             case 2 -> addNewSpace();
             case 3 -> deleteSpace(namesOfSpaces);
             case 0 -> adminMenu();
@@ -236,7 +238,7 @@ public final class AppUi {
         console.print("Enter the number of days available for booking:");
         int numberOfDaysAvailableForBooking = input.getInt(0, Integer.MAX_VALUE);
 
-        spaceService.addAndUpdateSpace(nameOfSpace, hourOfStartWorkingDay, hourOfEndWorkingDay, numberOfDaysAvailableForBooking);
+        spaceService.addSpace(nameOfSpace, hourOfStartWorkingDay, hourOfEndWorkingDay, numberOfDaysAvailableForBooking);
         console.print(nameOfSpace + " added.");
     }
 

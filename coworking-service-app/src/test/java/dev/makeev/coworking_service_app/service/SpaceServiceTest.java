@@ -37,7 +37,7 @@ class SpaceServiceTest {
     @Test
     @DisplayName("SpaceService test: Add and Update Space - Should add or update space successfully")
     void addAndUpdateSpace_shouldAddOrUpdateSpace() {
-        spaceService.addAndUpdateSpace(TEST_SPACE, 8, 10, 5);
+        spaceService.addSpace(TEST_SPACE, 8, 10, 5);
 
         verify(spaceDAO, times(1)).add(any(Space.class));
     }
