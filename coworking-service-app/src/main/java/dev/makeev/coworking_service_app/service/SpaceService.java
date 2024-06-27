@@ -8,39 +8,48 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service class for managing coworking spaces.
  */
-public class SpaceService {
+public final class SpaceService {
 
     private final SpaceDAO spaceDAO;
-    private final BookingService bookingService;
-
     /**
      * Constructs a new SpaceService.
      *
      * @param spaceDAO the SpaceDAO to use for space operations
-     * @param bookingService the BookingService to use for booking operations
      */
-    public SpaceService(SpaceDAO spaceDAO, BookingService bookingService) {
+    public SpaceService(SpaceDAO spaceDAO) {
         this.spaceDAO = spaceDAO;
-        this.bookingService = bookingService;
     }
 
     /**
      * Adds a new space or updates an existing space.
      *
      * @param nameOfSpace the name of the space
-     * @param hourOfStartWorkingDay the start hour of the working day
-     * @param hourOfEndWorkingDay the end hour of the working day
+     * @param hourOfBeginningWorkingDay the start hour of the working day
+     * @param hourOfEndingWorkingDay the endingBookingHour hour of the working day
      * @param numberOfDaysAvailableForBooking the number of days available for booking
      */
     public void addAndUpdateSpace(
-            String nameOfSpace, int hourOfStartWorkingDay, int hourOfEndWorkingDay, int numberOfDaysAvailableForBooking) {
-        WorkingHours workingHours = new WorkingHours(hourOfStartWorkingDay, hourOfEndWorkingDay);
-        spaceDAO.add(new Space(nameOfSpace, workingHours, initFreeSlotsForBooking(
-                workingHours, numberOfDaysAvailableForBooking)));
+            String nameOfSpace, int hourOfBeginningWorkingDay, int hourOfEndingWorkingDay, int numberOfDaysAvailableForBooking) {
+        WorkingHours workingHours = new WorkingHours(hourOfBeginningWorkingDay, hourOfEndingWorkingDay);
+        LocalDate nowDate = LocalDate.now();
+        Map<LocalDate, Map<Integer, Long>> bookingSlots = new HashMap<>();
+
+        Map<Integer, Long> slots = new HashMap<>();
+        long freeSlot = 0L;
+        for (int i = hourOfBeginningWorkingDay; i < hourOfEndingWorkingDay; i++) {
+            slots.put(i, freeSlot);
+        }
+
+        for (int i = 0; i < numberOfDaysAvailableForBooking; i++) {
+            bookingSlots.put(nowDate.plusDays(i), slots);
+        }
+
+        spaceDAO.add(new Space(nameOfSpace, workingHours, bookingSlots));
     }
 
     /**
@@ -48,8 +57,13 @@ public class SpaceService {
      *
      * @return a list of all spaces
      */
-    public List<Space> getSpaces() {
-        return spaceDAO.getSpaces();
+    public List<String> getSpaces() {
+        return spaceDAO.getNamesOfSpaces();
+    }
+
+
+    public Optional<Space> getSpaceByName(String nameOfCurrentSpace) {
+        return spaceDAO.getSpaceByName(nameOfCurrentSpace);
     }
 
     /**
@@ -58,28 +72,6 @@ public class SpaceService {
      * @param nameOfSpace the name of the space to delete
      */
     public void deleteSpace(String nameOfSpace) {
-        bookingService.deleteBookingsBySpace(nameOfSpace);
         spaceDAO.delete(nameOfSpace);
-    }
-
-    /**
-     * Initializes free slots for booking for a given number of days and working hours.
-     *
-     * @param workingHours the working hours of the space
-     * @param numberOfDaysAvailableForBooking the number of days available for booking
-     * @return a map of booking slots initialized to free
-     */
-    static Map<LocalDate, Map<Integer, Boolean>> initFreeSlotsForBooking(
-            WorkingHours workingHours, int numberOfDaysAvailableForBooking) {
-        Map<LocalDate, Map<Integer, Boolean>> bookingSlots = new HashMap<>();
-        LocalDate nowDate = LocalDate.now();
-        for (int i = 0; i < numberOfDaysAvailableForBooking; i++) {
-            Map<Integer, Boolean> availableHours = new HashMap<>();
-            for (int j = 0; j < workingHours.hourOfEndWorkingDay() - workingHours.hourOfStartWorkingDay(); j++) {
-                availableHours.put(workingHours.hourOfStartWorkingDay() + j, true);
-            }
-            bookingSlots.put(nowDate.plusDays(i), availableHours);
-        }
-        return bookingSlots;
     }
 }

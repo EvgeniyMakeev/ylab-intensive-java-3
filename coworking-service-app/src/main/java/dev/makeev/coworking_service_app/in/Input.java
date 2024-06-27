@@ -21,13 +21,6 @@ public interface Input {
     String getString();
 
     /**
-     * Reads and returns a double input from the user.
-     *
-     * @return The double input from the user.
-     */
-    Double getDouble();
-
-    /**
      * Reads and returns an integer input from the user within the specified length and range.
      *
      * @param maxLength The maximum length of the input.

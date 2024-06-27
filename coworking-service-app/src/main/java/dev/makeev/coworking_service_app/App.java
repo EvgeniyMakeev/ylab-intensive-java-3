@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app;
 
-import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
 import dev.makeev.coworking_service_app.ui.AppUi;
 
 /**
@@ -14,9 +13,8 @@ public class App {
      * @param args command-line arguments
      */
     public static void main(String[] args) {
-        try {
-            new AppUi().run();
-        } catch (SpaceIsNotAvailableException ignored) {
-        }
+        AppUi application = new AppUi();
+        application.initDb();
+        application.run();
     }
 }

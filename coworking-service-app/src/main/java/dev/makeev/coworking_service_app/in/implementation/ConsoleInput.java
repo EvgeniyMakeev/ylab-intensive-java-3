@@ -1,4 +1,4 @@
-package dev.makeev.coworking_service_app.in.impl;
+package dev.makeev.coworking_service_app.in.implementation;
 
 import dev.makeev.coworking_service_app.in.Input;
 
@@ -32,7 +32,7 @@ public class ConsoleInput implements Input {
                     && Integer.parseInt(optionString) >= minValue;
 
             if (isValid) {
-                option = Integer.parseInt(optionString);
+                option = Byte.parseByte(optionString);
             } else {
                 System.out.printf("Enter only digits %d - %d\n", minValue, maxValue);
             }
@@ -46,28 +46,6 @@ public class ConsoleInput implements Input {
     @Override
     public String getString() {
         return input.nextLine();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    @Override
-    public Double getDouble() {
-        String str = "";
-        double result = -1;
-        boolean scan = true;
-        while (scan) {
-            str = input.nextLine();
-            if (str.matches("^\\d+(\\.\\d+)?$") && !str.isEmpty()) {
-                result = Double.parseDouble(str);
-            } else {
-                System.out.println("You can only enter a positive number");
-            }
-            if (result >= 0) {
-                scan = false;
-            }
-        }
-        return result;
     }
 
     /**

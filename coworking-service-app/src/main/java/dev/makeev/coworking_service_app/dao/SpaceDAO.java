@@ -3,6 +3,7 @@ package dev.makeev.coworking_service_app.dao;
 import dev.makeev.coworking_service_app.model.Space;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -21,7 +22,7 @@ public interface SpaceDAO {
      *
      * @return a list of all spaces
      */
-    List<Space> getSpaces();
+    List<String> getNamesOfSpaces();
 
     /**
      * Retrieves a space by its name.
@@ -29,7 +30,7 @@ public interface SpaceDAO {
      * @param nameOfSpace the name of the space
      * @return the space with the specified name
      */
-    Space getSpaceByName(String nameOfSpace);
+    Optional<Space> getSpaceByName(String nameOfSpace);
 
     /**
      * Deletes a space by its name.

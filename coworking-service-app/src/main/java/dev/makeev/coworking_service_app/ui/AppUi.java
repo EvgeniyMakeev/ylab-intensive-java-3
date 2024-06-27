@@ -2,50 +2,54 @@ package dev.makeev.coworking_service_app.ui;
 
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.dao.UserDAO;
-import dev.makeev.coworking_service_app.dao.impl.BookingDAOInMemory;
-import dev.makeev.coworking_service_app.dao.impl.SpaceDAOInMemory;
-import dev.makeev.coworking_service_app.dao.impl.UserDAOInMemory;
+import dev.makeev.coworking_service_app.dao.implementation.BookingDAOInBd;
+import dev.makeev.coworking_service_app.dao.implementation.SpaceDAOInBd;
+import dev.makeev.coworking_service_app.dao.implementation.UserDAOInBd;
+import dev.makeev.coworking_service_app.exceptions.NoSlotsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
-import dev.makeev.coworking_service_app.in.impl.ConsoleInput;
 import dev.makeev.coworking_service_app.in.Input;
-import dev.makeev.coworking_service_app.model.Space;
-import dev.makeev.coworking_service_app.out.impl.ConsoleOutput;
+import dev.makeev.coworking_service_app.in.implementation.ConsoleInput;
+import dev.makeev.coworking_service_app.out.implementation.ConsoleOutput;
 import dev.makeev.coworking_service_app.service.BookingService;
 import dev.makeev.coworking_service_app.service.SpaceService;
 import dev.makeev.coworking_service_app.service.UserService;
+import dev.makeev.coworking_service_app.util.ConnectionManager;
+import dev.makeev.coworking_service_app.util.ConnectionManagerImpl;
 import dev.makeev.coworking_service_app.util.InitDb;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * The main user interface class for the coworking service application.
  */
 public final class AppUi {
 
-    private final UserDAO userDAO = new UserDAOInMemory();
+    private final ConnectionManager connectionManager = new ConnectionManagerImpl();
+    private final InitDb initDB = new InitDb(connectionManager);
+    private final UserDAO userDAO = new UserDAOInBd(connectionManager);
     private final UserService userService = new UserService(userDAO);
-    private final SpaceDAO spaceDAO = new SpaceDAOInMemory();
-    private final BookingService bookingService = new BookingService(new BookingDAOInMemory(), spaceDAO);
-    private final SpaceService spaceService = new SpaceService(spaceDAO, bookingService);
-    private final InitDb initDb = new InitDb(userDAO, spaceService, bookingService);
-
+    private final SpaceDAO spaceDAO = new SpaceDAOInBd(connectionManager);
+    private final BookingService bookingService = new BookingService(new BookingDAOInBd(connectionManager), spaceDAO);
+    private final SpaceService spaceService = new SpaceService(spaceDAO);
     private final Input input = new ConsoleInput();
     private final Messages console = new Messages(new ConsoleOutput());
-    private String loginOfCurrentUser = "login failed";
 
-    private Optional<Space> currentSpace = Optional.empty();
+    private String loginOfCurrentUser = "login failed";
+    private String nameOfCurrentSpace = "none";
+
+    /**
+     * Initializes the database.
+     */
+    public void initDb(){
+        initDB.initDb();
+    }
 
     /**
      * Runs the application user interface.
-     *
-     * @throws SpaceIsNotAvailableException if the space is not available for booking
      */
-    public void run() throws SpaceIsNotAvailableException {
-        initDb.initDb();
-
+    public void run() {
         while (true) {
             loginMenu();
             while (!loginOfCurrentUser.equals("login failed")) {
@@ -96,7 +100,7 @@ public final class AppUi {
         console.showUserMenu();
         switch (input.getInt(0, 6)) {
             case 1 -> console.printSpaces(spaceService.getSpaces());
-            case 2 -> showAvailableSlots();
+            case 2 -> showAvailableSlotsMenu();
             case 3 -> makeBooking();
             case 4 -> console.printBookings(bookingService.getAllBookingsForUser(loginOfCurrentUser));
             case 5 -> bookingCancellation();
@@ -105,22 +109,38 @@ public final class AppUi {
         }
     }
 
+    private void showAvailableSlotsMenu() {
+        try {
+            showAvailableSlots();
+        } catch (NoSlotsException e) {
+            console.print(e.getMessage());
+        }
+    }
+
     /**
      * Displays the available slots for booking.
      */
-    private void showAvailableSlots() {
-        List<Space> spaces = spaceService.getSpaces();
-        console.printSpaces(spaces);
+    private void showAvailableSlots() throws NoSlotsException {
+        List<String> nameOfSpace = spaceService.getSpaces();
+        if (nameOfSpace.isEmpty()) {
+            throw new NoSlotsException();
+        }
+        console.printSpaces(nameOfSpace);
         console.print("Choose space from list.");
-        currentSpace = Optional.ofNullable(spaceService.getSpaces().get(input.getInt(0, spaces.size()) - 1));
-        console.printAvailableSlotsForBooking(currentSpace.orElseThrow());
+        nameOfCurrentSpace = spaceService.getSpaces().get(input.getInt(0, nameOfSpace.size()) - 1);
+        console.printAvailableSlotsForBooking(spaceService.getSpaceByName(nameOfCurrentSpace).orElseThrow());
     }
 
     /**
      * Handles the process of making a booking.
      */
     private void makeBooking() {
-        showAvailableSlots();
+        try {
+            showAvailableSlots();
+        } catch (NoSlotsException e) {
+            console.print(e.getMessage());
+            return;
+        }
 
         console.print("Book space from date:");
         LocalDate dateBookingFrom = getDate();
@@ -133,10 +153,10 @@ public final class AppUi {
         int hourBookingTo = input.getInt(0, 24);
 
         try {
-            bookingService.addBooking(loginOfCurrentUser, currentSpace.orElseThrow().name(),
+            bookingService.addBooking(loginOfCurrentUser, nameOfCurrentSpace,
                     dateBookingFrom, hourBookingFrom,
                     dateBookingTo, hourBookingTo);
-            console.successfulBooking(currentSpace.orElseThrow().name(), dateBookingFrom, dateBookingTo,
+            console.successfulBooking(nameOfCurrentSpace, dateBookingFrom, dateBookingTo,
                     hourBookingFrom, hourBookingTo);
         } catch (SpaceIsNotAvailableException e) {
             console.print(e.getMessage());
@@ -147,9 +167,10 @@ public final class AppUi {
      * Handles the process of booking cancellation.
      */
     private void bookingCancellation() {
-        console.printBookings(bookingService.getAllBookingsForUser(loginOfCurrentUser));
+        List<String> bookingList = bookingService.getAllBookingsForUser(loginOfCurrentUser);
+        console.printBookings(bookingList);
         console.deleteBookingMessage();
-        int numberOfBookingForDelete = input.getInt(0, bookingService.getAllBookingsForUser(loginOfCurrentUser).size());
+        int numberOfBookingForDelete = input.getInt(0, bookingList.size());
         if (numberOfBookingForDelete != 0) {
             bookingService.deleteBookingByIndex(loginOfCurrentUser,
                     numberOfBookingForDelete - 1);
@@ -182,13 +203,13 @@ public final class AppUi {
      * Displays the spaces menu and handles space-related actions.
      */
     private void spacesMenu() {
-        List<Space> spaces = spaceService.getSpaces();
-        console.printSpaces(spaces);
+        List<String> namesOfSpaces = spaceService.getSpaces();
+        console.printSpaces(namesOfSpaces);
         console.selectionActionWithSpaces();
         switch (input.getInt(0, 3)) {
-            case 1 -> showAvailableSlots();
+            case 1 -> showAvailableSlotsMenu();
             case 2 -> addNewSpace();
-            case 3 -> deleteSpace(spaces);
+            case 3 -> deleteSpace(namesOfSpaces);
             case 0 -> adminMenu();
         }
     }
@@ -222,14 +243,14 @@ public final class AppUi {
     /**
      * Handles the process of deleting a space.
      *
-     * @param spaces the list of spaces
+     * @param namesOfSpaces the list of names of spaces
      */
-    private void deleteSpace(List<Space> spaces) {
-        console.printSpaces(spaces);
+    private void deleteSpace(List<String> namesOfSpaces) {
+        console.printSpaces(namesOfSpaces);
         console.deleteSpaceMessage();
-        int numberOfSpaceForDelete = input.getInt(0, spaces.size());
+        int numberOfSpaceForDelete = input.getInt(0, namesOfSpaces.size());
         if (numberOfSpaceForDelete != 0) {
-            String nameOfSpaceForDelete = spaces.get(numberOfSpaceForDelete - 1).name();
+            String nameOfSpaceForDelete = namesOfSpaces.get(numberOfSpaceForDelete - 1);
             spaceService.deleteSpace(nameOfSpaceForDelete);
             console.print(nameOfSpaceForDelete + " has been cancelled.");
         }

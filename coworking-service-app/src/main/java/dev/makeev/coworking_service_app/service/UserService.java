@@ -10,7 +10,7 @@ import java.util.Optional;
  * It encapsulates the business logic related to user management, such as adding users,
  * verifying credentials, and checking user roles.
  */
-public class UserService {
+public final class UserService {
 
     /**
      * The UserDAO instance for managing user data.
@@ -64,6 +64,6 @@ public class UserService {
      * @return {@code true} if the user is an admin, {@code false} otherwise.
      */
     public boolean isAdmin(String login){
-        return userDAO.getByLogin(login).get().isAdmin();
+        return userDAO.getByLogin(login).isPresent() ? userDAO.getByLogin(login).get().isAdmin() : false;
     }
 }

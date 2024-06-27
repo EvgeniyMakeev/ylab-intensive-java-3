@@ -2,7 +2,6 @@ package dev.makeev.coworking_service_app.service;
 
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.model.Space;
-import dev.makeev.coworking_service_app.model.WorkingHours;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,15 +9,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,11 +23,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SpaceServiceTest {
 
-    @Mock
-    private SpaceDAO spaceDAO;
+    public static final String TEST_SPACE = "TestSpace";
 
     @Mock
-    private BookingService bookingService;
+    private SpaceDAO spaceDAO;
 
     @InjectMocks
     private SpaceService spaceService;
@@ -42,43 +37,41 @@ class SpaceServiceTest {
     @Test
     @DisplayName("SpaceService test: Add and Update Space - Should add or update space successfully")
     void addAndUpdateSpace_shouldAddOrUpdateSpace() {
-        spaceService.addAndUpdateSpace("TestSpace", 8, 10, 5);
+        spaceService.addAndUpdateSpace(TEST_SPACE, 8, 10, 5);
 
         verify(spaceDAO, times(1)).add(any(Space.class));
     }
 
     @Test
-    @DisplayName("SpaceService test: Get Spaces - Should return all spaces")
-    void getSpaces_shouldReturnAllSpaces() {
-        List<Space> spaces = List.of(mockSpace);
-        when(spaceDAO.getSpaces()).thenReturn(spaces);
+    @DisplayName("SpaceService test: Get Spaces - Should return all spaces name")
+    void getNamesOfSpaces_shouldReturnAllNamesOfSpaces() {
+        List<String> spaces = List.of(mockSpace.toString());
+        when(spaceDAO.getNamesOfSpaces()).thenReturn(spaces);
 
-        List<Space> result = spaceService.getSpaces();
+        List<String> result = spaceService.getSpaces();
 
         assertThat(result).isNotEmpty();
         assertThat(result).isEqualTo(spaces);
+        verify(spaceDAO, times(1)).getNamesOfSpaces();
     }
 
     @Test
-    @DisplayName("SpaceService test: Delete Space - Should delete space and its bookings")
-    void deleteSpace_shouldDeleteSpaceAndBookings() {
-        doNothing().when(bookingService).deleteBookingsBySpace(anyString());
+    @DisplayName("SpaceService test: Get Space by name - Should return space")
+    void getSpaceByName_shouldReturnSpaceByName() {
+        when(spaceDAO.getSpaceByName(TEST_SPACE)).thenReturn(Optional.of(mockSpace));
 
-        spaceService.deleteSpace("TestSpace");
+        Optional<Space> resultSpace = spaceDAO.getSpaceByName(TEST_SPACE);
 
-        verify(bookingService, times(1)).deleteBookingsBySpace("TestSpace");
-        verify(spaceDAO, times(1)).delete("TestSpace");
+        assertTrue(resultSpace.isPresent());
+        assertThat(resultSpace).isEqualTo(Optional.of(mockSpace));
+        verify(spaceDAO, times(1)).getSpaceByName(any(String.class));
     }
 
     @Test
-    @DisplayName("SpaceService test: Initialize Free Slots for Booking - Should initialize free slots correctly")
-    void initFreeSlotsForBooking_shouldInitializeFreeSlotsCorrectly() {
-        WorkingHours workingHours = new WorkingHours(8, 10);
-        int numberOfDays = 5;
+    @DisplayName("SpaceService test: Delete Space - Should delete space successfully")
+    void deleteSpace_shouldDeleteSpace() {
+        spaceService.deleteSpace(TEST_SPACE);
 
-        Map<LocalDate, Map<Integer, Boolean>> result = SpaceService.initFreeSlotsForBooking(workingHours, numberOfDays);
-
-        assertThat(result).hasSize(numberOfDays);
-        assertTrue(result.get(LocalDate.now()).get(8));
+        verify(spaceDAO, times(1)).delete(any(String.class));
     }
 }

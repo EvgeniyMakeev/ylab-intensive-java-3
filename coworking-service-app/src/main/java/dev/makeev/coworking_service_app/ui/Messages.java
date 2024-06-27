@@ -4,6 +4,7 @@ import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.out.Output;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -80,15 +81,15 @@ public class Messages {
         console.output("Please enter day (2 digits):");
     }
 
-    public void printSpaces(List<Space> spaces) {
+    public void printSpaces(List<String> namesOfSpaces) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Available spaces:");
         int numberOfSpace = 1;
-        for (Space space : spaces) {
+        for (String nameOfSpace : namesOfSpaces) {
             stringBuilder.append("\n")
                     .append(numberOfSpace)
                     .append(". ")
-                    .append(space.name());
+                    .append(nameOfSpace);
             numberOfSpace++;
         }
         console.output(stringBuilder.toString());
@@ -98,6 +99,7 @@ public class Messages {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(space.name())
                 .append(" - available slots for booking:");
+        long freeSlot = 0L;
         space.bookingSlots().entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(dateEntry -> {
@@ -105,10 +107,10 @@ public class Messages {
                             .append(dateEntry.getKey())
                             .append("\n");
 
-                    dateEntry.getValue().entrySet().stream()
-                            .filter(Map.Entry::getValue)
-                            .sorted(Map.Entry.comparingByKey())
-                            .forEachOrdered(timeEntry -> stringBuilder.append(timeFormatter(timeEntry.getKey()))
+                    dateEntry.getValue().keySet().stream()
+                            .filter(integer -> dateEntry.getValue().get(integer) == freeSlot)
+                            .sorted(Comparator.comparingInt(Integer::intValue))
+                            .forEachOrdered(hour -> stringBuilder.append(timeFormatter(hour))
                                     .append(" | "));
                 });
 
@@ -162,6 +164,6 @@ public class Messages {
     }
 
     public void errorWhenEnteringHours() {
-        console.output("The end time of the working day cannot be less than the beginning of the working day.");
+        console.output("The endingBookingHour time of the working day cannot be less than the beginning of the working day.");
     }
 }

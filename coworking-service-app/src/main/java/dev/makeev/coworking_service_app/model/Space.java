@@ -12,5 +12,5 @@ import java.util.Map;
  */
 public record Space(String name,
                     WorkingHours workingHours,
-                    Map<LocalDate, Map<Integer, Boolean>> bookingSlots) {
+                    Map<LocalDate, Map<Integer, Long>> bookingSlots) {
 }

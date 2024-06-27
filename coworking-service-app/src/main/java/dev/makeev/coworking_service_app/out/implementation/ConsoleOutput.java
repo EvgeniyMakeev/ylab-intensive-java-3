@@ -1,4 +1,4 @@
-package dev.makeev.coworking_service_app.out.impl;
+package dev.makeev.coworking_service_app.out.implementation;
 
 import dev.makeev.coworking_service_app.out.Output;
 

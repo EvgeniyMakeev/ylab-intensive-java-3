@@ -1,0 +1,18 @@
+version: '3.9'
+
+volumes:
+  postgres_coworking_service_db:
+
+services:
+  postgres_coworking_service_db:
+    container_name: postgres_db_for_coworking_service_app
+    image: postgres:16.2
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=user
+      - POSTGRES_DB=coworking_service_db
+    volumes:
+      - postgres_coworking_service_db:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT:-55432}:5432

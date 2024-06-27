@@ -1,4 +1,4 @@
-package dev.makeev.coworking_service_app.in.impl;
+package dev.makeev.coworking_service_app.in.implementation;
 
 import dev.makeev.coworking_service_app.in.Input;
 import org.junit.jupiter.api.DisplayName;
@@ -39,19 +39,6 @@ public class ConsoleInputTest {
         String result = input.getString();
 
         assertThat(result).isEqualTo("Hello");
-    }
-
-    @Test
-    @DisplayName("ConsoleInput test: Get double from console - Should get double")
-    void getDouble_validInput_returnsDouble() {
-        String inputString = "3.14\n";
-        InputStream in = new ByteArrayInputStream(inputString.getBytes());
-        System.setIn(in);
-        Input input = new ConsoleInput();
-
-        double result = input.getDouble();
-
-        assertThat(result).isEqualTo(3.14);
     }
 
     @Test
