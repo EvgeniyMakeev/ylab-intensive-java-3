@@ -1,4 +1,6 @@
-package dev.makeev.coworking_service_app.util;
+package dev.makeev.coworking_service_app.util.implementation;
+
+import dev.makeev.coworking_service_app.util.ConnectionManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +49,9 @@ public class ConnectionManagerImpl implements ConnectionManager {
         this.password = password;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     @Override
     public Connection open() {
         try {

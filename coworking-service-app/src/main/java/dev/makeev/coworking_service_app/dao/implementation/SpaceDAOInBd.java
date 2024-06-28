@@ -20,7 +20,8 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
- * An in-memory implementation of the {@link SpaceDAO} interface.
+ * The {@code SpaceDAOInBd} class implements the {@link SpaceDAO} interface.
+ * It provides methods to interact with the database to manage Space entities.
  */
 public final class SpaceDAOInBd implements SpaceDAO {
 
@@ -60,6 +61,13 @@ public final class SpaceDAOInBd implements SpaceDAO {
         }
     }
 
+    /**
+     * Adds a new space to the database.
+     *
+     * @param newSpace the new space to add
+     * @param connection the database connection
+     * @throws SQLException if a database access error occurs
+     */
     private static void addSpace(Space newSpace, Connection connection) throws SQLException {
         try (var addSpaceStatement = connection.prepareStatement(SQLRequest.ADD_SPACE_SQL.getQuery())) {
             addSpaceStatement.setString(1, newSpace.name());
@@ -69,6 +77,13 @@ public final class SpaceDAOInBd implements SpaceDAO {
         }
     }
 
+    /**
+     * Adds booking slots for a new space to the database.
+     *
+     * @param newSpace the new space
+     * @param connection the database connection
+     * @throws SQLException if a database access error occurs
+     */
     private static void addSlots(Space newSpace, Connection connection) throws SQLException {
         try (var addSlotsForBookingStatement = connection.prepareStatement(SQLRequest.ADD_SLOTS_SQL.getQuery())) {
             newSpace.bookingSlots().forEach((date, bookingSlots) -> IntStream.range(newSpace.workingHours().hourOfBeginningWorkingDay(),
@@ -176,6 +191,14 @@ public final class SpaceDAOInBd implements SpaceDAO {
         }
     }
 
+    /**
+     * Deletes an entity by name using a specified SQL request.
+     *
+     * @param connection the database connection
+     * @param deleteBookingForSpaceSql the SQL request to delete the entity
+     * @param nameOfSpace the name of the entity to delete
+     * @throws SQLException if a database access error occurs
+     */
     private static void deleteByName(Connection connection, SQLRequest deleteBookingForSpaceSql, String nameOfSpace) throws SQLException {
         try (var statement = connection.prepareStatement(deleteBookingForSpaceSql.getQuery())) {
             statement.setString(1, nameOfSpace);

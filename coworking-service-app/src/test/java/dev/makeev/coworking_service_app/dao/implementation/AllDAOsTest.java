@@ -9,7 +9,7 @@ import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.User;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
-import dev.makeev.coworking_service_app.util.ConnectionManagerImpl;
+import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
 import dev.makeev.coworking_service_app.util.InitDb;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

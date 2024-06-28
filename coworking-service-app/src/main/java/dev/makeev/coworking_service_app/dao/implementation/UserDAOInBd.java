@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 /**
- * The {@code UserDAOImpl} class implements the {@link UserDAO} interface.
+ * The {@code UserDAOInBd} class implements the {@link UserDAO} interface.
  * It provides methods to interact with the database to manage User entities.
  */
 public final class UserDAOInBd implements UserDAO {
@@ -22,6 +22,9 @@ public final class UserDAOInBd implements UserDAO {
         this.connectionManager = connectionManager;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     @Override
     public void add(User newUser) {
         try (var connection = connectionManager.open();
@@ -35,6 +38,9 @@ public final class UserDAOInBd implements UserDAO {
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     @Override
     public Optional<User> getByLogin(String login) {
         try (var connection = connectionManager.open();

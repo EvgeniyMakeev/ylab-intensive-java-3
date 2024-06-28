@@ -51,9 +51,15 @@ public class InitDb {
         }
     }
 
-    private void createSchema(String liquibaseSchemaName) {
+    /**
+     * Creates the specified schema in the database if it does not already exist.
+     *
+     * @param schemaName The name of the schema to create.
+     * @throws DaoException if a SQL error occurs while creating the schema.
+     */
+    private void createSchema(String schemaName) {
         try (var connection = connectionManager.open()) {
-            String sql = "CREATE SCHEMA IF NOT EXISTS " + liquibaseSchemaName;
+            String sql = "CREATE SCHEMA IF NOT EXISTS " + schemaName;
             var statement = connection.createStatement();
             statement.executeUpdate(sql);
         } catch (SQLException e) {

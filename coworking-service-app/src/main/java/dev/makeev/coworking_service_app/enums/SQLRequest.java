@@ -1,5 +1,8 @@
 package dev.makeev.coworking_service_app.enums;
 
+/**
+ * Enum representing various SQL requests used in the coworking service application.
+ */
 public enum SQLRequest {
     ADD_USER_SQL ("INSERT INTO non_public.users (login, password, admin) VALUES (?,?,?)"),
 
@@ -46,14 +49,20 @@ public enum SQLRequest {
     private final String query;
 
     /**
+     * Constructor to initialize SQL query.
+     *
      * @param query SQL query
      */
     SQLRequest(String query) {
         this.query = query;
     }
 
+    /**
+     * Returns the SQL query.
+     *
+     * @return SQL query
+     */
     public String getQuery() {
         return query;
     }
-
 }

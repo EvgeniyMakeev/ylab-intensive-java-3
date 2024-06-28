@@ -6,6 +6,7 @@ import dev.makeev.coworking_service_app.dao.implementation.BookingDAOInBd;
 import dev.makeev.coworking_service_app.dao.implementation.SpaceDAOInBd;
 import dev.makeev.coworking_service_app.dao.implementation.UserDAOInBd;
 import dev.makeev.coworking_service_app.exceptions.NoSlotsException;
+import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
 import dev.makeev.coworking_service_app.in.Input;
 import dev.makeev.coworking_service_app.in.implementation.ConsoleInput;
@@ -14,7 +15,7 @@ import dev.makeev.coworking_service_app.service.BookingService;
 import dev.makeev.coworking_service_app.service.SpaceService;
 import dev.makeev.coworking_service_app.service.UserService;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
-import dev.makeev.coworking_service_app.util.ConnectionManagerImpl;
+import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
 import dev.makeev.coworking_service_app.util.InitDb;
 
 import java.time.LocalDate;
@@ -238,8 +239,12 @@ public final class AppUi {
         console.print("Enter the number of days available for booking:");
         int numberOfDaysAvailableForBooking = input.getInt(0, Integer.MAX_VALUE);
 
-        spaceService.addSpace(nameOfSpace, hourOfStartWorkingDay, hourOfEndWorkingDay, numberOfDaysAvailableForBooking);
-        console.print(nameOfSpace + " added.");
+        try {
+            spaceService.addSpace(nameOfSpace, hourOfStartWorkingDay, hourOfEndWorkingDay, numberOfDaysAvailableForBooking);
+            console.print(nameOfSpace + " added.");
+        } catch (SpaceAlreadyExistsException e) {
+            console.print(e.getMessage());
+        }
     }
 
     /**

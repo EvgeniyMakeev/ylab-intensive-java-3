@@ -7,13 +7,18 @@ import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An in-memory implementation of the {@link BookingDAO} interface.
+ * The {@code BookingDAOInBd} class implements the {@link BookingDAO} interface.
+ * It provides methods to interact with the database to manage Booking entities.
  */
 public final class BookingDAOInBd implements BookingDAO {
 
@@ -23,6 +28,9 @@ public final class BookingDAOInBd implements BookingDAO {
         this.connectionManager = connectionManager;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     @Override
     public void add(Booking newBooking) {
         try (var connection = connectionManager.open()) {
@@ -50,6 +58,14 @@ public final class BookingDAOInBd implements BookingDAO {
         }
     }
 
+    /**
+     * Adds a new booking to the database.
+     *
+     * @param connection the database connection
+     * @param newBooking the new booking to add
+     * @return the generated booking ID
+     * @throws SQLException if a database access error occurs
+     */
     private static long addBooking(Connection connection, Booking newBooking) throws SQLException {
         try (var addSpaceStatement = connection.prepareStatement(
                 SQLRequest.ADD_BOOKING_SQL.getQuery(),
@@ -72,6 +88,14 @@ public final class BookingDAOInBd implements BookingDAO {
         }
     }
 
+    /**
+     * Updates the booking slots for a given booking.
+     *
+     * @param connection the database connection
+     * @param newBooking the new booking
+     * @param bookingId  the booking ID
+     * @throws SQLException if a database access error occurs
+     */
     private static void bookingSlots(Connection connection, Booking newBooking, Long bookingId) throws SQLException {
         try (var updateSlotsStatement = connection.prepareStatement(SQLRequest.BOOK_SLOTS_SQL.getQuery())) {
             LocalDate startDate = newBooking.bookingRange().beginningBookingDate();
@@ -80,7 +104,7 @@ public final class BookingDAOInBd implements BookingDAO {
             int endHour = newBooking.bookingRange().endingBookingHour();
 
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-                for (int hour = startHour; hour <= endHour; hour++) {
+                for (int hour = startHour; hour < endHour; hour++) {
                     try {
                         updateSlotsStatement.setLong(1, bookingId);
                         updateSlotsStatement.setString(2, newBooking.nameOfBookingSpace());
@@ -189,6 +213,13 @@ public final class BookingDAOInBd implements BookingDAO {
         }
     }
 
+    /**
+     * Deletes a booking by its ID from the database.
+     *
+     * @param idOfBooking the ID of the booking to delete
+     * @param connection  the database connection
+     * @throws SQLException if a database access error occurs
+     */
     private static void deleteBookingById(long idOfBooking, Connection connection) throws SQLException {
         try (var statementDeleteBooking =
                      connection.prepareStatement(SQLRequest.DELETE_BOOKING_SQL.getQuery())) {
@@ -197,6 +228,13 @@ public final class BookingDAOInBd implements BookingDAO {
         }
     }
 
+    /**
+     * Updates the booking slots for a given booking ID.
+     *
+     * @param idOfBooking the ID of the booking
+     * @param connection  the database connection
+     * @throws SQLException if a database access error occurs
+     */
     private static void updateSlots(long idOfBooking, Connection connection) throws SQLException {
         long availableForBooking = 0L;
         try (var statementUpdateSlots =

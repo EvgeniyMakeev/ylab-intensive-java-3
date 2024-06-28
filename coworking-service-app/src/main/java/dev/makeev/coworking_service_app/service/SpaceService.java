@@ -1,6 +1,7 @@
 package dev.makeev.coworking_service_app.service;
 
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
+import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 
@@ -34,8 +35,14 @@ public final class SpaceService {
      * @param numberOfDaysAvailableForBooking the number of days available for booking
      */
     public void addSpace(
-            String nameOfSpace, int hourOfBeginningWorkingDay, int hourOfEndingWorkingDay, int numberOfDaysAvailableForBooking) {
+            String nameOfSpace, int hourOfBeginningWorkingDay, int hourOfEndingWorkingDay, int numberOfDaysAvailableForBooking)
+            throws SpaceAlreadyExistsException {
         WorkingHours workingHours = new WorkingHours(hourOfBeginningWorkingDay, hourOfEndingWorkingDay);
+
+        if (getSpaceByName(nameOfSpace).isPresent()) {
+            throw new SpaceAlreadyExistsException();
+        }
+
         LocalDate nowDate = LocalDate.now();
         Map<LocalDate, Map<Integer, Long>> bookingSlots = new HashMap<>();
 
