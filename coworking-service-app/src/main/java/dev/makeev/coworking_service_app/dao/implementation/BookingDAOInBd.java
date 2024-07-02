@@ -5,10 +5,12 @@ import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
+import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -33,28 +35,49 @@ public final class BookingDAOInBd implements BookingDAO {
      */
     @Override
     public void add(Booking newBooking) {
-        try (var connection = connectionManager.open()) {
-            connection.setAutoCommit(false);
+        try (Connection connection = connectionManager.open()) {
+            setAutoCommit(connection, false);
             try {
                 long bookingId = addBooking(connection, newBooking);
                 bookingSlots(connection, newBooking, bookingId);
                 connection.commit();
             } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException rollbackException) {
-                    throw new DaoException("Rollback failed", rollbackException);
-                }
+                rollback(connection);
                 throw new DaoException("SQL error occurred", e);
             } finally {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    throw new DaoException("Failed to set autoCommit back to true", e);
-                }
+                setAutoCommit(connection, true);
             }
         } catch (SQLException e) {
             throw new DaoException("Failed to open connection", e);
+        }
+    }
+
+    /**
+     * Rolls back the given SQL connection.
+     *
+     * @param connection The SQL connection to be rolled back.
+     * @throws DaoException If the rollback operation fails.
+     */
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException rollbackException) {
+            throw new DaoException("Rollback failed", rollbackException);
+        }
+    }
+
+    /**
+     * Sets the auto-commit mode of the given SQL connection.
+     *
+     * @param connection The SQL connection for which to set the auto-commit mode.
+     * @param autoCommit The desired auto-commit mode (true or false).
+     * @throws DaoException If setting the auto-commit mode fails.
+     */
+    private void setAutoCommit(Connection connection, boolean autoCommit) {
+        try {
+            connection.setAutoCommit(autoCommit);
+        } catch (SQLException e) {
+            throw new DaoException("Failed to set autoCommit to " + autoCommit, e);
         }
     }
 
@@ -66,8 +89,8 @@ public final class BookingDAOInBd implements BookingDAO {
      * @return the generated booking ID
      * @throws SQLException if a database access error occurs
      */
-    private static long addBooking(Connection connection, Booking newBooking) throws SQLException {
-        try (var addSpaceStatement = connection.prepareStatement(
+    private long addBooking(Connection connection, Booking newBooking) throws SQLException {
+        try (PreparedStatement addSpaceStatement = connection.prepareStatement(
                 SQLRequest.ADD_BOOKING_SQL.getQuery(),
                 Statement.RETURN_GENERATED_KEYS)) {
             addSpaceStatement.setString(1, newBooking.loginOfUser());
@@ -96,24 +119,34 @@ public final class BookingDAOInBd implements BookingDAO {
      * @param bookingId  the booking ID
      * @throws SQLException if a database access error occurs
      */
-    private static void bookingSlots(Connection connection, Booking newBooking, Long bookingId) throws SQLException {
-        try (var updateSlotsStatement = connection.prepareStatement(SQLRequest.BOOK_SLOTS_SQL.getQuery())) {
-            LocalDate startDate = newBooking.bookingRange().beginningBookingDate();
-            LocalDate endDate = newBooking.bookingRange().endingBookingDate();
-            int startHour = newBooking.bookingRange().beginningBookingHour();
-            int endHour = newBooking.bookingRange().endingBookingHour();
+    private void bookingSlots(Connection connection, Booking newBooking, Long bookingId) throws SQLException {
+        LocalDate startDate = newBooking.bookingRange().beginningBookingDate();
+        LocalDate endDate = newBooking.bookingRange().endingBookingDate();
+        int startHourBooking = newBooking.bookingRange().beginningBookingHour();
+        int endHourBooking = newBooking.bookingRange().endingBookingHour();
+
+        WorkingHours workingHours = getWorkingHoursOfSpaceByName(newBooking.nameOfBookingSpace());
+
+        try (PreparedStatement updateSlotsStatement =
+                     connection.prepareStatement(SQLRequest.BOOK_SLOTS_SQL.getQuery())) {
 
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+                int startHour = workingHours.hourOfBeginningWorkingDay();
+                int endHour = workingHours.hourOfEndingWorkingDay();
+
+                if (date.isEqual(startDate)) {
+                    startHour = startHourBooking;
+                }
+                if (date.isEqual(endDate)) {
+                    endHour = endHourBooking;
+                }
+
                 for (int hour = startHour; hour < endHour; hour++) {
-                    try {
-                        updateSlotsStatement.setLong(1, bookingId);
-                        updateSlotsStatement.setString(2, newBooking.nameOfBookingSpace());
-                        updateSlotsStatement.setDate(3, Date.valueOf(date));
-                        updateSlotsStatement.setInt(4, hour);
-                        updateSlotsStatement.addBatch();
-                    } catch (SQLException e) {
-                        throw new DaoException("Failed to add slot to batch", e);
-                    }
+                    updateSlotsStatement.setLong(1, bookingId);
+                    updateSlotsStatement.setString(2, newBooking.nameOfBookingSpace());
+                    updateSlotsStatement.setDate(3, Date.valueOf(date));
+                    updateSlotsStatement.setInt(4, hour);
+                    updateSlotsStatement.addBatch();
                 }
             }
             updateSlotsStatement.executeBatch();
@@ -121,32 +154,41 @@ public final class BookingDAOInBd implements BookingDAO {
     }
 
     /**
+     * Retrieves the working hours of a space identified by its name from the database.
+     *
+     * @param spaceName The name of the space to retrieve working hours for.
+     * @return A {@link WorkingHours} object representing the working hours of the space.
+     * @throws SQLException   If an SQL exception occurs while accessing the database.
+     * @throws DaoException   If the space with the specified name is not found in the database.
+     */
+    private WorkingHours getWorkingHoursOfSpaceByName(String spaceName) throws SQLException {
+        try (Connection connection = connectionManager.open();
+             PreparedStatement getWorkingHoursStatement =
+                     connection.prepareStatement(SQLRequest.GET_WORKING_HOURS_OF_SPACE_BY_NAME_SQL.getQuery())) {
+            getWorkingHoursStatement.setString(1, spaceName);
+
+            ResultSet resultSet = getWorkingHoursStatement.executeQuery();
+            if (resultSet.next()) {
+                int hourOfBeginning = resultSet.getInt("hour_of_beginning_working_day");
+                int hourOfEnding = resultSet.getInt("hour_of_ending_working_day");
+                return new WorkingHours(hourOfBeginning, hourOfEnding);
+            } else {
+                throw new DaoException("Space not found: " + spaceName, new SQLException());
+            }
+        }
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     @Override
     public List<Booking> getAllForUser(String loginOfUser) {
-        try (var connection = connectionManager.open();
-             var statement = connection.prepareStatement(
+        try (Connection connection = connectionManager.open();
+             PreparedStatement statement = connection.prepareStatement(
                      SQLRequest.GET_ALL_BOOKINGS_FOR_USER_SQL.getQuery())) {
             statement.setString(1, loginOfUser);
-            ResultSet resultSet = statement.executeQuery();
-            List<Booking> listOfTrainingsOfUser = new ArrayList<>();
-            while (resultSet.next()) {
-                BookingRange nextBookingRange = new BookingRange(
-                        resultSet.getDate("beginning_booking_date").toLocalDate(),
-                        resultSet.getInt("beginning_booking_hour"),
-                        resultSet.getDate("ending_booking_date").toLocalDate(),
-                        resultSet.getInt("ending_booking_hour"));
-
-                Booking nextBooking = new Booking(
-                        resultSet.getLong("id"),
-                        loginOfUser,
-                        resultSet.getString("name_of_space"),
-                        nextBookingRange);
-
-                listOfTrainingsOfUser.add(nextBooking);
-            }
-            return listOfTrainingsOfUser;
+            return getBookings(statement);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -157,30 +199,34 @@ public final class BookingDAOInBd implements BookingDAO {
      */
     @Override
     public List<Booking> getAll() {
-        try (var connection = connectionManager.open();
-             var statement = connection.prepareStatement(
+        try (Connection connection = connectionManager.open();
+             PreparedStatement statement = connection.prepareStatement(
                      SQLRequest.GET_ALL_BOOKINGS_SQL.getQuery())) {
-            ResultSet resultSet = statement.executeQuery();
-            List<Booking> listOfTrainingsOfUser = new ArrayList<>();
-            while (resultSet.next()) {
-                BookingRange nextBookingRange = new BookingRange(
-                        resultSet.getDate("beginning_booking_date").toLocalDate(),
-                        resultSet.getInt("beginning_booking_hour"),
-                        resultSet.getDate("ending_booking_date").toLocalDate(),
-                        resultSet.getInt("ending_booking_hour"));
-
-                Booking nextBooking = new Booking(
-                        resultSet.getLong("id"),
-                        resultSet.getString("login_of_user"),
-                        resultSet.getString("name_of_space"),
-                        nextBookingRange);
-
-                listOfTrainingsOfUser.add(nextBooking);
-            }
-            return listOfTrainingsOfUser;
+            return getBookings(statement);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
+    }
+
+    private List<Booking> getBookings(PreparedStatement statement) throws SQLException {
+        ResultSet resultSet = statement.executeQuery();
+        List<Booking> listOfTrainingsOfUser = new ArrayList<>();
+        while (resultSet.next()) {
+            BookingRange nextBookingRange = new BookingRange(
+                    resultSet.getDate("beginning_booking_date").toLocalDate(),
+                    resultSet.getInt("beginning_booking_hour"),
+                    resultSet.getDate("ending_booking_date").toLocalDate(),
+                    resultSet.getInt("ending_booking_hour"));
+
+            Booking nextBooking = new Booking(
+                    resultSet.getLong("id"),
+                    resultSet.getString("login_of_user"),
+                    resultSet.getString("name_of_space"),
+                    nextBookingRange);
+
+            listOfTrainingsOfUser.add(nextBooking);
+        }
+        return listOfTrainingsOfUser;
     }
 
     /**
@@ -188,25 +234,17 @@ public final class BookingDAOInBd implements BookingDAO {
      */
     @Override
     public void delete(long idOfBooking) {
-        try (var connection = connectionManager.open()) {
-            connection.setAutoCommit(false);
+        try (Connection connection = connectionManager.open()) {
+            setAutoCommit(connection, false);
             try {
                 updateSlots(idOfBooking, connection);
                 deleteBookingById(idOfBooking, connection);
                 connection.commit();
             } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException rollbackException) {
-                    throw new DaoException("Rollback failed", rollbackException);
-                }
+                rollback(connection);
                 throw new DaoException("SQL error occurred", e);
             } finally {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    throw new DaoException("Failed to set autoCommit back to true", e);
-                }
+                setAutoCommit(connection, true);
             }
         } catch (SQLException e) {
             throw new DaoException("Failed to open connection", e);
@@ -221,7 +259,7 @@ public final class BookingDAOInBd implements BookingDAO {
      * @throws SQLException if a database access error occurs
      */
     private static void deleteBookingById(long idOfBooking, Connection connection) throws SQLException {
-        try (var statementDeleteBooking =
+        try (PreparedStatement statementDeleteBooking =
                      connection.prepareStatement(SQLRequest.DELETE_BOOKING_SQL.getQuery())) {
             statementDeleteBooking.setLong(1, idOfBooking);
             statementDeleteBooking.executeUpdate();
@@ -237,7 +275,7 @@ public final class BookingDAOInBd implements BookingDAO {
      */
     private static void updateSlots(long idOfBooking, Connection connection) throws SQLException {
         long availableForBooking = 0L;
-        try (var statementUpdateSlots =
+        try (PreparedStatement statementUpdateSlots =
                      connection.prepareStatement(SQLRequest.UPDATE_SLOTS_SQL.getQuery())) {
             statementUpdateSlots.setLong(1, availableForBooking);
             statementUpdateSlots.setLong(2, idOfBooking);

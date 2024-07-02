@@ -3,10 +3,10 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.25.xsd"
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.25.xsd"
         logicalFilePath="db/changelog/changelog.xml">
 
-    <changeSet id="002-create-table" author="evgeniy_makeev">
+    <changeSet id="003-create-table" author="evgeniy_makeev">
         <createTable tableName="users"
                      schemaName="non_public"
                      remarks="Table for storing user information">
@@ -18,7 +18,7 @@
             <column name="password"
                     type="VARCHAR(255)"
                     remarks="User password">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="admin"
                     type="BOOLEAN"
@@ -53,7 +53,7 @@
                      remarks="Table for storing bookings">
             <column name="id"
                     type="BIGINT"
-                    defaultValueSequenceNext="booking_id_seq"
+                    defaultValueComputed="nextval('non_public.booking_id_seq')"
                     remarks="Primary key for bookings">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

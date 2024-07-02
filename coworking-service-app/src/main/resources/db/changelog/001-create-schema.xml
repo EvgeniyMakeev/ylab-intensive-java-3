@@ -6,8 +6,9 @@
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.25.xsd"
         logicalFilePath="db/changelog/changelog.xml">
 
-    <changeSet id="001-create-sequences" author="evgeniy_makeev">
-        <createSequence schemaName="non_public" sequenceName="booking_id_seq"
-                        dataType="BIGINT" startValue="1" incrementBy="1"/>
+    <changeSet id="001-create-schema" author="evgeniy_makeev">
+        <sql>
+            CREATE SCHEMA IF NOT EXISTS non_public;
+        </sql>
     </changeSet>
 </databaseChangeLog>

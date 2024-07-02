@@ -1,6 +1,7 @@
 package dev.makeev.coworking_service_app.service;
 
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
+import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.model.Space;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,11 +14,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @DisplayName("SpaceService Test")
 @ExtendWith(MockitoExtension.class)
@@ -35,11 +34,23 @@ class SpaceServiceTest {
     private Space mockSpace;
 
     @Test
-    @DisplayName("SpaceService test: Add and Update Space - Should add or update space successfully")
-    void addAndUpdateSpace_shouldAddOrUpdateSpace() {
+    @DisplayName("SpaceService test: Add Space - Should add or update space successfully")
+    void addSpace_shouldAddNewSpace() throws SpaceAlreadyExistsException {
         spaceService.addSpace(TEST_SPACE, 8, 10, 5);
 
         verify(spaceDAO, times(1)).add(any(Space.class));
+    }
+
+    @Test
+    @DisplayName("SpaceService test: Add Space which already exists - Should throw SpaceAlreadyExistsException")
+    void addSpaceWhichAlreadyExists_shouldGetException() {
+        when(spaceDAO.getSpaceByName(TEST_SPACE)).thenReturn(Optional.of(mockSpace));
+
+        assertThatThrownBy(() ->
+                spaceService.addSpace(TEST_SPACE, 8, 10, 5))
+                .isInstanceOf(SpaceAlreadyExistsException.class);
+
+        verify(spaceDAO, times(0)).add(any(Space.class));
     }
 
     @Test

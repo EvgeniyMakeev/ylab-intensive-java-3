@@ -12,8 +12,8 @@ public enum SQLRequest {
             INSERT INTO non_public.spaces \
             (name, hour_of_beginning_working_day, hour_of_ending_working_day) VALUES (?,?,?)"""),
     GET_ALL_SPACES_SQL("SELECT * FROM non_public.spaces"),
-
     GET_SPACE_BY_NAME_SQL(GET_ALL_SPACES_SQL.query + " WHERE name=?"),
+    GET_WORKING_HOURS_OF_SPACE_BY_NAME_SQL("SELECT hour_of_beginning_working_day, hour_of_ending_working_day FROM non_public.spaces WHERE name=?"),
 
     ADD_SLOTS_SQL("""
             INSERT INTO non_public.slots_for_booking \

@@ -9,6 +9,7 @@ import dev.makeev.coworking_service_app.util.ConnectionManager;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -36,28 +37,49 @@ public final class SpaceDAOInBd implements SpaceDAO {
      */
     @Override
     public void add(Space newSpace) {
-        try (var connection = connectionManager.open()) {
-            connection.setAutoCommit(false);
+        try (Connection connection = connectionManager.open()) {
+            setAutoCommit(connection, false);
             try {
                 addSpace(newSpace, connection);
                 addSlots(newSpace, connection);
                 connection.commit();
             } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException rollbackException) {
-                    throw new DaoException("Rollback failed", rollbackException);
-                }
+                rollback(connection);
                 throw new DaoException("SQL error occurred", e);
             } finally {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    throw new DaoException("Failed to set autoCommit back to true", e);
-                }
+                setAutoCommit(connection, true);
             }
         } catch (SQLException e) {
             throw new DaoException("Failed to open connection", e);
+        }
+    }
+
+    /**
+     * Rolls back the given SQL connection.
+     *
+     * @param connection The SQL connection to be rolled back.
+     * @throws DaoException If the rollback operation fails.
+     */
+    private void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException rollbackException) {
+            throw new DaoException("Rollback failed", rollbackException);
+        }
+    }
+
+    /**
+     * Sets the auto-commit mode of the given SQL connection.
+     *
+     * @param connection The SQL connection for which to set the auto-commit mode.
+     * @param autoCommit The desired auto-commit mode (true or false).
+     * @throws DaoException If setting the auto-commit mode fails.
+     */
+    private void setAutoCommit(Connection connection, boolean autoCommit) {
+        try {
+            connection.setAutoCommit(autoCommit);
+        } catch (SQLException e) {
+            throw new DaoException("Failed to set autoCommit to " + autoCommit, e);
         }
     }
 
@@ -69,7 +91,7 @@ public final class SpaceDAOInBd implements SpaceDAO {
      * @throws SQLException if a database access error occurs
      */
     private static void addSpace(Space newSpace, Connection connection) throws SQLException {
-        try (var addSpaceStatement = connection.prepareStatement(SQLRequest.ADD_SPACE_SQL.getQuery())) {
+        try (PreparedStatement addSpaceStatement = connection.prepareStatement(SQLRequest.ADD_SPACE_SQL.getQuery())) {
             addSpaceStatement.setString(1, newSpace.name());
             addSpaceStatement.setInt(2, newSpace.workingHours().hourOfBeginningWorkingDay());
             addSpaceStatement.setInt(3, newSpace.workingHours().hourOfEndingWorkingDay());
@@ -85,7 +107,7 @@ public final class SpaceDAOInBd implements SpaceDAO {
      * @throws SQLException if a database access error occurs
      */
     private static void addSlots(Space newSpace, Connection connection) throws SQLException {
-        try (var addSlotsForBookingStatement = connection.prepareStatement(SQLRequest.ADD_SLOTS_SQL.getQuery())) {
+        try (PreparedStatement addSlotsForBookingStatement = connection.prepareStatement(SQLRequest.ADD_SLOTS_SQL.getQuery())) {
             newSpace.bookingSlots().forEach((date, bookingSlots) -> IntStream.range(newSpace.workingHours().hourOfBeginningWorkingDay(),
                     newSpace.workingHours().hourOfEndingWorkingDay()).forEach(hour -> {
                 try {
@@ -107,8 +129,8 @@ public final class SpaceDAOInBd implements SpaceDAO {
      */
     @Override
     public List<String> getNamesOfSpaces() {
-        try (var connection = connectionManager.open();
-             var statement = connection.prepareStatement(SQLRequest.GET_ALL_SPACES_SQL.getQuery())) {
+        try (Connection connection = connectionManager.open();
+             PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_SPACES_SQL.getQuery())) {
             List<String> listNamesOfSpaces = new ArrayList<>();
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -125,9 +147,9 @@ public final class SpaceDAOInBd implements SpaceDAO {
      */
     @Override
     public Optional<Space> getSpaceByName(String nameOfSpace) {
-        try (var connection = connectionManager.open();
-             var spaceStatement = connection.prepareStatement(SQLRequest.GET_SPACE_BY_NAME_SQL.getQuery());
-             var slotsStatement = connection.prepareStatement(SQLRequest.GET_SLOTS_BY_SPACE_NAME_SQL.getQuery())) {
+        try (Connection connection = connectionManager.open();
+             PreparedStatement spaceStatement = connection.prepareStatement(SQLRequest.GET_SPACE_BY_NAME_SQL.getQuery());
+             PreparedStatement slotsStatement = connection.prepareStatement(SQLRequest.GET_SLOTS_BY_SPACE_NAME_SQL.getQuery())) {
 
             spaceStatement.setString(1, nameOfSpace);
             ResultSet spaceStatementResultSet = spaceStatement.executeQuery();
@@ -165,26 +187,18 @@ public final class SpaceDAOInBd implements SpaceDAO {
      */
     @Override
     public void delete(String nameOfSpace) {
-        try (var connection = connectionManager.open()) {
-            connection.setAutoCommit(false);
+        try (Connection connection = connectionManager.open()) {
+            setAutoCommit(connection, false);
             try {
                 deleteByName(connection, SQLRequest.DELETE_BOOKING_FOR_SPACE_SQL, nameOfSpace);
                 deleteByName(connection, SQLRequest.DELETE_SLOTS_FOR_SPACE_SQL, nameOfSpace);
                 deleteByName(connection, SQLRequest.DELETE_SPACE_SQL, nameOfSpace);
                 connection.commit();
             } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException rollbackException) {
-                    throw new DaoException("Rollback failed", rollbackException);
-                }
+                rollback(connection);
                 throw new DaoException("SQL error occurred", e);
             } finally {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    throw new DaoException("Failed to set autoCommit back to true", e);
-                }
+                setAutoCommit(connection, true);
             }
         } catch (SQLException e) {
             throw new DaoException("Failed to open connection", e);
@@ -200,7 +214,7 @@ public final class SpaceDAOInBd implements SpaceDAO {
      * @throws SQLException if a database access error occurs
      */
     private static void deleteByName(Connection connection, SQLRequest deleteBookingForSpaceSql, String nameOfSpace) throws SQLException {
-        try (var statement = connection.prepareStatement(deleteBookingForSpaceSql.getQuery())) {
+        try (PreparedStatement statement = connection.prepareStatement(deleteBookingForSpaceSql.getQuery())) {
             statement.setString(1, nameOfSpace);
             statement.executeUpdate();
         }

@@ -6,6 +6,8 @@ import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.User;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -27,8 +29,8 @@ public final class UserDAOInBd implements UserDAO {
      */
     @Override
     public void add(User newUser) {
-        try (var connection = connectionManager.open();
-             var statement = connection.prepareStatement(SQLRequest.ADD_USER_SQL.getQuery())) {
+        try (Connection connection = connectionManager.open();
+             PreparedStatement statement = connection.prepareStatement(SQLRequest.ADD_USER_SQL.getQuery())) {
             statement.setString(1, newUser.login());
             statement.setString(2, newUser.password());
             statement.setBoolean(3, false);
@@ -43,8 +45,8 @@ public final class UserDAOInBd implements UserDAO {
      */
     @Override
     public Optional<User> getByLogin(String login) {
-        try (var connection = connectionManager.open();
-             var statement = connection.prepareStatement(SQLRequest.GET_USER_BY_LOGIN_SQL.getQuery())) {
+        try (Connection connection = connectionManager.open();
+             PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_USER_BY_LOGIN_SQL.getQuery())) {
             statement.setString(1, login);
             User user = null;
             ResultSet resultSet = statement.executeQuery();

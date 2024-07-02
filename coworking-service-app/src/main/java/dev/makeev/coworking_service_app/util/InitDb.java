@@ -2,18 +2,22 @@ package dev.makeev.coworking_service_app.util;
 
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import liquibase.Liquibase;
+import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * The {@code InitDb} class provides a method to initialize the database schema
  * and apply migrations using Liquibase.
  */
-public class InitDb {
+public final class InitDb {
 
     private final ConnectionManager connectionManager;
 
@@ -31,18 +35,17 @@ public class InitDb {
      * If the "non_public" schema does not exist, it creates it.
      */
     public void initDb() {
-        String defaultSchemaName = "non_public";
-        String liquibaseSchemaName = "liquibase";
+        Properties properties =  PropertiesLoader.loadProperties();
+        String changelogPath = properties.getProperty("liquibase.changelogFile");
 
+        String defaultSchemaName = properties.getProperty("liquibase.defaultSchemaName");
         createSchema(defaultSchemaName);
-        createSchema(liquibaseSchemaName);
 
-        try (var connection = connectionManager.open()) {
-            var database = DatabaseFactory.getInstance()
+        try (Connection connection = connectionManager.open()) {
+            Database database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(connection));
             database.setDefaultSchemaName(defaultSchemaName);
-            database.setLiquibaseSchemaName(liquibaseSchemaName);
-            var liquibase = new Liquibase("db/changelog/changelog.xml",
+            Liquibase liquibase = new Liquibase(changelogPath,
                     new ClassLoaderResourceAccessor(), database);
             liquibase.update();
             System.out.println("Migration is completed successfully");
@@ -58,12 +61,13 @@ public class InitDb {
      * @throws DaoException if a SQL error occurs while creating the schema.
      */
     private void createSchema(String schemaName) {
-        try (var connection = connectionManager.open()) {
+        try (Connection connection = connectionManager.open()) {
             String sql = "CREATE SCHEMA IF NOT EXISTS " + schemaName;
-            var statement = connection.createStatement();
+            Statement statement = connection.createStatement();
             statement.executeUpdate(sql);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
     }
+
 }
