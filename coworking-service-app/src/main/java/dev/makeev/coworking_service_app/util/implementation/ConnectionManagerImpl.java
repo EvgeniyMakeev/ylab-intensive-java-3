@@ -18,6 +18,14 @@ public final class ConnectionManagerImpl implements ConnectionManager {
     private final String username;
     private final String password;
 
+    static {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load PostgreSQL driver", e);
+        }
+    }
+
     /**
      * Constructs a new {@code ConnectionManagerImpl} and initializes it with database connection
      * properties from the "application.properties" file on the classpath.

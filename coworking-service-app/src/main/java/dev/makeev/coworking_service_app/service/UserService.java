@@ -1,6 +1,11 @@
 package dev.makeev.coworking_service_app.service;
 
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
+import dev.makeev.coworking_service_app.aop.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.UserDAO;
+import dev.makeev.coworking_service_app.dto.UserRequestDTO;
+import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
+import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import dev.makeev.coworking_service_app.model.User;
 
 import java.util.Optional;
@@ -26,24 +31,22 @@ public final class UserService {
         this.userDAO = userDAO;
     }
 
-    /**
-     * Adds a new user with the specified login and password.
-     *
-     * @param login    The login of the user.
-     * @param password The password of the user.
-     */
-    public void addUser(String login, String password) {
-        userDAO.add(new User(login, password, false));
+
+    @LoggingTime
+    @LoggingToDb
+    public void addUser(UserRequestDTO userRequestDTO) {
+        userDAO.add(new User(userRequestDTO.login(), userRequestDTO.password(), false));
     }
 
     /**
      * Checks if a user with the specified login exists.
      *
      * @param login The login to check.
-     * @return {@code true} if the user exists, {@code false} otherwise.
      */
-    public boolean existByLogin(String login) {
-        return userDAO.getByLogin(login).isPresent();
+    public void existByLogin(String login) throws LoginAlreadyExistsException {
+        if (userDAO.getByLogin(login).isPresent()){
+            throw new LoginAlreadyExistsException();
+        }
     }
 
     /**
@@ -52,9 +55,12 @@ public final class UserService {
      * @param login    The login to verify.
      * @param password The password to verify.
      */
-    public boolean checkCredentials(String login, String password) {
+    @LoggingTime
+    public void checkCredentials(String login, String password) throws VerificationException {
         Optional<User> user = userDAO.getByLogin(login);
-        return user.isPresent() && user.get().password().equals(password);
+        if (user.isEmpty() || !user.get().password().equals(password)) {
+            throw new VerificationException();
+        }
     }
 
     /**
@@ -63,6 +69,7 @@ public final class UserService {
      * @param login The login of the user.
      * @return {@code true} if the user is an admin, {@code false} otherwise.
      */
+    @LoggingTime
     public boolean isAdmin(String login){
         return userDAO.getByLogin(login).isPresent() ? userDAO.getByLogin(login).get().isAdmin() : false;
     }

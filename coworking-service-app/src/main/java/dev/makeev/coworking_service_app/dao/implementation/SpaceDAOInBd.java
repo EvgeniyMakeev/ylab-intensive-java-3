@@ -1,5 +1,6 @@
 package dev.makeev.coworking_service_app.dao.implementation;
 
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
@@ -7,17 +8,10 @@ import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
 
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 /**
@@ -35,6 +29,7 @@ public final class SpaceDAOInBd implements SpaceDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public void add(Space newSpace) {
         try (Connection connection = connectionManager.open()) {
@@ -127,6 +122,7 @@ public final class SpaceDAOInBd implements SpaceDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public List<String> getNamesOfSpaces() {
         try (Connection connection = connectionManager.open();
@@ -145,6 +141,7 @@ public final class SpaceDAOInBd implements SpaceDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public Optional<Space> getSpaceByName(String nameOfSpace) {
         try (Connection connection = connectionManager.open();
@@ -185,6 +182,7 @@ public final class SpaceDAOInBd implements SpaceDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public void delete(String nameOfSpace) {
         try (Connection connection = connectionManager.open()) {

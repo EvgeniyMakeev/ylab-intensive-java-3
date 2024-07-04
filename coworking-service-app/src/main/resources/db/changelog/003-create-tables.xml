@@ -116,5 +116,26 @@
                     remarks="Flag indicating if the hour is available for booking">
             </column>
         </createTable>
+
+        <createTable tableName="user_activity_log"
+                     schemaName="non_public"
+                     remarks="Table for storing log of users activity">
+            <column name="timestamp"
+                    type="TIMESTAMP"
+                    remarks="Timestamp of user action">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_of_user"
+                    type="VARCHAR(255)"
+                    remarks="Login of user">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action"
+                    type="VARCHAR(255)"
+                    defaultValue="0"
+                    remarks="User action">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
     </changeSet>
 </databaseChangeLog>

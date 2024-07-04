@@ -3,7 +3,7 @@ package dev.makeev.coworking_service_app.exceptions;
 /**
  * Exception thrown when a space with this name already exists.
  */
-public class SpaceAlreadyExistsException extends Exception {
+public class SpaceAlreadyExistsException extends RuntimeException {
 
     /**
      * Returns the exception message indicating space this name already exists.

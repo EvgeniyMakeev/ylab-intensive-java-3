@@ -6,5 +6,6 @@ package dev.makeev.coworking_service_app.model;
  * @param hourOfBeginningWorkingDay  the start hour of the working day
  * @param hourOfEndingWorkingDay    the endingBookingHour hour of the working day
  */
-public record WorkingHours(int hourOfBeginningWorkingDay, int hourOfEndingWorkingDay) {
+public record WorkingHours(int hourOfBeginningWorkingDay,
+                           int hourOfEndingWorkingDay) {
 }

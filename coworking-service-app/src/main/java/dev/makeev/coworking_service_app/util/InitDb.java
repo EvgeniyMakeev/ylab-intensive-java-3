@@ -1,10 +1,13 @@
 package dev.makeev.coworking_service_app.util;
 
 import dev.makeev.coworking_service_app.exceptions.DaoException;
+import liquibase.Contexts;
+import liquibase.LabelExpression;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
@@ -35,9 +38,8 @@ public final class InitDb {
      * If the "non_public" schema does not exist, it creates it.
      */
     public void initDb() {
-        Properties properties =  PropertiesLoader.loadProperties();
+        Properties properties = PropertiesLoader.loadProperties();
         String changelogPath = properties.getProperty("liquibase.changelogFile");
-
         String defaultSchemaName = properties.getProperty("liquibase.defaultSchemaName");
         createSchema(defaultSchemaName);
 
@@ -45,12 +47,18 @@ public final class InitDb {
             Database database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(connection));
             database.setDefaultSchemaName(defaultSchemaName);
-            Liquibase liquibase = new Liquibase(changelogPath,
-                    new ClassLoaderResourceAccessor(), database);
-            liquibase.update();
-            System.out.println("Migration is completed successfully");
-        } catch (LiquibaseException | SQLException e) {
-            System.out.println("SQL Exception in migration " + e.getMessage());
+
+            try (Liquibase liquibase = new Liquibase(changelogPath, new ClassLoaderResourceAccessor(), database)) {
+                liquibase.clearCheckSums();
+                liquibase.update(new Contexts(), new LabelExpression());
+                System.out.println("Migration is completed successfully");
+            } catch (LiquibaseException e) {
+                System.out.println("Liquibase Exception in migration: " + e.getMessage());
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Exception in migration: " + e.getMessage());
+        } catch (DatabaseException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -69,5 +77,4 @@ public final class InitDb {
             throw new DaoException(e);
         }
     }
-
 }

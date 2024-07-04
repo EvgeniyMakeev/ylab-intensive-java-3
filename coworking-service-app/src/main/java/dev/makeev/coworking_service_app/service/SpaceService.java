@@ -1,7 +1,10 @@
 package dev.makeev.coworking_service_app.service;
 
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
+import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
 import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
+import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 
@@ -9,7 +12,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Service class for managing coworking spaces.
@@ -29,17 +31,13 @@ public final class SpaceService {
     /**
      * Adds a new space or updates an existing space.
      *
-     * @param nameOfSpace the name of the space
-     * @param hourOfBeginningWorkingDay the start hour of the working day
-     * @param hourOfEndingWorkingDay the endingBookingHour hour of the working day
-     * @param numberOfDaysAvailableForBooking the number of days available for booking
+     * @param spaceAddDTO the spaceDTO
      */
-    public void addSpace(
-            String nameOfSpace, int hourOfBeginningWorkingDay, int hourOfEndingWorkingDay, int numberOfDaysAvailableForBooking)
-            throws SpaceAlreadyExistsException {
-        WorkingHours workingHours = new WorkingHours(hourOfBeginningWorkingDay, hourOfEndingWorkingDay);
+    @LoggingTime
+    public void addSpace(SpaceAddDTO spaceAddDTO) throws SpaceAlreadyExistsException, SpaceNotFoundException {
+        WorkingHours workingHours = new WorkingHours(spaceAddDTO.hourOfBeginningWorkingDay(), spaceAddDTO.hourOfEndingWorkingDay());
 
-        if (getSpaceByName(nameOfSpace).isPresent()) {
+        if (spaceDAO.getSpaceByName(spaceAddDTO.name()).isPresent()) {
             throw new SpaceAlreadyExistsException();
         }
 
@@ -48,15 +46,15 @@ public final class SpaceService {
 
         Map<Integer, Long> slots = new HashMap<>();
         long freeSlot = 0L;
-        for (int i = hourOfBeginningWorkingDay; i < hourOfEndingWorkingDay; i++) {
+        for (int i = spaceAddDTO.hourOfBeginningWorkingDay(); i < spaceAddDTO.hourOfEndingWorkingDay(); i++) {
             slots.put(i, freeSlot);
         }
 
-        for (int i = 0; i < numberOfDaysAvailableForBooking; i++) {
+        for (int i = 0; i < spaceAddDTO.numberOfDaysAvailableForBooking(); i++) {
             bookingSlots.put(nowDate.plusDays(i), slots);
         }
 
-        spaceDAO.add(new Space(nameOfSpace, workingHours, bookingSlots));
+        spaceDAO.add(new Space(spaceAddDTO.name(), workingHours, bookingSlots));
     }
 
     /**
@@ -64,21 +62,19 @@ public final class SpaceService {
      *
      * @return a list of all spaces
      */
+    @LoggingTime
     public List<String> getSpaces() {
         return spaceDAO.getNamesOfSpaces();
     }
 
-
-    public Optional<Space> getSpaceByName(String nameOfCurrentSpace) {
-        return spaceDAO.getSpaceByName(nameOfCurrentSpace);
-    }
 
     /**
      * Deletes a space by its name.
      *
      * @param nameOfSpace the name of the space to delete
      */
-    public void deleteSpace(String nameOfSpace) {
+    public void deleteSpace(String nameOfSpace) throws SpaceNotFoundException {
+        spaceDAO.getSpaceByName(nameOfSpace).orElseThrow(SpaceNotFoundException::new);
         spaceDAO.delete(nameOfSpace);
     }
 }

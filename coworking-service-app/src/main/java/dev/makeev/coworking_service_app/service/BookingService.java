@@ -1,15 +1,18 @@
 package dev.makeev.coworking_service_app.service;
 
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
+import dev.makeev.coworking_service_app.aop.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
+import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
 import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
+import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -38,21 +41,17 @@ public final class BookingService {
      * Adds a booking for a user.
      *
      * @param loginOfUser the login of the user
-     * @param bookingSpaceName the name of the space to book
-     * @param beginningBookingDate the start date of the booking
-     * @param beginningBookingHour the start hour of the booking
-     * @param endingBookingDate the endingBookingHour date of the booking
-     * @param endingBookingHour the endingBookingHour hour of the booking
+     * @param booking the booking
      * @throws SpaceIsNotAvailableException if the space is not available for the specified date and time
      */
-    public void addBooking(String loginOfUser, String bookingSpaceName, LocalDate beginningBookingDate, int beginningBookingHour,
-                           LocalDate endingBookingDate, int endingBookingHour) throws SpaceIsNotAvailableException {
+    @LoggingTime
+    @LoggingToDb
+    public void addBooking(String loginOfUser, Booking booking) throws SpaceIsNotAvailableException, SpaceNotFoundException {
 
-        Space bookingSpace = spaceDAO.getSpaceByName(bookingSpaceName).orElseThrow();
-        BookingRange bookingRange = new BookingRange(beginningBookingDate, beginningBookingHour, endingBookingDate, endingBookingHour);
+        Space bookingSpace = spaceDAO.getSpaceByName(booking.nameOfBookingSpace()).orElseThrow(SpaceNotFoundException::new);
 
-        if (isSpaceAvailableForBookingOnDateAndTime(bookingSpace, bookingRange, bookingSpace.workingHours())) {
-            bookingDAO.add(new Booking(loginOfUser, bookingSpaceName, bookingRange));
+        if (isSpaceAvailableForBookingOnDateAndTime(bookingSpace, booking.bookingRange(), bookingSpace.workingHours())) {
+            bookingDAO.add(booking);
 
         } else {
             throw new SpaceIsNotAvailableException();
@@ -108,16 +107,10 @@ public final class BookingService {
      * @param loginOfUser the login of the user
      * @return a list of formatted booking strings
      */
-    public List<String> getAllBookingsForUser(String loginOfUser) {
-        List<Booking> bookings = bookingDAO.getAllForUser(loginOfUser);
-        List<String> formatedBookings = new ArrayList<>();
-        for (Booking booking : bookings) {
-            formatedBookings.add(String.format("%d. Space: %s | From: %02d:00 %s | To: %02d:00 %s\n",
-                    bookings.indexOf(booking) + 1, booking.nameOfBookingSpace(),
-                    booking.bookingRange().beginningBookingHour(), booking.bookingRange().beginningBookingDate(),
-                    booking.bookingRange().endingBookingHour(), booking.bookingRange().endingBookingDate()));
-        }
-        return formatedBookings;
+    @LoggingTime
+    @LoggingToDb
+    public List<Booking> getAllBookingsForUser(String loginOfUser) {
+        return bookingDAO.getAllForUser(loginOfUser);
     }
 
     /**
@@ -125,47 +118,25 @@ public final class BookingService {
      *
      * @return a list of formatted booking strings
      */
-    public List<String> getAllBookingsSortedByUser() {
-        List<Booking> bookings = bookingDAO.getAll();
-        return bookings.stream()
+    public List<Booking> getAllBookingsSortedByUser() {
+        return bookingDAO.getAll().stream()
                 .sorted(Comparator.comparing(Booking::loginOfUser))
-                .map(Booking::toString)
                 .toList();
     }
 
-    /**
-     * Retrieves all bookings sorted by date.
-     *
-     * @return a list of formatted booking strings
-     */
-    public List<String> getAllBookingsSortedByDate() {
-        List<Booking> bookings = bookingDAO.getAll();
-        return bookings.stream()
-                .sorted(Comparator.comparing(booking -> booking.bookingRange().beginningBookingDate()))
-                .map(Booking::toString)
-                .toList();
-    }
-
-    /**
-     * Retrieves all bookings sorted by space.
-     *
-     * @return a list of formatted booking strings
-     */
-    public List<String> getAllBookingsSortedBySpace() {
-        List<Booking> bookings = bookingDAO.getAll();
-        return bookings.stream()
-                .sorted(Comparator.comparing(Booking::nameOfBookingSpace))
-                .map(Booking::toString)
-                .toList();
-    }
 
     /**
      * Deletes a booking by its index in the user's booking list.
      *
-     * @param loginOfUser the login of the user
-     * @param indexOfBookingInList the index of the booking in the list
+     * @param bookingId the id of the booking for deleting
      */
-    public void deleteBookingByIndex(String loginOfUser, int indexOfBookingInList) {
-        bookingDAO.delete(bookingDAO.getAllForUser(loginOfUser).get(indexOfBookingInList).id());
+    @LoggingTime
+    @LoggingToDb
+    public void deleteBookingById(String login, long bookingId) throws BookingNotFoundException {
+        if (bookingDAO.getBookingById(bookingId).isPresent()) {
+            bookingDAO.delete(bookingId);
+        } else {
+            throw new BookingNotFoundException();
+        }
     }
 }

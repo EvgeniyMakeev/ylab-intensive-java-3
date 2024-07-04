@@ -4,6 +4,7 @@ package dev.makeev.coworking_service_app.enums;
  * Enum representing various SQL requests used in the coworking service application.
  */
 public enum SQLRequest {
+
     ADD_USER_SQL ("INSERT INTO non_public.users (login, password, admin) VALUES (?,?,?)"),
 
     GET_USER_BY_LOGIN_SQL ("SELECT * FROM non_public.users WHERE login=? "),
@@ -11,8 +12,11 @@ public enum SQLRequest {
     ADD_SPACE_SQL("""
             INSERT INTO non_public.spaces \
             (name, hour_of_beginning_working_day, hour_of_ending_working_day) VALUES (?,?,?)"""),
+
     GET_ALL_SPACES_SQL("SELECT * FROM non_public.spaces"),
+
     GET_SPACE_BY_NAME_SQL(GET_ALL_SPACES_SQL.query + " WHERE name=?"),
+
     GET_WORKING_HOURS_OF_SPACE_BY_NAME_SQL("SELECT hour_of_beginning_working_day, hour_of_ending_working_day FROM non_public.spaces WHERE name=?"),
 
     ADD_SLOTS_SQL("""
@@ -39,12 +43,20 @@ public enum SQLRequest {
             beginning_booking_date, beginning_booking_hour, \
             ending_booking_date, ending_booking_hour) \
             VALUES (?,?,?,?,?,?)"""),
+
     GET_ALL_BOOKINGS_SQL("SELECT * FROM non_public.bookings"),
 
     GET_ALL_BOOKINGS_FOR_USER_SQL(GET_ALL_BOOKINGS_SQL.query + " WHERE login_of_user=?"),
 
-    DELETE_BOOKING_SQL("DELETE FROM non_public.bookings WHERE id=?");
+    GET_BOOKING_BY_ID_SQL(GET_ALL_BOOKINGS_SQL.query + " WHERE id=?"),
 
+    DELETE_BOOKING_SQL("DELETE FROM non_public.bookings WHERE id=?"),
+
+    ADD_LOG_SQL ("INSERT INTO non_public.user_activity_log (timestamp, login_of_user, action) VALUES (?,?,?)"),
+
+    GET_ALL_LOGS_SQL ("SELECT * FROM non_public.user_activity_log"),
+
+    GET_ALL_LOGS_FOR_USER_SQL (GET_ALL_LOGS_SQL.query + " WHERE login_of_user=?");
 
     private final String query;
 

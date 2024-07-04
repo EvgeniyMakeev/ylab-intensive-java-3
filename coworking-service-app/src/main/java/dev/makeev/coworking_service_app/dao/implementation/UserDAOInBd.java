@@ -1,5 +1,6 @@
 package dev.makeev.coworking_service_app.dao.implementation;
 
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
@@ -27,6 +28,7 @@ public final class UserDAOInBd implements UserDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public void add(User newUser) {
         try (Connection connection = connectionManager.open();
@@ -43,6 +45,7 @@ public final class UserDAOInBd implements UserDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public Optional<User> getByLogin(String login) {
         try (Connection connection = connectionManager.open();

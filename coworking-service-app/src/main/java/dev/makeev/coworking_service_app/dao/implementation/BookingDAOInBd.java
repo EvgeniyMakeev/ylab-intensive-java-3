@@ -1,5 +1,6 @@
 package dev.makeev.coworking_service_app.dao.implementation;
 
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
@@ -8,15 +9,11 @@ import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The {@code BookingDAOInBd} class implements the {@link BookingDAO} interface.
@@ -33,6 +30,7 @@ public final class BookingDAOInBd implements BookingDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public void add(Booking newBooking) {
         try (Connection connection = connectionManager.open()) {
@@ -87,9 +85,8 @@ public final class BookingDAOInBd implements BookingDAO {
      * @param connection the database connection
      * @param newBooking the new booking to add
      * @return the generated booking ID
-     * @throws SQLException if a database access error occurs
      */
-    private long addBooking(Connection connection, Booking newBooking) throws SQLException {
+    private long addBooking(Connection connection, Booking newBooking) {
         try (PreparedStatement addSpaceStatement = connection.prepareStatement(
                 SQLRequest.ADD_BOOKING_SQL.getQuery(),
                 Statement.RETURN_GENERATED_KEYS)) {
@@ -108,6 +105,8 @@ public final class BookingDAOInBd implements BookingDAO {
                     throw new SQLException("Creating booking failed, no ID obtained.");
                 }
             }
+        } catch (SQLException e) {
+            throw new DaoException("Failed to add booking", e);
         }
     }
 
@@ -117,9 +116,8 @@ public final class BookingDAOInBd implements BookingDAO {
      * @param connection the database connection
      * @param newBooking the new booking
      * @param bookingId  the booking ID
-     * @throws SQLException if a database access error occurs
      */
-    private void bookingSlots(Connection connection, Booking newBooking, Long bookingId) throws SQLException {
+    private void bookingSlots(Connection connection, Booking newBooking, Long bookingId) {
         LocalDate startDate = newBooking.bookingRange().beginningBookingDate();
         LocalDate endDate = newBooking.bookingRange().endingBookingDate();
         int startHourBooking = newBooking.bookingRange().beginningBookingHour();
@@ -150,6 +148,8 @@ public final class BookingDAOInBd implements BookingDAO {
                 }
             }
             updateSlotsStatement.executeBatch();
+        } catch (SQLException e) {
+            throw new DaoException("Failed to booking slots", e);
         }
     }
 
@@ -158,10 +158,8 @@ public final class BookingDAOInBd implements BookingDAO {
      *
      * @param spaceName The name of the space to retrieve working hours for.
      * @return A {@link WorkingHours} object representing the working hours of the space.
-     * @throws SQLException   If an SQL exception occurs while accessing the database.
-     * @throws DaoException   If the space with the specified name is not found in the database.
      */
-    private WorkingHours getWorkingHoursOfSpaceByName(String spaceName) throws SQLException {
+    private WorkingHours getWorkingHoursOfSpaceByName(String spaceName) {
         try (Connection connection = connectionManager.open();
              PreparedStatement getWorkingHoursStatement =
                      connection.prepareStatement(SQLRequest.GET_WORKING_HOURS_OF_SPACE_BY_NAME_SQL.getQuery())) {
@@ -175,6 +173,8 @@ public final class BookingDAOInBd implements BookingDAO {
             } else {
                 throw new DaoException("Space not found: " + spaceName, new SQLException());
             }
+        } catch (SQLException e) {
+            throw new DaoException("Failed to get working hours of space", e);
         }
     }
 
@@ -182,6 +182,7 @@ public final class BookingDAOInBd implements BookingDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public List<Booking> getAllForUser(String loginOfUser) {
         try (Connection connection = connectionManager.open();
@@ -197,6 +198,7 @@ public final class BookingDAOInBd implements BookingDAO {
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
     @Override
     public List<Booking> getAll() {
         try (Connection connection = connectionManager.open();
@@ -208,30 +210,65 @@ public final class BookingDAOInBd implements BookingDAO {
         }
     }
 
-    private List<Booking> getBookings(PreparedStatement statement) throws SQLException {
-        ResultSet resultSet = statement.executeQuery();
-        List<Booking> listOfTrainingsOfUser = new ArrayList<>();
-        while (resultSet.next()) {
-            BookingRange nextBookingRange = new BookingRange(
-                    resultSet.getDate("beginning_booking_date").toLocalDate(),
-                    resultSet.getInt("beginning_booking_hour"),
-                    resultSet.getDate("ending_booking_date").toLocalDate(),
-                    resultSet.getInt("ending_booking_hour"));
+    private List<Booking> getBookings(PreparedStatement statement) {
+        try {
+            ResultSet resultSet = statement.executeQuery();
+            List<Booking> listOfTrainingsOfUser = new ArrayList<>();
+            while (resultSet.next()) {
+                BookingRange nextBookingRange = new BookingRange(
+                        resultSet.getDate("beginning_booking_date").toLocalDate(),
+                        resultSet.getInt("beginning_booking_hour"),
+                        resultSet.getDate("ending_booking_date").toLocalDate(),
+                        resultSet.getInt("ending_booking_hour"));
 
-            Booking nextBooking = new Booking(
-                    resultSet.getLong("id"),
-                    resultSet.getString("login_of_user"),
-                    resultSet.getString("name_of_space"),
-                    nextBookingRange);
+                Booking nextBooking = new Booking(
+                        resultSet.getLong("id"),
+                        resultSet.getString("login_of_user"),
+                        resultSet.getString("name_of_space"),
+                        nextBookingRange);
 
-            listOfTrainingsOfUser.add(nextBooking);
+                listOfTrainingsOfUser.add(nextBooking);
+            }
+            return listOfTrainingsOfUser;
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
-        return listOfTrainingsOfUser;
     }
 
     /**
      * {@inheritdoc}
      */
+    @LoggingTime
+    @Override
+    public Optional<Booking> getBookingById(long id) {
+        try (Connection connection = connectionManager.open();
+             PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_BOOKING_BY_ID_SQL.getQuery())) {
+
+            statement.setLong(1, id);
+            ResultSet statementResultSet = statement.executeQuery();
+
+            if (statementResultSet.next()) {
+                String login_of_user = statementResultSet.getString("login_of_user");
+                String nameOfBookingSpace = statementResultSet.getString("name_of_space");
+                BookingRange bookingRange = new BookingRange(
+                        statementResultSet.getDate("beginning_booking_date").toLocalDate(),
+                        statementResultSet.getInt("beginning_booking_hour"),
+                        statementResultSet.getDate("ending_booking_date").toLocalDate(),
+                        statementResultSet.getInt("ending_booking_hour"));
+
+                return Optional.of(new Booking(login_of_user, nameOfBookingSpace, bookingRange));
+            } else {
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new DaoException("Error retrieving space by name", e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    @LoggingTime
     @Override
     public void delete(long idOfBooking) {
         try (Connection connection = connectionManager.open()) {
@@ -256,7 +293,7 @@ public final class BookingDAOInBd implements BookingDAO {
      *
      * @param idOfBooking the ID of the booking to delete
      * @param connection  the database connection
-     * @throws SQLException if a database access error occurs
+     * @throws SQLException if booking not exist.
      */
     private static void deleteBookingById(long idOfBooking, Connection connection) throws SQLException {
         try (PreparedStatement statementDeleteBooking =
