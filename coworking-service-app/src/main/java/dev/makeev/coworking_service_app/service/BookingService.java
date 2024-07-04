@@ -9,7 +9,6 @@ import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -108,16 +107,8 @@ public final class BookingService {
      * @param loginOfUser the login of the user
      * @return a list of formatted booking strings
      */
-    public List<String> getAllBookingsForUser(String loginOfUser) {
-        List<Booking> bookings = bookingDAO.getAllForUser(loginOfUser);
-        List<String> formatedBookings = new ArrayList<>();
-        for (Booking booking : bookings) {
-            formatedBookings.add(String.format("%d. Space: %s | From: %02d:00 %s | To: %02d:00 %s\n",
-                    bookings.indexOf(booking) + 1, booking.nameOfBookingSpace(),
-                    booking.bookingRange().beginningBookingHour(), booking.bookingRange().beginningBookingDate(),
-                    booking.bookingRange().endingBookingHour(), booking.bookingRange().endingBookingDate()));
-        }
-        return formatedBookings;
+    public List<Booking> getAllBookingsForUser(String loginOfUser) {
+        return bookingDAO.getAllForUser(loginOfUser);
     }
 
     /**
@@ -125,11 +116,9 @@ public final class BookingService {
      *
      * @return a list of formatted booking strings
      */
-    public List<String> getAllBookingsSortedByUser() {
-        List<Booking> bookings = bookingDAO.getAll();
-        return bookings.stream()
+    public List<Booking> getAllBookingsSortedByUser() {
+        return bookingDAO.getAll().stream()
                 .sorted(Comparator.comparing(Booking::loginOfUser))
-                .map(Booking::toString)
                 .toList();
     }
 

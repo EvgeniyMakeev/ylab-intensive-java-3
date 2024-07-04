@@ -28,16 +28,16 @@ public record Booking(Long id,
                 bookingRange);
     }
 
-    @Override
-    public String toString() {
-        return String.format(
-                "ID: %d | Space: %s | From: %02d:00 %s | To: %02d:00 %s | By: %s\n",
-                id,
-                nameOfBookingSpace,
-                bookingRange.beginningBookingHour(),
-                bookingRange.beginningBookingDate(),
-                bookingRange.endingBookingHour(),
-                bookingRange.endingBookingDate(),
-                loginOfUser);
-    }
+//    @Override
+//    public String toString() {
+//        return String.format(
+//                "ID: %d | Space: %s | From: %02d:00 %s | To: %02d:00 %s | By: %s\n",
+//                id,
+//                nameOfBookingSpace,
+//                bookingRange.beginningBookingHour(),
+//                bookingRange.beginningBookingDate(),
+//                bookingRange.endingBookingHour(),
+//                bookingRange.endingBookingDate(),
+//                loginOfUser);
+//    }
 }

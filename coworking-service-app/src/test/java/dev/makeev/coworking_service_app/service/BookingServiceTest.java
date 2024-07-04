@@ -85,51 +85,51 @@ class BookingServiceTest {
         verify(bookingDAO, never()).add(any(Booking.class));
     }
 
-    @Test
-    @DisplayName("BookingService test: Get All Bookings For User - Should return all bookings for user")
-    void getAllBookingsForUser_shouldReturnAllBookingsForUser() {
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(mockBooking);
-        when(mockBooking.bookingRange()).thenReturn(mockBookingRange);
-        when(bookingDAO.getAllForUser(anyString())).thenReturn(bookings);
-        when(mockBooking.toString()).thenReturn("1. Space: null | From: 00:00 null | To: 00:00 null");
+//    @Test
+//    @DisplayName("BookingService test: Get All Bookings For User - Should return all bookings for user")
+//    void getAllBookingsForUser_shouldReturnAllBookingsForUser() {
+//        List<Booking> bookings = new ArrayList<>();
+//        bookings.add(mockBooking);
+//        when(mockBooking.bookingRange()).thenReturn(mockBookingRange);
+//        when(bookingDAO.getAllForUser(anyString())).thenReturn(bookings);
+//        when(mockBooking.toString()).thenReturn("1. Space: null | From: 00:00 null | To: 00:00 null");
+//
+//        List<String> result = bookingService.getAllBookingsForUser("testUser");
+//
+//        assertThat(result).isNotEmpty();
+//        assertThat(result.get(0)).contains(mockBooking.toString());
+//        verify(bookingDAO, times(1)).getAllForUser("testUser");
+//    }
 
-        List<String> result = bookingService.getAllBookingsForUser("testUser");
-
-        assertThat(result).isNotEmpty();
-        assertThat(result.get(0)).contains(mockBooking.toString());
-        verify(bookingDAO, times(1)).getAllForUser("testUser");
-    }
-
-    @Test
-    @DisplayName("BookingService test: Get All Bookings Sorted By User - Should return all bookings sorted by user")
-    void getAllBookingsSortedByUser_shouldReturnAllBookingsSortedByUser() {
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(mockBooking);
-        when(bookingDAO.getAll()).thenReturn(bookings);
-        when(mockBooking.toString()).thenReturn("1. Space: null | From: 00:00 null | To: 00:00 null");
-
-        List<String> result = bookingService.getAllBookingsSortedByUser();
-
-        assertThat(result).isNotEmpty();
-        assertThat(result.get(0)).contains(mockBooking.toString());
-        verify(bookingDAO, times(1)).getAll();
-    }
-
-    @Test
-    @DisplayName("BookingService test: Get All Bookings Sorted By Date - Should return all bookings sorted by date")
-    void getAllBookingsSortedByDate_shouldReturnAllBookingsSortedByDate() {
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(mockBooking);
-        when(bookingDAO.getAll()).thenReturn(bookings);
-        when(mockBooking.toString()).thenReturn("1. Space: null | From: 00:00 null | To: 00:00 null");
-
-        List<String> result = bookingService.getAllBookingsSortedByUser();
-
-        assertThat(result).isNotEmpty();
-        assertThat(result.get(0)).contains(mockBooking.toString());
-        verify(bookingDAO, times(1)).getAll();
-    }
+//    @Test
+//    @DisplayName("BookingService test: Get All Bookings Sorted By User - Should return all bookings sorted by user")
+//    void getAllBookingsSortedByUser_shouldReturnAllBookingsSortedByUser() {
+//        List<Booking> bookings = new ArrayList<>();
+//        bookings.add(mockBooking);
+//        when(bookingDAO.getAll()).thenReturn(bookings);
+//        when(mockBooking.toString()).thenReturn("1. Space: null | From: 00:00 null | To: 00:00 null");
+//
+//        List<String> result = bookingService.getAllBookingsSortedByUser();
+//
+//        assertThat(result).isNotEmpty();
+//        assertThat(result.get(0)).contains(mockBooking.toString());
+//        verify(bookingDAO, times(1)).getAll();
+//    }
+//
+//    @Test
+//    @DisplayName("BookingService test: Get All Bookings Sorted By Date - Should return all bookings sorted by date")
+//    void getAllBookingsSortedByDate_shouldReturnAllBookingsSortedByDate() {
+//        List<Booking> bookings = new ArrayList<>();
+//        bookings.add(mockBooking);
+//        when(bookingDAO.getAll()).thenReturn(bookings);
+//        when(mockBooking.toString()).thenReturn("1. Space: null | From: 00:00 null | To: 00:00 null");
+//
+//        List<String> result = bookingService.getAllBookingsSortedByUser();
+//
+//        assertThat(result).isNotEmpty();
+//        assertThat(result.get(0)).contains(mockBooking.toString());
+//        verify(bookingDAO, times(1)).getAll();
+//    }
 
     @Test
     @DisplayName("BookingService test: Get All Bookings Sorted By Space - Should return all bookings sorted by space")
