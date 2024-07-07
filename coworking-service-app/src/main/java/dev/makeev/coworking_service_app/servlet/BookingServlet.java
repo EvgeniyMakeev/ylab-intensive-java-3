@@ -1,11 +1,13 @@
 package dev.makeev.coworking_service_app.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.implementation.BookingDAOInBd;
 import dev.makeev.coworking_service_app.dao.implementation.SpaceDAOInBd;
 import dev.makeev.coworking_service_app.dao.implementation.UserDAOInBd;
-import dev.makeev.coworking_service_app.dto.*;
+import dev.makeev.coworking_service_app.dto.BookingAddDTO;
+import dev.makeev.coworking_service_app.dto.BookingDTO;
+import dev.makeev.coworking_service_app.dto.BookingRequestDTO;
+import dev.makeev.coworking_service_app.dto.UserRequestDTO;
 import dev.makeev.coworking_service_app.exceptions.*;
 import dev.makeev.coworking_service_app.mappers.ApiResponse;
 import dev.makeev.coworking_service_app.mappers.BookingMapper;
@@ -44,7 +46,6 @@ public class BookingServlet extends HttpServlet {
         objectMapper = new ObjectMapper();
     }
 
-    @LoggingTime
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
@@ -81,7 +82,6 @@ public class BookingServlet extends HttpServlet {
         }
     }
 
-    @LoggingTime
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
@@ -90,8 +90,8 @@ public class BookingServlet extends HttpServlet {
 
             if (isValid(bookingAddDTO)) {
                 userService.checkCredentials(bookingAddDTO.loginOfUser(), bookingAddDTO.password());
-//                Booking booking = bookingMapper.toBooking(bookingAddDTO);
-//                bookingService.addBooking(bookingAddDTO.loginOfUser(), booking);
+                Booking booking = bookingMapper.toBooking(bookingAddDTO);
+                bookingService.addBooking(bookingAddDTO.loginOfUser(), booking);
 
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 objectMapper.writeValue(response.getWriter(), new ApiResponse("Booking added successfully"));
@@ -132,31 +132,33 @@ public class BookingServlet extends HttpServlet {
                 && bookingAddDTO.endingBookingHour() <= maxHourOfEnding;
     }
 
-    @LoggingTime
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
         try {
-            bookingCancellation(objectMapper.readValue(request.getInputStream(), BookingRequestDTO.class));
+            BookingRequestDTO bookingRequestDTO = objectMapper.readValue(request.getInputStream(), BookingRequestDTO.class);
+            userService.checkCredentials(bookingRequestDTO.login(), bookingRequestDTO.password());
+            if (userService.isAdmin(bookingRequestDTO.login())) {
+                bookingService.deleteBookingById(bookingRequestDTO.login(), bookingRequestDTO.id());
+                response.setStatus(HttpServletResponse.SC_OK);
+                objectMapper.writeValue(response.getWriter(), new ApiResponse("Booking deleted successfully"));
+            } else {
+                if (bookingService.getAllBookingsForUser(bookingRequestDTO.login()).stream()
+                        .anyMatch(booking -> Objects.equals(booking.id(), bookingRequestDTO.id()))) {
+                    bookingService.deleteBookingById(bookingRequestDTO.login(), bookingRequestDTO.id());
+                } else {
+                    throw new BookingNotFoundException();
+                }
+            }
+        } catch (VerificationException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            objectMapper.writeValue(response.getWriter(), new ApiResponse(e.getMessage()));
         } catch (BookingNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             objectMapper.writeValue(response.getWriter(), new ApiResponse(e.getMessage()));
         } catch (DaoException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             objectMapper.writeValue(response.getWriter(), new ApiResponse(e.getMessage()));
-        }
-    }
-
-    private void bookingCancellation(BookingRequestDTO bookingRequestDTO) {
-        if (userService.isAdmin(bookingRequestDTO.login())) {
-            bookingService.deleteBookingById(bookingRequestDTO.login(), bookingRequestDTO.id());
-        } else {
-            if (bookingService.getAllBookingsForUser(bookingRequestDTO.login()).stream()
-                    .anyMatch(booking -> Objects.equals(booking.id(), bookingRequestDTO.id()))) {
-                bookingService.deleteBookingById(bookingRequestDTO.login(), bookingRequestDTO.id());
-            } else {
-                throw new BookingNotFoundException();
-            }
         }
     }
 }

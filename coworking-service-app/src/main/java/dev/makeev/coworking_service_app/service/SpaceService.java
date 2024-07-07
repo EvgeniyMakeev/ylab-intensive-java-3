@@ -9,9 +9,7 @@ import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service class for managing coworking spaces.
@@ -67,6 +65,10 @@ public final class SpaceService {
         return spaceDAO.getNamesOfSpaces();
     }
 
+    @LoggingTime
+    public Optional<Space> getSpacesByName(String name) {
+        return spaceDAO.getSpaceByName(name);
+    }
 
     /**
      * Deletes a space by its name.
@@ -76,5 +78,30 @@ public final class SpaceService {
     public void deleteSpace(String nameOfSpace) throws SpaceNotFoundException {
         spaceDAO.getSpaceByName(nameOfSpace).orElseThrow(SpaceNotFoundException::new);
         spaceDAO.delete(nameOfSpace);
+    }
+
+    public List<String> getAvailableSlotsForBooking(String name) throws SpaceNotFoundException {
+        Space space = spaceDAO.getSpaceByName(name).orElseThrow(SpaceNotFoundException::new);
+
+        List<String> availableSlots = new ArrayList<>();
+        availableSlots.add(space.name() + " - available slots for booking:");
+
+        long freeSlot = 0L;
+
+        space.bookingSlots().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEachOrdered(dateEntry -> {
+                    availableSlots.add(dateEntry.getKey().toString());
+                    StringBuilder stringBuilder = new StringBuilder();
+                    dateEntry.getValue().keySet().stream()
+                            .filter(hour -> dateEntry.getValue().get(hour) == freeSlot)
+                            .sorted(Comparator.naturalOrder())
+                            .forEachOrdered(hour ->
+                                    stringBuilder.append(String.format("%02d:00 - %02d:00", hour, hour + 1))
+                                    .append(" | "));
+                    availableSlots.add(stringBuilder.toString());
+                });
+
+        return availableSlots;
     }
 }

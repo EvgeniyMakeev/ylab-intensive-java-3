@@ -4,7 +4,7 @@
 
   <groupId>makeev</groupId>
   <artifactId>coworking-service-app</artifactId>
-  <version>3.1</version>
+  <version>3.1.1</version>
   <packaging>war</packaging>
 
   <name>coworking-service-app</name>
@@ -37,7 +37,7 @@
     <aspectj.version>1.9.7</aspectj.version>
     <plugin.war.version>3.4.0</plugin.war.version>
     <plugin.aspectj.version>1.15.0</plugin.aspectj.version>
-    <mapstruct.version>1.5.5.Final</mapstruct.version>
+    <mapstruct.version>1.6.0.Beta2</mapstruct.version>
     <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
   </properties>
 
@@ -194,15 +194,21 @@
           <complianceLevel>16</complianceLevel>
           <source>16</source>
           <target>16</target>
+          <aspectLibraries>
+            <aspectLibrary>
+              <groupId>org.aspectj</groupId>
+              <artifactId>aspectjrt</artifactId>
+            </aspectLibrary>
+          </aspectLibraries>
           <showWeaveInfo>true</showWeaveInfo>
-          <verbose>true</verbose>
-          <Xlint>ignore</Xlint>
-          <encoding>UTF-8 </encoding>
+          <forceAjcCompile>true</forceAjcCompile>
+          <encoding>UTF-8</encoding>
         </configuration>
         <executions>
           <execution>
             <goals>
               <goal>compile</goal>
+              <goal>test-compile</goal>
             </goals>
           </execution>
         </executions>
@@ -213,8 +219,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <source>16</source>
-          <target>16</target>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
           <annotationProcessorPaths>
             <path>
               <groupId>org.mapstruct</groupId>
@@ -222,6 +228,9 @@
               <version>${mapstruct.version}</version>
             </path>
           </annotationProcessorPaths>
+          <compilerArgs>
+            <arg>-Amapstruct.unmappedTargetPolicy=IGNORE</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
   </plugins>

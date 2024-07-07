@@ -216,32 +216,32 @@ public class AllDAOsTest {
         assertThat(allBookingsAfterAdd.size()).isEqualTo(allBookingsBeforeAdd.size() + 1);
     }
 
-//    @Test
-//    @Order(11)
-//    @DisplayName("BookingDAOInBd test: Delete Booking - Should delete a booking for a user")
-//    void delete_shouldDeleteBooking() {
-//        List<Booking> allBookingsBeforeDelete = bookingDAO.getAll();
-//        bookingDAO.delete(bookingDAO.getAllForUser(TEST_LOGIN_2).get(0).id());
-//
-//        List<Booking> allBookingsAfterDelete = bookingDAO.getAll();
-//        List<Booking> bookingsForDeletedUser = bookingDAO.getAllForUser(TEST_LOGIN_2);
-//
-//        assertThat(allBookingsBeforeDelete.size() - 1).isEqualTo(allBookingsAfterDelete.size());
-//        assertTrue(bookingsForDeletedUser.isEmpty());
-//    }
+    @Test
+    @Order(11)
+    @DisplayName("BookingDAOInBd test: Delete Booking - Should delete a booking for a user")
+    void delete_shouldDeleteBooking() {
+        List<Booking> allBookingsBeforeDelete = bookingDAO.getAll();
+        bookingDAO.delete(bookingDAO.getAllForUser(TEST_LOGIN_2).get(0).id());
 
-//    @Test
-//    @Order(12)
-//    @DisplayName("BookingDAOInBd test: Delete Booking - Should not delete a booking with incorrect ID")
-//    void delete_shouldNotDeleteBookingWithIncorrectId() {
-//        List<Booking> allBookingsBeforeDelete = bookingDAO.getAll();
-//        long incorrectId = 999L;
-//        bookingDAO.delete(incorrectId);
-//
-//        List<Booking> allBookingsAfterDelete = bookingDAO.getAll();
-//
-//        assertThat(allBookingsBeforeDelete.size()).isEqualTo(allBookingsAfterDelete.size());
-//    }
+        List<Booking> allBookingsAfterDelete = bookingDAO.getAll();
+        List<Booking> bookingsForDeletedUser = bookingDAO.getAllForUser(TEST_LOGIN_2);
+
+        assertThat(allBookingsBeforeDelete.size() - 1).isEqualTo(allBookingsAfterDelete.size());
+        assertTrue(bookingsForDeletedUser.isEmpty());
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("BookingDAOInBd test: Delete Booking - Should not delete a booking with incorrect ID")
+    void delete_shouldNotDeleteBookingWithIncorrectId() {
+        List<Booking> allBookingsBeforeDelete = bookingDAO.getAll();
+        long incorrectId = 999L;
+        bookingDAO.delete(incorrectId);
+
+        List<Booking> allBookingsAfterDelete = bookingDAO.getAll();
+
+        assertThat(allBookingsBeforeDelete.size()).isEqualTo(allBookingsAfterDelete.size());
+    }
 
     @Test
     @Order(13)

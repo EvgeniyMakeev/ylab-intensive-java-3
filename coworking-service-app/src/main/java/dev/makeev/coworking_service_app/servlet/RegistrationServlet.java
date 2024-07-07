@@ -37,8 +37,7 @@ public class RegistrationServlet extends HttpServlet {
         try {
             UserRequestDTO userRequestDTO = getUserRequestDTO(request, response);
             if (userRequestDTO != null) {
-                userService.existByLogin(userRequestDTO.login());
-                userService.addUser(userRequestDTO);
+                userService.addUser(userRequestDTO.login(), userRequestDTO.password());
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 objectMapper.writeValue(response.getWriter(), new ApiResponse("User added successfully"));
             }

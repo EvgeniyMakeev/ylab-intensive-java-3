@@ -1,42 +1,55 @@
-package dev.makeev.coworking_service_app.service;
-
-import dev.makeev.coworking_service_app.dao.BookingDAO;
-import dev.makeev.coworking_service_app.dao.SpaceDAO;
-import dev.makeev.coworking_service_app.model.Booking;
-import dev.makeev.coworking_service_app.model.BookingRange;
-import dev.makeev.coworking_service_app.model.Space;
-import dev.makeev.coworking_service_app.model.WorkingHours;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-@DisplayName("BookingService Test")
-@ExtendWith(MockitoExtension.class)
-class BookingServiceTest {
-
-    @Mock
-    private BookingDAO bookingDAO;
-
-    @Mock
-    private SpaceDAO spaceDAO;
-
-    @InjectMocks
-    private BookingService bookingService;
-
-    @Mock
-    private Space mockSpace;
-
-    @Mock
-    private Booking mockBooking;
-
-    @Mock
-    private BookingRange mockBookingRange;
-
-    @Mock
-    private WorkingHours mockWorkingHours;
-
+//package dev.makeev.coworking_service_app.service;
+//
+//import dev.makeev.coworking_service_app.dao.BookingDAO;
+//import dev.makeev.coworking_service_app.dao.SpaceDAO;
+//import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
+//import dev.makeev.coworking_service_app.model.Booking;
+//import dev.makeev.coworking_service_app.model.BookingRange;
+//import dev.makeev.coworking_service_app.model.Space;
+//import dev.makeev.coworking_service_app.model.WorkingHours;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.extension.ExtendWith;
+//import org.mockito.InjectMocks;
+//import org.mockito.Mock;
+//import org.mockito.junit.jupiter.MockitoExtension;
+//
+//import java.time.LocalDate;
+//import java.util.ArrayList;
+//import java.util.List;
+//import java.util.Map;
+//import java.util.Optional;
+//
+//import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+//import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+//import static org.mockito.ArgumentMatchers.anyString;
+//import static org.mockito.Mockito.*;
+//
+//@DisplayName("BookingService Test")
+//@ExtendWith(MockitoExtension.class)
+//class BookingServiceTest {
+//
+//    @Mock
+//    private BookingDAO bookingDAO;
+//
+//    @Mock
+//    private SpaceDAO spaceDAO;
+//
+//    @InjectMocks
+//    private BookingService bookingService;
+//
+//    @Mock
+//    private Space mockSpace;
+//
+//    @Mock
+//    private Booking mockBooking;
+//
+//    @Mock
+//    private BookingRange mockBookingRange;
+//
+//    @Mock
+//    private WorkingHours mockWorkingHours;
+//
 //    @Test
 //    @DisplayName("BookingService test: Add Booking - Should add booking if space is available")
 //    void addBooking_shouldAddBookingIfSpaceIsAvailable() throws SpaceIsNotAvailableException {
@@ -51,7 +64,7 @@ class BookingServiceTest {
 //
 //        verify(bookingDAO, times(1)).add(any(Booking.class));
 //    }
-
+//
 //    @Test
 //    @DisplayName("BookingService test: Add Booking - Should throw exception if space is not available")
 //    void addBooking_shouldThrowExceptionIfSpaceIsNotAvailable() {
@@ -66,7 +79,7 @@ class BookingServiceTest {
 //
 //        verify(bookingDAO, never()).add(any(Booking.class));
 //    }
-
+//
 //    @Test
 //    @DisplayName("BookingService test: Get All Bookings For User - Should return all bookings for user")
 //    void getAllBookingsForUser_shouldReturnAllBookingsForUser() {
@@ -82,7 +95,7 @@ class BookingServiceTest {
 //        assertThat(result.get(0)).contains(mockBooking.toString());
 //        verify(bookingDAO, times(1)).getAllForUser("testUser");
 //    }
-
+//
 //    @Test
 //    @DisplayName("BookingService test: Get All Bookings Sorted By User - Should return all bookings sorted by user")
 //    void getAllBookingsSortedByUser_shouldReturnAllBookingsSortedByUser() {
@@ -97,17 +110,5 @@ class BookingServiceTest {
 //        assertThat(result.get(0)).contains(mockBooking.toString());
 //        verify(bookingDAO, times(1)).getAll();
 //    }
-
-
-//    @Test
-//    @DisplayName("BookingService test: Delete Booking By Index - Should delete booking by index")
-//    void deleteBookingByIndex_shouldDeleteBookingByIndex() {
-//        List<Booking> bookings = new ArrayList<>();
-//        bookings.add(mockBooking);
-//        when(bookingDAO.getAllForUser(anyString())).thenReturn(bookings);
 //
-//        bookingService.deleteBookingByIndex("testUser", 0);
-//
-//        verify(bookingDAO, times(1)).delete(anyLong());
-//    }
-}
+//}

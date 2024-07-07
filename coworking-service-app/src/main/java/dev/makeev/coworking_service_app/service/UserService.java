@@ -3,7 +3,6 @@ package dev.makeev.coworking_service_app.service;
 import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.aop.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.UserDAO;
-import dev.makeev.coworking_service_app.dto.UserRequestDTO;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import dev.makeev.coworking_service_app.model.User;
@@ -34,20 +33,13 @@ public final class UserService {
 
     @LoggingTime
     @LoggingToDb
-    public void addUser(UserRequestDTO userRequestDTO) {
-        userDAO.add(new User(userRequestDTO.login(), userRequestDTO.password(), false));
-    }
-
-    /**
-     * Checks if a user with the specified login exists.
-     *
-     * @param login The login to check.
-     */
-    public void existByLogin(String login) throws LoginAlreadyExistsException {
+    public void addUser(String login, String password) throws LoginAlreadyExistsException {
         if (userDAO.getByLogin(login).isPresent()){
             throw new LoginAlreadyExistsException();
         }
+        userDAO.add(new User(login, password));
     }
+
 
     /**
      * Verifies the credentials of a user.

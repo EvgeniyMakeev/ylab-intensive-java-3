@@ -40,4 +40,14 @@
         <url-pattern>/api/v1/spaces</url-pattern>
     </servlet-mapping>
 
+    <display-name>Log</display-name>
+
+    <servlet>
+        <servlet-name>LogServlet</servlet-name>
+        <servlet-class>dev.makeev.coworking_service_app.servlet.LogServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogServlet</servlet-name>
+        <url-pattern>/api/v1/log</url-pattern>
+    </servlet-mapping>
 </web-app>

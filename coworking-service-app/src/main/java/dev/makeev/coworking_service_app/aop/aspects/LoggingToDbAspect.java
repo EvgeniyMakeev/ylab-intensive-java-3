@@ -8,8 +8,6 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
-import java.util.Arrays;
-
 @Aspect
 public class LoggingToDbAspect {
 
@@ -23,11 +21,16 @@ public class LoggingToDbAspect {
     public void loggingToDB(JoinPoint joinPoint) {
         String args = "No args";
         try {
-            args = Arrays.toString(joinPoint.getArgs());
-        } finally {
-            String message = joinPoint.getSignature().getName();
-            logService.addLog(args, message);
+            Object[] methodArgs = joinPoint.getArgs();
+            if (methodArgs.length > 0) {
+                args = methodArgs[0].toString();
+            }
+        } catch (Exception e) {
+            System.err.println("Error processing method arguments: " + e.getMessage());
         }
-    }
 
+        String message = joinPoint.getSignature().getName();
+        logService.addLog(args, message);
+    }
 }
+

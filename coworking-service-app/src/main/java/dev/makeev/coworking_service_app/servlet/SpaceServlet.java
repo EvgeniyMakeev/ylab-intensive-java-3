@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 @WebServlet("/api/v1/spaces")
@@ -43,9 +44,9 @@ public class SpaceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
-        try {
+        try (OutputStream outputStream = response.getOutputStream()){
             List<String> spaces = spaceService.getSpaces();
-            objectMapper.writeValue(response.getOutputStream(), spaces);
+            objectMapper.writeValue(outputStream, spaces);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (DaoException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
