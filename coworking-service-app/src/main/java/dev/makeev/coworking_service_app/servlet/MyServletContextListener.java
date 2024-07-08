@@ -1,5 +1,6 @@
 package dev.makeev.coworking_service_app.servlet;
 
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.util.InitDb;
 import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
 import jakarta.servlet.ServletContextEvent;
@@ -11,10 +12,13 @@ import java.sql.SQLException;
 
 @WebListener
 public class MyServletContextListener implements ServletContextListener {
+
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         new InitDb(new ConnectionManagerImpl()).initDb();
     }
+
+    @LoggingTime
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         try {

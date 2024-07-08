@@ -72,7 +72,6 @@ public class RegistrationServlet extends HttpServlet {
 
     private UserRequestDTO getUserRequestDTO(
             HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType(CONTENT_TYPE);
         UserRequestDTO userRequestDTO = objectMapper.readValue(request.getInputStream(), UserRequestDTO.class);
         if (userRequestDTO.login() == null
                 || userRequestDTO.login().isEmpty()

@@ -2,6 +2,7 @@ package dev.makeev.coworking_service_app.service;
 
 import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
+import dev.makeev.coworking_service_app.dto.SlotsAvailableForBookingDTO;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
 import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
@@ -61,13 +62,8 @@ public final class SpaceService {
      * @return a list of all spaces
      */
     @LoggingTime
-    public List<String> getSpaces() {
+    public List<String> getNamesOfSpaces() {
         return spaceDAO.getNamesOfSpaces();
-    }
-
-    @LoggingTime
-    public Optional<Space> getSpacesByName(String name) {
-        return spaceDAO.getSpaceByName(name);
     }
 
     /**
@@ -80,26 +76,23 @@ public final class SpaceService {
         spaceDAO.delete(nameOfSpace);
     }
 
-    public List<String> getAvailableSlotsForBooking(String name) throws SpaceNotFoundException {
+    public List<SlotsAvailableForBookingDTO> getAvailableSlotsForBooking(String name) throws SpaceNotFoundException {
         Space space = spaceDAO.getSpaceByName(name).orElseThrow(SpaceNotFoundException::new);
 
-        List<String> availableSlots = new ArrayList<>();
-        availableSlots.add(space.name() + " - available slots for booking:");
+        List<SlotsAvailableForBookingDTO> availableSlots = new ArrayList<>();
 
         long freeSlot = 0L;
 
         space.bookingSlots().entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(dateEntry -> {
-                    availableSlots.add(dateEntry.getKey().toString());
-                    StringBuilder stringBuilder = new StringBuilder();
+                    List<String> slots = new ArrayList<>();
                     dateEntry.getValue().keySet().stream()
                             .filter(hour -> dateEntry.getValue().get(hour) == freeSlot)
                             .sorted(Comparator.naturalOrder())
                             .forEachOrdered(hour ->
-                                    stringBuilder.append(String.format("%02d:00 - %02d:00", hour, hour + 1))
-                                    .append(" | "));
-                    availableSlots.add(stringBuilder.toString());
+                                    slots.add(String.format("%02d:00 - %02d:00", hour, hour + 1)));
+                    availableSlots.add(new SlotsAvailableForBookingDTO(dateEntry.getKey().toString(), slots));
                 });
 
         return availableSlots;

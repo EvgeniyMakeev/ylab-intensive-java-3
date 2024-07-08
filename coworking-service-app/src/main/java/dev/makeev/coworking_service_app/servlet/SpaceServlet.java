@@ -45,7 +45,7 @@ public class SpaceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
         try (OutputStream outputStream = response.getOutputStream()){
-            List<String> spaces = spaceService.getSpaces();
+            List<String> spaces = spaceService.getNamesOfSpaces();
             objectMapper.writeValue(outputStream, spaces);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (DaoException e) {

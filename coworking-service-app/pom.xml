@@ -4,7 +4,7 @@
 
   <groupId>makeev</groupId>
   <artifactId>coworking-service-app</artifactId>
-  <version>3.1.1</version>
+  <version>3.1.2</version>
   <packaging>war</packaging>
 
   <name>coworking-service-app</name>
@@ -21,6 +21,8 @@
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <slf4j-api.version>2.0.13</slf4j-api.version>
     <mockito.version>5.12.0</mockito.version>
     <assertj-core.version>3.26.0</assertj-core.version>
@@ -34,7 +36,7 @@
     <testcontainers.version>1.19.8</testcontainers.version>
     <jakarta.servlet.version>6.1.0</jakarta.servlet.version>
     <jackson.version>2.17.1</jackson.version>
-    <aspectj.version>1.9.7</aspectj.version>
+    <aspectj.version>1.9.20.1</aspectj.version>
     <plugin.war.version>3.4.0</plugin.war.version>
     <plugin.aspectj.version>1.15.0</plugin.aspectj.version>
     <mapstruct.version>1.6.0.Beta2</mapstruct.version>
@@ -186,33 +188,27 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>aspectj-maven-plugin</artifactId>
-        <version>${plugin.aspectj.version}</version>
-        <configuration>
-          <complianceLevel>16</complianceLevel>
-          <source>16</source>
-          <target>16</target>
-          <aspectLibraries>
-            <aspectLibrary>
-              <groupId>org.aspectj</groupId>
-              <artifactId>aspectjrt</artifactId>
-            </aspectLibrary>
-          </aspectLibraries>
-          <showWeaveInfo>true</showWeaveInfo>
-          <forceAjcCompile>true</forceAjcCompile>
-          <encoding>UTF-8</encoding>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>test-compile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-compiler-plugin</artifactId>-->
+<!--        <version>${maven-compiler-plugin.version}</version>-->
+<!--        <configuration>-->
+<!--          <source>${maven.compiler.source}</source>-->
+<!--          <target>${maven.compiler.target}</target>-->
+<!--          <annotationProcessorPaths>-->
+<!--            <path>-->
+<!--              <groupId>org.mapstruct</groupId>-->
+<!--              <artifactId>mapstruct-processor</artifactId>-->
+<!--              <version>${mapstruct.version}</version>-->
+<!--            </path>-->
+<!--            <path>-->
+<!--              <groupId>org.aspectj</groupId>-->
+<!--              <artifactId>aspectjrt</artifactId>-->
+<!--              <version>1.9.7</version>-->
+<!--            </path>-->
+<!--          </annotationProcessorPaths>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -228,11 +224,36 @@
               <version>${mapstruct.version}</version>
             </path>
           </annotationProcessorPaths>
-          <compilerArgs>
-            <arg>-Amapstruct.unmappedTargetPolicy=IGNORE</arg>
-          </compilerArgs>
         </configuration>
       </plugin>
+
+<!--      <plugin>-->
+<!--        <groupId>org.codehaus.mojo</groupId>-->
+<!--        <artifactId>aspectj-maven-plugin</artifactId>-->
+<!--        <version>${plugin.aspectj.version}</version>-->
+<!--        <configuration>-->
+<!--          <complianceLevel>16</complianceLevel>-->
+<!--          <source>16</source>-->
+<!--          <target>16</target>-->
+<!--          <aspectLibraries>-->
+<!--            <aspectLibrary>-->
+<!--              <groupId>org.aspectj</groupId>-->
+<!--              <artifactId>aspectjrt</artifactId>-->
+<!--            </aspectLibrary>-->
+<!--          </aspectLibraries>-->
+<!--          <showWeaveInfo>true</showWeaveInfo>-->
+<!--          <forceAjcCompile>true</forceAjcCompile>-->
+<!--          <encoding>UTF-8</encoding>-->
+<!--        </configuration>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <goals>-->
+<!--              <goal>compile</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
   </plugins>
  </build>
 

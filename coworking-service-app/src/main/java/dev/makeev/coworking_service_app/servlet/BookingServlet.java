@@ -1,6 +1,7 @@
 package dev.makeev.coworking_service_app.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.implementation.BookingDAOInBd;
 import dev.makeev.coworking_service_app.dao.implementation.SpaceDAOInBd;
 import dev.makeev.coworking_service_app.dao.implementation.UserDAOInBd;
@@ -46,6 +47,7 @@ public class BookingServlet extends HttpServlet {
         objectMapper = new ObjectMapper();
     }
 
+    @LoggingTime
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
@@ -82,6 +84,7 @@ public class BookingServlet extends HttpServlet {
         }
     }
 
+    @LoggingTime
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
@@ -116,8 +119,8 @@ public class BookingServlet extends HttpServlet {
     }
 
     private boolean isValid(BookingAddDTO bookingAddDTO) {
-        return bookingAddDTO != null
-                || bookingAddDTO.loginOfUser() != null
+        return bookingAddDTO == null
+                || bookingAddDTO.loginOfUser() == null
                 || bookingAddDTO.nameOfBookingSpace() != null
                 || bookingAddDTO.beginningBookingDate() != null
                 || bookingAddDTO.endingBookingDate() != null
@@ -129,9 +132,12 @@ public class BookingServlet extends HttpServlet {
         int maxHourOfEnding = 24;
 
         return bookingAddDTO.beginningBookingHour() >= minHourOfBeginning
+                && bookingAddDTO.beginningBookingHour() < maxHourOfEnding
+                && bookingAddDTO.endingBookingHour() > minHourOfBeginning
                 && bookingAddDTO.endingBookingHour() <= maxHourOfEnding;
     }
 
+    @LoggingTime
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);

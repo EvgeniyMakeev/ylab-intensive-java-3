@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+
 @Mapper
 public interface BookingMapper {
     BookingMapper INSTANCE = Mappers.getMapper(BookingMapper.class);
@@ -14,18 +15,18 @@ public interface BookingMapper {
     @Mapping(target = "id", source = "booking.id")
     @Mapping(target = "loginOfUser", source = "booking.loginOfUser")
     @Mapping(target = "nameOfBookingSpace", source = "booking.nameOfBookingSpace")
-    @Mapping(target = "beginningBookingDate", source = "booking.bookingRange.beginningBookingDate", dateFormat = "dd.MM.yyyy")
+    @Mapping(target = "beginningBookingDate", source = "booking.bookingRange.beginningBookingDate", dateFormat = "yyyy-MM-dd")
     @Mapping(target = "beginningBookingHour", source = "booking.bookingRange.beginningBookingHour")
-    @Mapping(target = "endingBookingDate", source = "booking.bookingRange.endingBookingDate", dateFormat = "dd.MM.yyyy")
+    @Mapping(target = "endingBookingDate", source = "booking.bookingRange.endingBookingDate", dateFormat = "yyyy-MM-dd")
     @Mapping(target = "endingBookingHour", source = "booking.bookingRange.endingBookingHour")
     BookingDTO toBookingDTO(Booking booking);
 
-    @Mapping(target = "id", ignore = true, source = "password")
+    @Mapping(target = "id", ignore = true, source = "bookingAddDTO.password")
     @Mapping(target = "loginOfUser", source = "bookingAddDTO.loginOfUser")
     @Mapping(target = "nameOfBookingSpace", source = "bookingAddDTO.nameOfBookingSpace")
-    @Mapping(target = "bookingRange.beginningBookingDate", source = "beginningBookingDate", dateFormat = "dd.MM.yyyy")
+    @Mapping(target = "bookingRange.beginningBookingDate", dateFormat = "yyyy-MM-dd", source = "bookingAddDTO.beginningBookingDate")
     @Mapping(target = "bookingRange.beginningBookingHour", source = "bookingAddDTO.beginningBookingHour")
-    @Mapping(target = "bookingRange.endingBookingDate", source = "endingBookingDate", dateFormat = "dd.MM.yyyy")
+    @Mapping(target = "bookingRange.endingBookingDate", dateFormat = "yyyy-MM-dd", source = "bookingAddDTO.endingBookingDate")
     @Mapping(target = "bookingRange.endingBookingHour", source = "bookingAddDTO.endingBookingHour")
     Booking toBooking(BookingAddDTO bookingAddDTO);
 }

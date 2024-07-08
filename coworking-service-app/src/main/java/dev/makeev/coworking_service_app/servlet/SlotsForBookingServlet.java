@@ -3,6 +3,7 @@ package dev.makeev.coworking_service_app.servlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.implementation.SpaceDAOInBd;
+import dev.makeev.coworking_service_app.dto.SlotsAvailableForBookingDTO;
 import dev.makeev.coworking_service_app.dto.SpaceSlotsDTO;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
@@ -38,8 +39,8 @@ public class SlotsForBookingServlet extends HttpServlet {
         try (OutputStream outputStream = response.getOutputStream()){
             SpaceSlotsDTO spaceSlotsDTO = objectMapper.readValue(request.getInputStream(), SpaceSlotsDTO.class);
             if (spaceSlotsDTO != null) {
-                List<String> slotsForBooking = spaceService.getAvailableSlotsForBooking(spaceSlotsDTO.name());
-
+                List<SlotsAvailableForBookingDTO> slotsForBooking =
+                        spaceService.getAvailableSlotsForBooking(spaceSlotsDTO.name());
                 objectMapper.writeValue(outputStream, slotsForBooking);
                 response.setStatus(HttpServletResponse.SC_OK);
             }

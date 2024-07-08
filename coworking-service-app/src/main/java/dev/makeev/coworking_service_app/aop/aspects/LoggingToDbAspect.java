@@ -19,18 +19,25 @@ public class LoggingToDbAspect {
 
     @After("annotatedByLoggingToDb()")
     public void loggingToDB(JoinPoint joinPoint) {
-        String args = "No args";
+        String loginArg = "No args";
         try {
             Object[] methodArgs = joinPoint.getArgs();
             if (methodArgs.length > 0) {
-                args = methodArgs[0].toString();
+                loginArg = methodArgs[0].toString();
             }
         } catch (Exception e) {
             System.err.println("Error processing method arguments: " + e.getMessage());
         }
 
-        String message = joinPoint.getSignature().getName();
-        logService.addLog(args, message);
+        String methodName = joinPoint.getSignature().getName();
+        switch (joinPoint.getSignature().getName()) {
+            case "addUser" -> methodName = "Registered.";
+            case "addBooking" -> methodName = "Add new booking.";
+            case "getAllBookingsForUser" -> methodName = "Looked at a bookings.";
+            case "deleteBookingById" -> methodName = "Cancelled a booking.";
+        }
+
+        logService.addLog(loginArg, methodName);
     }
 }
 

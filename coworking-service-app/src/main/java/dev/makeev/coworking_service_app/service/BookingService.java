@@ -79,7 +79,7 @@ public final class BookingService {
                     int endHour = (date.equals(bookingRange.endingBookingDate())) ?
                             bookingRange.endingBookingHour() : workingHours.hourOfEndingWorkingDay();
 
-                    return IntStream.range(startHour, endHour).allMatch(hour -> slots.getOrDefault(hour, 0L) == 0L);
+                    return IntStream.range(startHour, endHour).allMatch(hour -> slots.get(hour) == 0L);
                 });
     }
 
@@ -118,6 +118,7 @@ public final class BookingService {
      *
      * @return a list of formatted booking strings
      */
+    @LoggingTime
     public List<Booking> getAllBookingsSortedByUser() {
         return bookingDAO.getAll().stream()
                 .sorted(Comparator.comparing(Booking::loginOfUser))

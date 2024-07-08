@@ -1,6 +1,7 @@
 package dev.makeev.coworking_service_app.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.implementation.LogDaoInBd;
 import dev.makeev.coworking_service_app.dao.implementation.UserDAOInBd;
 import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
@@ -40,6 +41,7 @@ public class LogServlet extends HttpServlet {
         objectMapper = new ObjectMapper();
     }
 
+    @LoggingTime
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
@@ -71,7 +73,6 @@ public class LogServlet extends HttpServlet {
 
     private UserRequestDTO getUserRequestDTO(
             HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType(CONTENT_TYPE);
         UserRequestDTO userRequestDTO = objectMapper.readValue(request.getInputStream(), UserRequestDTO.class);
         if (userRequestDTO.login() == null
                 || userRequestDTO.login().isEmpty()
