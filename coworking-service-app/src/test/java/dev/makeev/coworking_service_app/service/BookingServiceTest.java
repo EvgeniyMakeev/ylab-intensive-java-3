@@ -55,9 +55,6 @@ class BookingServiceTest {
     private Booking mockBooking2;
 
     @Mock
-    private BookingRange mockBookingRange;
-
-    @Mock
     private WorkingHours mockWorkingHours;
 
     @Test

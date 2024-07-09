@@ -9,7 +9,11 @@ import dev.makeev.coworking_service_app.dto.BookingAddDTO;
 import dev.makeev.coworking_service_app.dto.BookingDTO;
 import dev.makeev.coworking_service_app.dto.BookingRequestDTO;
 import dev.makeev.coworking_service_app.dto.UserRequestDTO;
-import dev.makeev.coworking_service_app.exceptions.*;
+import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
+import dev.makeev.coworking_service_app.exceptions.DaoException;
+import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
+import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
+import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import dev.makeev.coworking_service_app.mappers.ApiResponse;
 import dev.makeev.coworking_service_app.mappers.BookingMapper;
 import dev.makeev.coworking_service_app.model.Booking;
@@ -23,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Objects;
@@ -52,7 +57,12 @@ public class BookingServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(CONTENT_TYPE);
         try (OutputStream outputStream = response.getOutputStream()){
-            UserRequestDTO userRequestDTO = objectMapper.readValue(request.getInputStream(), UserRequestDTO.class);
+            InputStream inputStream = request.getInputStream();
+            if (inputStream == null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            UserRequestDTO userRequestDTO = objectMapper.readValue(inputStream, UserRequestDTO.class);
             checkingRequest(response, userRequestDTO);
 
             List<Booking> bookings = userService.isAdmin(userRequestDTO.login())

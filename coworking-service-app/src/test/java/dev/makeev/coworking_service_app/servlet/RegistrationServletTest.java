@@ -15,12 +15,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RegistrationServletTest {
+
+    private static final String LOGIN = "TestUser";
+    private static final String PASSWORD = "TestPassword";
+
 
     @Mock
     private UserService userService;
@@ -44,7 +57,13 @@ public class RegistrationServletTest {
 
     @Test
     public void testDoPost_UserAddedSuccessfully() throws IOException, LoginAlreadyExistsException, DaoException {
-        InputStream inputStream = new ByteArrayInputStream("{\"login\":\"testuser\",\"password\":\"testpass\"}".getBytes());
+        String jsonRequest = """
+                        {
+                            "login": "TestUser",
+                            "password":"TestPassword"
+                        }
+                        """;
+        InputStream inputStream = new ByteArrayInputStream(jsonRequest.getBytes());
         ServletInputStream servletInputStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(servletInputStream);
         when(servletInputStream.read(any(byte[].class))).thenAnswer(invocation -> inputStream.read((byte[]) invocation.getArguments()[0]));
@@ -53,9 +72,9 @@ public class RegistrationServletTest {
         PrintWriter printWriter = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(printWriter);
 
-        UserRequestDTO userRequestDTO = new UserRequestDTO("testuser", "testpass");
+        UserRequestDTO userRequestDTO = new UserRequestDTO(LOGIN, PASSWORD);
         when(objectMapper.readValue(any(InputStream.class), eq(UserRequestDTO.class))).thenReturn(userRequestDTO);
-        doNothing().when(userService).addUser("testuser", "testpass");
+        doNothing().when(userService).addUser(LOGIN, PASSWORD);
 
         servlet.doPost(request, response);
 
