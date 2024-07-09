@@ -40,13 +40,13 @@ public final class BookingService {
     /**
      * Adds a booking for a user.
      *
-     * @param loginOfUser the login of the user
+     * @param login the login of the user
      * @param booking the booking
      * @throws SpaceIsNotAvailableException if the space is not available for the specified date and time
      */
     @LoggingTime
     @LoggingToDb
-    public void addBooking(String loginOfUser, Booking booking) throws SpaceIsNotAvailableException, SpaceNotFoundException {
+    public void addBooking(String login, Booking booking) throws SpaceIsNotAvailableException, SpaceNotFoundException {
 
         Space bookingSpace = spaceDAO.getSpaceByName(booking.nameOfBookingSpace()).orElseThrow(SpaceNotFoundException::new);
 
@@ -104,13 +104,13 @@ public final class BookingService {
     /**
      * Retrieves all bookings for a user.
      *
-     * @param loginOfUser the login of the user
+     * @param login the login of the user
      * @return a list of formatted booking strings
      */
     @LoggingTime
     @LoggingToDb
-    public List<Booking> getAllBookingsForUser(String loginOfUser) {
-        return bookingDAO.getAllForUser(loginOfUser);
+    public List<Booking> getAllBookingsForUser(String login) {
+        return bookingDAO.getAllForUser(login);
     }
 
     /**
@@ -121,7 +121,7 @@ public final class BookingService {
     @LoggingTime
     public List<Booking> getAllBookingsSortedByUser() {
         return bookingDAO.getAll().stream()
-                .sorted(Comparator.comparing(Booking::loginOfUser))
+                .sorted(Comparator.comparing(Booking::login))
                 .toList();
     }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.makeev.coworking_service_app.dto.UserRequestDTO;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
-import dev.makeev.coworking_service_app.mappers.ApiResponse;
+import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.service.UserService;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;

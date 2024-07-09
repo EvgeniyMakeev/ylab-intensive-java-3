@@ -9,7 +9,7 @@
     <changeSet id="006-insert-data" author="evgeniy_makeev">
         <insert tableName="bookings" schemaName="non_public">
             <column name="id" valueSequenceNext="booking_id_seq"/>
-            <column name="login_of_user" value="User1"/>
+            <column name="login" value="User1"/>
             <column name="name_of_space" value="Workplace No. 1"/>
             <column name="beginning_booking_date" value="2024-06-27"/>
             <column name="beginning_booking_hour" value="8"/>
@@ -19,7 +19,7 @@
 
         <insert tableName="bookings" schemaName="non_public">
             <column name="id" valueSequenceNext="booking_id_seq"/>
-            <column name="login_of_user" value="User2"/>
+            <column name="login" value="User2"/>
             <column name="name_of_space" value="Conference hall"/>
             <column name="beginning_booking_date" value="2024-06-28"/>
             <column name="beginning_booking_hour" value="10"/>
@@ -85,13 +85,13 @@
 
         <insert tableName="user_activity_log" schemaName="non_public">
             <column name="timestamp" value="now()"/>
-            <column name="login_of_user" value="User1"/>
+            <column name="login" value="User1"/>
             <column name="action" value="Add new booking."/>
         </insert>
 
         <insert tableName="user_activity_log" schemaName="non_public">
             <column name="timestamp" value="now()"/>
-            <column name="login_of_user" value="User2"/>
+            <column name="login" value="User2"/>
             <column name="action" value="Add new booking."/>
         </insert>
     </changeSet>

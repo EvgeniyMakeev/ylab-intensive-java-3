@@ -13,7 +13,7 @@ public interface BookingMapper {
     BookingMapper INSTANCE = Mappers.getMapper(BookingMapper.class);
 
     @Mapping(target = "id", source = "booking.id")
-    @Mapping(target = "loginOfUser", source = "booking.loginOfUser")
+    @Mapping(target = "login", source = "booking.login")
     @Mapping(target = "nameOfBookingSpace", source = "booking.nameOfBookingSpace")
     @Mapping(target = "beginningBookingDate", source = "booking.bookingRange.beginningBookingDate", dateFormat = "yyyy-MM-dd")
     @Mapping(target = "beginningBookingHour", source = "booking.bookingRange.beginningBookingHour")
@@ -22,7 +22,7 @@ public interface BookingMapper {
     BookingDTO toBookingDTO(Booking booking);
 
     @Mapping(target = "id", ignore = true, source = "bookingAddDTO.password")
-    @Mapping(target = "loginOfUser", source = "bookingAddDTO.loginOfUser")
+    @Mapping(target = "login", source = "bookingAddDTO.login")
     @Mapping(target = "nameOfBookingSpace", source = "bookingAddDTO.nameOfBookingSpace")
     @Mapping(target = "bookingRange.beginningBookingDate", dateFormat = "yyyy-MM-dd", source = "bookingAddDTO.beginningBookingDate")
     @Mapping(target = "bookingRange.beginningBookingHour", source = "bookingAddDTO.beginningBookingHour")

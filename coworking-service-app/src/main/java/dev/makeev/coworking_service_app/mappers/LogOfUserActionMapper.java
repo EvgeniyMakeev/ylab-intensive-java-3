@@ -11,7 +11,7 @@ public interface LogOfUserActionMapper {
     LogOfUserActionMapper INSTANCE = Mappers.getMapper(LogOfUserActionMapper.class);
 
     @Mapping(target = "localDateTime", source = "logOfUserAction.localDateTime", dateFormat = "dd.MM.yyyy")
-    @Mapping(target = "loginOfUser", source = "logOfUserAction.loginOfUser")
+    @Mapping(target = "login", source = "logOfUserAction.login")
     @Mapping(target = "messageAboutAction", source = "logOfUserAction.messageAboutAction")
     LogOfUserActionDTO toLogOfUserActionDTO (LogOfUserAction logOfUserAction);
 }

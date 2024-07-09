@@ -14,7 +14,7 @@ import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
-import dev.makeev.coworking_service_app.mappers.ApiResponse;
+import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.mappers.BookingMapper;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.service.BookingService;
@@ -102,9 +102,9 @@ public class BookingServlet extends HttpServlet {
            BookingAddDTO bookingAddDTO = objectMapper.readValue(request.getInputStream(), BookingAddDTO.class);
 
             if (isValid(bookingAddDTO)) {
-                userService.checkCredentials(bookingAddDTO.loginOfUser(), bookingAddDTO.password());
+                userService.checkCredentials(bookingAddDTO.login(), bookingAddDTO.password());
                 Booking booking = bookingMapper.toBooking(bookingAddDTO);
-                bookingService.addBooking(bookingAddDTO.loginOfUser(), booking);
+                bookingService.addBooking(bookingAddDTO.login(), booking);
 
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 objectMapper.writeValue(response.getWriter(), new ApiResponse("Booking added successfully"));
@@ -130,7 +130,7 @@ public class BookingServlet extends HttpServlet {
 
     private boolean isValid(BookingAddDTO bookingAddDTO) {
         return bookingAddDTO == null
-                || bookingAddDTO.loginOfUser() == null
+                || bookingAddDTO.login() == null
                 || bookingAddDTO.nameOfBookingSpace() != null
                 || bookingAddDTO.beginningBookingDate() != null
                 || bookingAddDTO.endingBookingDate() != null

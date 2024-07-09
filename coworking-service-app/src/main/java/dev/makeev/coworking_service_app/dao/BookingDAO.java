@@ -27,10 +27,10 @@ public interface BookingDAO {
     /**
      * Retrieves all bookings for a user.
      *
-     * @param loginOfUser the login of the user
+     * @param login the login of the user
      * @return a list of bookings for the user
      */
-    List<Booking> getAllForUser(String loginOfUser);
+    List<Booking> getAllForUser(String login);
 
     /**
      * Retrieves all bookings.

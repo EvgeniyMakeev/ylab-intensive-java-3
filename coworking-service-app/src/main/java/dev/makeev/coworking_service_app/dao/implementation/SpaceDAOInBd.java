@@ -129,9 +129,13 @@ public final class SpaceDAOInBd implements SpaceDAO {
              PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_SPACES_SQL.getQuery())) {
             List<String> listNamesOfSpaces = new ArrayList<>();
             ResultSet resultSet = statement.executeQuery();
+
             while (resultSet.next()) {
                 listNamesOfSpaces.add(resultSet.getString("name"));
             }
+
+            resultSet.close();
+
             return listNamesOfSpaces;
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -170,10 +174,13 @@ public final class SpaceDAOInBd implements SpaceDAO {
                             .put(hour, bookingId);
                 }
 
+                spaceStatementResultSet.close();
                 return Optional.of(new Space(nameOfSpace, workingHours, bookingSlots));
             } else {
+                spaceStatementResultSet.close();
                 return Optional.empty();
             }
+
         } catch (SQLException e) {
             throw new DaoException("Error retrieving space by name", e);
         }

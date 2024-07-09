@@ -113,9 +113,9 @@ class BookingServiceTest {
     void getAllBookingsSortedByUser_shouldReturnAllBookingsSortedByUser() {
         List<Booking> bookings = new ArrayList<>();
         bookings.add(mockBooking1);
-        when(mockBooking1.loginOfUser()).thenReturn(LOGIN);
+        when(mockBooking1.login()).thenReturn(LOGIN);
         bookings.add(mockBooking2);
-        when(mockBooking2.loginOfUser()).thenReturn("LOGIN-2");
+        when(mockBooking2.login()).thenReturn("LOGIN-2");
         when(bookingDAO.getAll()).thenReturn(bookings);
 
         List<Booking> result = bookingService.getAllBookingsSortedByUser();

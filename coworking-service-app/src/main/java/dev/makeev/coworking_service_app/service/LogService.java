@@ -15,15 +15,11 @@ public final class LogService {
         this.logDAO = logDAO;
     }
 
-    public void addLog(String loginOfUser, String message) {
-        logDAO.add(new LogOfUserAction(LocalDateTime.now(), loginOfUser, message));
+    public void addLog(String login, String message) {
+        logDAO.add(new LogOfUserAction(LocalDateTime.now(), login, message));
     }
 
     public List<LogOfUserAction> getLogs() {
         return logDAO.getAll();
-    }
-
-    public List<LogOfUserAction> getLogsOfUser(String loginOfUser) {
-        return logDAO.getAllByLogin(loginOfUser);
     }
 }

@@ -53,11 +53,14 @@ public final class UserDAOInBd implements UserDAO {
             statement.setString(1, login);
             User user = null;
             ResultSet resultSet = statement.executeQuery();
+
             if (resultSet.next()) {
                 user = new User(login,
                         resultSet.getString("password"),
                         resultSet.getBoolean("admin"));
             }
+
+            resultSet.close();
             return Optional.ofNullable(user);
         } catch (SQLException e) {
             throw new DaoException(e);

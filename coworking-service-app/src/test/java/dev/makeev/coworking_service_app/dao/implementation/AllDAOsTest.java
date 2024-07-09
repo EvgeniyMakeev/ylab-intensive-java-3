@@ -186,7 +186,7 @@ public class AllDAOsTest {
         List<Booking> bookingsAfterAdd = bookingDAO.getAllForUser(TEST_LOGIN_1);
         assertTrue(bookingsBeforeAdd.isEmpty());
         assertFalse(bookingsAfterAdd.isEmpty());
-        assertThat(bookingsAfterAdd.get(0).loginOfUser()).isEqualTo(TEST_BOOKING_1.loginOfUser());
+        assertThat(bookingsAfterAdd.get(0).login()).isEqualTo(TEST_BOOKING_1.login());
         assertThat(bookingsAfterAdd.get(0).nameOfBookingSpace()).isEqualTo(TEST_BOOKING_1.nameOfBookingSpace());
         assertThat(bookingsAfterAdd.get(0).bookingRange()).isEqualTo(TEST_BOOKING_1.bookingRange());
     }
@@ -198,7 +198,7 @@ public class AllDAOsTest {
         List<Booking> bookings = bookingDAO.getAllForUser(TEST_LOGIN_1);
 
         assertFalse(bookings.isEmpty());
-        assertThat(bookings.get(0).loginOfUser()).isEqualTo(TEST_LOGIN_1);
+        assertThat(bookings.get(0).login()).isEqualTo(TEST_LOGIN_1);
         assertThat(bookings.get(0).nameOfBookingSpace()).isEqualTo(TEST_BOOKING_1.nameOfBookingSpace());
         assertThat(bookings.get(0).bookingRange()).isEqualTo(TEST_BOOKING_1.bookingRange());
     }

@@ -7,7 +7,7 @@ import dev.makeev.coworking_service_app.dto.SlotsAvailableForBookingDTO;
 import dev.makeev.coworking_service_app.dto.SpaceSlotsDTO;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
-import dev.makeev.coworking_service_app.mappers.ApiResponse;
+import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.service.SpaceService;
 import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
 import jakarta.servlet.annotation.WebServlet;

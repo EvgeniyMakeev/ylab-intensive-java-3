@@ -3,7 +3,7 @@ package dev.makeev.coworking_service_app.servlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.makeev.coworking_service_app.dto.BookingAddDTO;
 import dev.makeev.coworking_service_app.dto.BookingRequestDTO;
-import dev.makeev.coworking_service_app.mappers.ApiResponse;
+import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.mappers.BookingMapper;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
@@ -19,12 +19,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class BookingServletTest {
 
@@ -72,7 +79,7 @@ class BookingServletTest {
     void testDoPost_ValidRequest() throws Exception {
         String jsonRequest = """
                         {
-                            "loginOfUser": "TestUser",
+                            "login": "TestUser",
                             "password": "TestPassword",
                             "nameOfBookingSpace": "Test Space",
                             "beginningBookingDate": "2024-07-11",

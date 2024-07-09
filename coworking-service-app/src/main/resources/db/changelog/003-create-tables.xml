@@ -57,10 +57,10 @@
                     remarks="Primary key for bookings">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="login_of_user"
+            <column name="login"
                     type="VARCHAR(255)"
                     remarks="Foreign key for login of user">
-                <constraints foreignKeyName="bookings_login_of_user_users_login"
+                <constraints foreignKeyName="bookings_login_users_login"
                              references="non_public.users(login)" referencedTableSchemaName="non_public"/>
             </column>
             <column name="name_of_space"
@@ -125,7 +125,7 @@
                     remarks="Timestamp of user action">
                 <constraints nullable="false"/>
             </column>
-            <column name="login_of_user"
+            <column name="login"
                     type="VARCHAR(255)"
                     remarks="Login of user">
                 <constraints nullable="false"/>

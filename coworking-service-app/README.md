@@ -1,15 +1,31 @@
 # Coworking Service Application
 
 The Coworking Service Application is a Java-based program designed to manage bookings and spaces in a coworking environment. It allows users to book spaces, view available slots, cancel bookings, and manage space availability. The application is built with simplicity and ease of use in mind, providing a seamless experience for both users and administrators.
-
 ## Features
 
 - **User Authentication**: Users can log in securely using their credentials or register for a new account if they are not already registered.
 - **User and Admin Roles**: The application supports different roles for users and administrators, each with its own set of permissions and functionalities.
 - **Space Management**: Admins can add, update, and delete coworking spaces, specifying their opening and closing hours, and availability for booking.
 - **Booking Management**: Users can view available spaces, book them for specific dates and times, and cancel their bookings if necessary.
-- **Flexible Booking System**: The booking system is flexible and intuitive, allowing users to easily find available slots and make reservations according to their preferences.
-- **Interactive User Interface**: The application features an interactive command-line interface (CLI) that guides users through the booking process and provides helpful prompts and messages.
+- **Logging User Actions**: Admins can view logs of user actions for auditing and tracking purposes.
+
+## REST API
+The application is now a REST API that accepts requests and returns responses in JSON format.
+
+### UserServlet
+Handles user registration, login, and authentication. This servlet ensures that users can securely register for new accounts and log in with their credentials.
+
+### SpaceServlet
+Manages coworking spaces, including adding, updating, and deleting spaces. Administrators use this servlet to configure the availability and details of coworking spaces.
+
+### BookingServlet
+Manages bookings, including viewing available slots, making reservations, and canceling bookings. Users interact with this servlet to book spaces and manage their reservations.
+
+### SlotsForBookingServlet
+Provides information about available slots for booking in specific coworking spaces. This servlet responds to requests for checking available booking times for a given space.
+
+### LogServlet
+Manages logs of user actions. This servlet allows administrators to view logs of user activities, which is useful for auditing and tracking purposes.
 
 ## Installation
 
@@ -32,21 +48,16 @@ To run the Coworking Service Application, follow these steps:
   ```bash
   javac -d out src/**/*.java
   ```
-5. Run the compiled program using the following command:
-
-  ```bash
-  java -cp out dev.makeev.coworking_service_app.App
-  ```
 
 ## Usage
 
-Once the application is running, users can interact with it using the command-line interface. Here's how to use some of the main features:
+The application exposes a set of RESTful endpoints. Here are some examples of how to interact with the main features:
 
-- **Login or Register**: If you're a new user, register for an account. Otherwise, log in with your existing credentials.
-- **View Available Spaces**: See a list of available coworking spaces and their details.
-- **Book a Space**: Select a space, choose a date and time, and make a booking.
-- **Cancel Booking**: View your existing bookings and cancel them if needed.
-- **Admin Functions**: Administrators have additional options to manage spaces, view bookings, and perform other administrative tasks.
+- **Login or Register**:  Use the "/api/v1/users" endpoint to register for an account or log in with your existing credentials.
+- **View Available Spaces**: Use the /api/v1/spaces endpoint to see a list of available coworking spaces and their details.
+- **Book a Space**: Use the "/api/v1/bookings" endpoint to select a space, choose a date and time, and make a booking.
+- **Cancel Booking**: Use the "/api/v1/bookings" endpoint to view your existing bookings and cancel them if needed.
+- **Admin Functions**: Administrators have additional options to manage spaces, view bookings, view logs, and perform other administrative tasks.
 
 ## Contributing
 

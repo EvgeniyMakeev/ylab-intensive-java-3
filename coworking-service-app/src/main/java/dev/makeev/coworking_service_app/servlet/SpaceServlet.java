@@ -10,7 +10,7 @@ import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
-import dev.makeev.coworking_service_app.mappers.ApiResponse;
+import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.service.SpaceService;
 import dev.makeev.coworking_service_app.service.UserService;
 import dev.makeev.coworking_service_app.util.ConnectionManager;

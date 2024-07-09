@@ -8,7 +8,7 @@ import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
 import dev.makeev.coworking_service_app.dto.UserRequestDTO;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
-import dev.makeev.coworking_service_app.mappers.ApiResponse;
+import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.mappers.LogOfUserActionMapper;
 import dev.makeev.coworking_service_app.model.LogOfUserAction;
 import dev.makeev.coworking_service_app.service.LogService;

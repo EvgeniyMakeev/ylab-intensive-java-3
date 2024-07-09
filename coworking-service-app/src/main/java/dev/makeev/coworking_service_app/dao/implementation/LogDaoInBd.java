@@ -26,7 +26,7 @@ public class LogDaoInBd implements LogDAO {
         try (Connection connection = connectionManager.open();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.ADD_LOG_SQL.getQuery())) {
             statement.setTimestamp(1, Timestamp.valueOf(logOfUserAction.localDateTime()));
-            statement.setString(2, logOfUserAction.loginOfUser());
+            statement.setString(2, logOfUserAction.login());
             statement.setString(3, logOfUserAction.messageAboutAction());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -72,10 +72,11 @@ public class LogDaoInBd implements LogDAO {
             userActions.add(
                     new LogOfUserAction(
                             resultSet.getTimestamp("timestamp").toLocalDateTime(),
-                            resultSet.getString("login_of_user"),
+                            resultSet.getString("login"),
                             resultSet.getString("action"))
             );
         }
+        resultSet.close();
         return userActions;
     }
 }

@@ -7,7 +7,7 @@ import dev.makeev.coworking_service_app.dto.UserRequestDTO;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
-import dev.makeev.coworking_service_app.mappers.ApiResponse;
+import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.service.UserService;
 import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
 import jakarta.servlet.annotation.WebServlet;
