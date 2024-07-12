@@ -1,4 +1,8 @@
 package dev.makeev.coworking_service_app.dto;
 
-public record BookingRequestDTO(Long id, String login, String password) {
+import org.springframework.lang.NonNull;
+
+public record BookingRequestDTO(@NonNull Long id,
+                                @NonNull  String login,
+                                @NonNull String password) {
 }

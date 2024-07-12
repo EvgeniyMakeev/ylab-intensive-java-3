@@ -1,12 +1,14 @@
 package dev.makeev.coworking_service_app.dao.implementation;
 
-import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
+import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.sql.Date;
 import java.sql.*;
@@ -18,10 +20,12 @@ import java.util.stream.IntStream;
  * The {@code SpaceDAOInBd} class implements the {@link SpaceDAO} interface.
  * It provides methods to interact with the database to manage Space entities.
  */
+@Component
 public final class SpaceDAOInBd implements SpaceDAO {
 
     private final ConnectionManager connectionManager;
 
+    @Autowired
     public SpaceDAOInBd(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }

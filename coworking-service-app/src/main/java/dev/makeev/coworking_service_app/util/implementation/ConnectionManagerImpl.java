@@ -2,6 +2,8 @@ package dev.makeev.coworking_service_app.util.implementation;
 
 import dev.makeev.coworking_service_app.util.ConnectionManager;
 import dev.makeev.coworking_service_app.util.PropertiesLoader;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,6 +14,7 @@ import java.util.Properties;
  * The {@code ConnectionManagerImpl} class implements the {@link ConnectionManager} interface.
  * It provides methods to open a database connection using the JDBC DriverManager.
  */
+@Component
 public final class ConnectionManagerImpl implements ConnectionManager {
 
     private final String url;
@@ -44,7 +47,9 @@ public final class ConnectionManagerImpl implements ConnectionManager {
      * @param username The username for the database connection.
      * @param password The password for the database connection.
      */
-    public ConnectionManagerImpl(String url, String username, String password) {
+    public ConnectionManagerImpl(@Value("${db.url}") String url,
+                                 @Value("${db.username}") String username,
+                                 @Value("${db.password}") String password) {
         this.url = url;
         this.username = username;
         this.password = password;

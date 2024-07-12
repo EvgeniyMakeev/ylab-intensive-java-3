@@ -1,6 +1,6 @@
 package dev.makeev.coworking_service_app.dao.implementation;
 
-import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
+import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
@@ -8,8 +8,15 @@ import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +26,12 @@ import java.util.Optional;
  * The {@code BookingDAOInBd} class implements the {@link BookingDAO} interface.
  * It provides methods to interact with the database to manage Booking entities.
  */
+@Component
 public final class BookingDAOInBd implements BookingDAO {
 
     private final ConnectionManager connectionManager;
 
+    @Autowired
     public BookingDAOInBd(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }

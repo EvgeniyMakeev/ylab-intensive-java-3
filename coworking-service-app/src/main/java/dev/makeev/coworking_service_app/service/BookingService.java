@@ -1,7 +1,7 @@
 package dev.makeev.coworking_service_app.service;
 
-import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
-import dev.makeev.coworking_service_app.aop.annotations.LoggingToDb;
+import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
+import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
@@ -11,6 +11,8 @@ import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -21,6 +23,7 @@ import java.util.stream.IntStream;
 /**
  * Service class for managing bookings.
  */
+@Service
 public final class BookingService {
 
     private final BookingDAO bookingDAO;
@@ -32,6 +35,7 @@ public final class BookingService {
      * @param bookingDAO the BookingDAO to use for booking operations
      * @param spaceDAO the SpaceDAO to use for space operations
      */
+    @Autowired
     public BookingService(BookingDAO bookingDAO, SpaceDAO spaceDAO) {
         this.bookingDAO = bookingDAO;
         this.spaceDAO = spaceDAO;

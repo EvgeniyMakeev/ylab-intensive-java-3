@@ -1,4 +1,4 @@
-package dev.makeev.coworking_service_app.aop.annotations;
+package dev.makeev.coworking_service_app.advice.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface LoggingTime {
+public @interface LoggingToDb {
 }

@@ -1,11 +1,13 @@
 package dev.makeev.coworking_service_app.dao.implementation;
 
-import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
+import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.User;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,10 +19,12 @@ import java.util.Optional;
  * The {@code UserDAOInBd} class implements the {@link UserDAO} interface.
  * It provides methods to interact with the database to manage User entities.
  */
+@Component
 public final class UserDAOInBd implements UserDAO {
 
     private final ConnectionManager connectionManager;
 
+    @Autowired
     public UserDAOInBd(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
@@ -51,17 +55,18 @@ public final class UserDAOInBd implements UserDAO {
         try (Connection connection = connectionManager.open();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_USER_BY_LOGIN_SQL.getQuery())) {
             statement.setString(1, login);
-            User user = null;
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                user = new User(login,
+                User user = new User(login,
                         resultSet.getString("password"),
                         resultSet.getBoolean("admin"));
+                resultSet.close();
+                return Optional.of(user);
+            } else {
+                resultSet.close();
+                return Optional.empty();
             }
-
-            resultSet.close();
-            return Optional.ofNullable(user);
         } catch (SQLException e) {
             throw new DaoException(e);
         }

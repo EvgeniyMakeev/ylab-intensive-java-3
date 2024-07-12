@@ -1,6 +1,6 @@
 package dev.makeev.coworking_service_app.service;
 
-import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
+import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.dto.SlotsAvailableForBookingDTO;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
@@ -8,6 +8,8 @@ import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -15,6 +17,7 @@ import java.util.*;
 /**
  * Service class for managing coworking spaces.
  */
+@Service
 public final class SpaceService {
 
     private final SpaceDAO spaceDAO;
@@ -23,6 +26,7 @@ public final class SpaceService {
      *
      * @param spaceDAO the SpaceDAO to use for space operations
      */
+    @Autowired
     public SpaceService(SpaceDAO spaceDAO) {
         this.spaceDAO = spaceDAO;
     }

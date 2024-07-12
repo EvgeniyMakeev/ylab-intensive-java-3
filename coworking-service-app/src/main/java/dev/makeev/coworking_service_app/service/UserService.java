@@ -1,11 +1,13 @@
 package dev.makeev.coworking_service_app.service;
 
-import dev.makeev.coworking_service_app.aop.annotations.LoggingTime;
-import dev.makeev.coworking_service_app.aop.annotations.LoggingToDb;
+import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
+import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import dev.makeev.coworking_service_app.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
@@ -14,6 +16,7 @@ import java.util.Optional;
  * It encapsulates the business logic related to user management, such as adding users,
  * verifying credentials, and checking user roles.
  */
+@Service
 public final class UserService {
 
     /**
@@ -26,6 +29,7 @@ public final class UserService {
      *
      * @param userDAO The UserDAO instance to use for data access.
      */
+    @Autowired
     public UserService(UserDAO userDAO) {
         this.userDAO = userDAO;
     }

@@ -5,12 +5,9 @@ import dev.makeev.coworking_service_app.dto.BookingDTO;
 import dev.makeev.coworking_service_app.model.Booking;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-
-@Mapper
+@Mapper(componentModel = "spring")
 public interface BookingMapper {
-    BookingMapper INSTANCE = Mappers.getMapper(BookingMapper.class);
 
     @Mapping(target = "id", source = "booking.id")
     @Mapping(target = "login", source = "booking.login")

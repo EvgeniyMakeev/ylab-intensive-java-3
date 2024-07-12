@@ -4,11 +4,9 @@ import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
 import dev.makeev.coworking_service_app.model.LogOfUserAction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface LogOfUserActionMapper {
-    LogOfUserActionMapper INSTANCE = Mappers.getMapper(LogOfUserActionMapper.class);
 
     @Mapping(target = "localDateTime", source = "logOfUserAction.localDateTime", dateFormat = "dd.MM.yyyy")
     @Mapping(target = "login", source = "logOfUserAction.login")

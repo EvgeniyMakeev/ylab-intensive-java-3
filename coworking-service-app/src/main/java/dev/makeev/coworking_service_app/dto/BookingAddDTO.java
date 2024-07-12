@@ -1,10 +1,12 @@
 package dev.makeev.coworking_service_app.dto;
 
-public record BookingAddDTO(String login,
-                            String password,
-                            String nameOfBookingSpace,
-                            String beginningBookingDate,
-                            int beginningBookingHour,
-                            String endingBookingDate,
-                            int endingBookingHour) {
+import org.springframework.lang.NonNull;
+
+public record BookingAddDTO(@NonNull String login,
+                            @NonNull String password,
+                            @NonNull String nameOfBookingSpace,
+                            @NonNull String beginningBookingDate,
+                            @NonNull int beginningBookingHour,
+                            @NonNull String endingBookingDate,
+                            @NonNull int endingBookingHour) {
 }

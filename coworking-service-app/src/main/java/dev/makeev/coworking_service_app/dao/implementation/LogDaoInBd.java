@@ -5,15 +5,19 @@ import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.LogOfUserAction;
 import dev.makeev.coworking_service_app.util.ConnectionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class LogDaoInBd implements LogDAO {
 
     private final ConnectionManager connectionManager;
 
+    @Autowired
     public LogDaoInBd(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
