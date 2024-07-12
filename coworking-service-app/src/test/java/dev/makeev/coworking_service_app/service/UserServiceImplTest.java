@@ -3,6 +3,7 @@ package dev.makeev.coworking_service_app.service;
 import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import dev.makeev.coworking_service_app.model.User;
+import dev.makeev.coworking_service_app.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("UserService Test")
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceImplTest {
 
     private static final String LOGIN = "TestUser";
     private static final String PASSWORD = "TestPassword";
@@ -31,12 +32,12 @@ class UserServiceTest {
     private UserDAO userDAO;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Test
     @DisplayName("UserService test: Add User - Should add new user to DAO")
     void addUser_shouldAddUserToDAO() {
-        userService.addUser(LOGIN, PASSWORD);
+        userServiceImpl.addUser(LOGIN, PASSWORD);
 
         verify(userDAO, times(1)).add(new User(LOGIN, PASSWORD));
     }
@@ -46,7 +47,7 @@ class UserServiceTest {
     void checkCredentials_shouldCheckCredentialsOfUserIsCorrect() {
         when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(testUser));
 
-        assertDoesNotThrow(() -> userService.checkCredentials(LOGIN,PASSWORD));
+        assertDoesNotThrow(() -> userServiceImpl.checkCredentials(LOGIN,PASSWORD));
         verify(userDAO, times(1)).getByLogin(eq(LOGIN));
     }
 
@@ -56,7 +57,7 @@ class UserServiceTest {
         when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(testUser));
 
         assertThatThrownBy(() ->
-                userService.checkCredentials(LOGIN,"Wrong Password"))
+                userServiceImpl.checkCredentials(LOGIN,"Wrong Password"))
                 .isInstanceOf(VerificationException.class);
 
         verify(userDAO, times(1)).getByLogin(eq(LOGIN));
@@ -67,7 +68,7 @@ class UserServiceTest {
     void isAdmin_shouldReturnTrueIfUserIsAdmin() {
         when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(new User(LOGIN, PASSWORD, true)));
 
-        assertTrue(userService.isAdmin(LOGIN));
+        assertTrue(userServiceImpl.isAdmin(LOGIN));
     }
 
     @Test
@@ -75,7 +76,7 @@ class UserServiceTest {
     void isAdmin_shouldReturnFalseIfUserIsNotAdmin() {
         when(userDAO.getByLogin(LOGIN)).thenReturn(Optional.of(testUser));
 
-        assertFalse(userService.isAdmin(LOGIN));
+        assertFalse(userServiceImpl.isAdmin(LOGIN));
     }
 
 }

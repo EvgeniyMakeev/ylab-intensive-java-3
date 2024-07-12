@@ -4,6 +4,7 @@ import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
 import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.model.Space;
+import dev.makeev.coworking_service_app.service.implementation.SpaceServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("SpaceService Test")
 @ExtendWith(MockitoExtension.class)
-class SpaceServiceTest {
+class SpaceServiceImplTest {
 
     public static final String TEST_SPACE = "TestSpace";
 
@@ -31,7 +32,7 @@ class SpaceServiceTest {
     private SpaceDAO spaceDAO;
 
     @InjectMocks
-    private SpaceService spaceService;
+    private SpaceServiceImpl spaceServiceImpl;
 
     @Mock
     private Space mockSpace;
@@ -42,7 +43,7 @@ class SpaceServiceTest {
     @Test
     @DisplayName("SpaceService test: Add Space - Should add or update space successfully")
     void addSpace_shouldAddNewSpace() throws SpaceAlreadyExistsException {
-        spaceService.addSpace(mockSpaceAddDTO);
+        spaceServiceImpl.addSpace(mockSpaceAddDTO);
 
         verify(spaceDAO, times(1)).add(any(Space.class));
     }
@@ -54,7 +55,7 @@ class SpaceServiceTest {
         when(spaceDAO.getSpaceByName(TEST_SPACE)).thenReturn(Optional.of(mockSpace));
 
         assertThatThrownBy(() ->
-                spaceService.addSpace(mockSpaceAddDTO))
+                spaceServiceImpl.addSpace(mockSpaceAddDTO))
                 .isInstanceOf(SpaceAlreadyExistsException.class);
 
         verify(spaceDAO, times(0)).add(any(Space.class));
@@ -66,7 +67,7 @@ class SpaceServiceTest {
         List<String> spaces = List.of(mockSpace.toString());
         when(spaceDAO.getNamesOfSpaces()).thenReturn(spaces);
 
-        List<String> result = spaceService.getNamesOfSpaces();
+        List<String> result = spaceServiceImpl.getNamesOfSpaces();
 
         assertThat(result).isNotEmpty();
         assertThat(result).isEqualTo(spaces);
@@ -79,7 +80,7 @@ class SpaceServiceTest {
     void deleteSpace_shouldDeleteSpace() {
         when(spaceDAO.getSpaceByName(TEST_SPACE)).thenReturn(Optional.of(mockSpace));
 
-        spaceService.deleteSpace(TEST_SPACE);
+        spaceServiceImpl.deleteSpace(TEST_SPACE);
 
         verify(spaceDAO, times(1)).delete(any(String.class));
     }

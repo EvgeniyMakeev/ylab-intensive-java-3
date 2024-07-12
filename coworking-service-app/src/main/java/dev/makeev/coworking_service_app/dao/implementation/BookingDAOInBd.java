@@ -27,7 +27,7 @@ import java.util.Optional;
  * It provides methods to interact with the database to manage Booking entities.
  */
 @Component
-public final class BookingDAOInBd implements BookingDAO {
+public class BookingDAOInBd implements BookingDAO {
 
     private final ConnectionManager connectionManager;
 

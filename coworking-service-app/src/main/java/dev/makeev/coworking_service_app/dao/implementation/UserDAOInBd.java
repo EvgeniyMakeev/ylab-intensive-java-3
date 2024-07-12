@@ -20,7 +20,7 @@ import java.util.Optional;
  * It provides methods to interact with the database to manage User entities.
  */
 @Component
-public final class UserDAOInBd implements UserDAO {
+public class UserDAOInBd implements UserDAO {
 
     private final ConnectionManager connectionManager;
 

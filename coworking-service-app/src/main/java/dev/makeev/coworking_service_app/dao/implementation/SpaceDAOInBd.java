@@ -21,7 +21,7 @@ import java.util.stream.IntStream;
  * It provides methods to interact with the database to manage Space entities.
  */
 @Component
-public final class SpaceDAOInBd implements SpaceDAO {
+public class SpaceDAOInBd implements SpaceDAO {
 
     private final ConnectionManager connectionManager;
 

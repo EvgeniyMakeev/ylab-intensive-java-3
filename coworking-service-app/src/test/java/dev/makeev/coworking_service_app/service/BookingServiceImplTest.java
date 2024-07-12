@@ -7,6 +7,7 @@ import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
+import dev.makeev.coworking_service_app.service.implementation.BookingServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("BookingService Test")
 @ExtendWith(MockitoExtension.class)
-class BookingServiceTest {
+class BookingServiceImplTest {
 
     private static final String NAME_OF_SPACE = "TestSpace";
     private static final String LOGIN = "TestLogin";
@@ -43,7 +44,7 @@ class BookingServiceTest {
     private SpaceDAO spaceDAO;
 
     @InjectMocks
-    private BookingService bookingService;
+    private BookingServiceImpl bookingServiceImpl;
 
     @Mock
     private Space mockSpace;
@@ -70,7 +71,7 @@ class BookingServiceTest {
         Booking booking = new Booking(LOGIN, NAME_OF_SPACE,
                 new BookingRange(LocalDate.now(), 10, LocalDate.now(), 11));
 
-        bookingService.addBooking(LOGIN, booking);
+        bookingServiceImpl.addBooking(LOGIN, booking);
 
         verify(bookingDAO, times(1)).add(any(Booking.class));
     }
@@ -87,7 +88,7 @@ class BookingServiceTest {
         Booking booking = new Booking(LOGIN, NAME_OF_SPACE,
                 new BookingRange(LocalDate.now(), 10, LocalDate.now(), 11));
 
-        assertThatThrownBy(() -> bookingService.addBooking("testUser", booking))
+        assertThatThrownBy(() -> bookingServiceImpl.addBooking("testUser", booking))
                 .isInstanceOf(SpaceIsNotAvailableException.class);
 
         verify(bookingDAO, never()).add(any(Booking.class));
@@ -101,7 +102,7 @@ class BookingServiceTest {
         bookings.add(mockBooking1);
         when(bookingDAO.getAllForUser(LOGIN)).thenReturn(bookings);
 
-        List<Booking> result = bookingService.getAllBookingsForUser(LOGIN);
+        List<Booking> result = bookingServiceImpl.getAllBookingsForUser(LOGIN);
 
         assertThat(result).isNotEmpty();
         assertThat(result).hasSize(2);
@@ -118,7 +119,7 @@ class BookingServiceTest {
         when(mockBooking2.login()).thenReturn("LOGIN-2");
         when(bookingDAO.getAll()).thenReturn(bookings);
 
-        List<Booking> result = bookingService.getAllBookingsSortedByUser();
+        List<Booking> result = bookingServiceImpl.getAllBookingsSortedByUser();
 
         assertThat(result).isNotEmpty();
         assertThat(result).hasSize(2);
