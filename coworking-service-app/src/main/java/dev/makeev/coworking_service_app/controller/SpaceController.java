@@ -3,6 +3,7 @@ package dev.makeev.coworking_service_app.controller;
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
+import dev.makeev.coworking_service_app.dto.SpaceDTO;
 import dev.makeev.coworking_service_app.dto.SpaceDeleteDTO;
 import dev.makeev.coworking_service_app.exceptions.NoAdminException;
 import dev.makeev.coworking_service_app.service.SpaceService;
@@ -31,8 +32,8 @@ public class SpaceController {
 
     @LoggingTime
     @GetMapping
-    public ResponseEntity<List<String>> getSpaces() {
-        return ResponseEntity.ok(spaceService.getNamesOfSpaces());
+    public ResponseEntity<List<SpaceDTO>> getSpaces() {
+        return ResponseEntity.ok(spaceService.getSpaces());
     }
 
     @LoggingTime

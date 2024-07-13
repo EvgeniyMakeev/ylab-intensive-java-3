@@ -4,7 +4,7 @@
 
   <groupId>makeev</groupId>
   <artifactId>coworking-service-app</artifactId>
-  <version>4.1.1</version>
+  <version>4.2</version>
   <packaging>war</packaging>
 
   <name>coworking-service-app</name>
@@ -43,7 +43,6 @@
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
@@ -56,7 +55,14 @@
       <version>${spring.version}</version>
     </dependency>
 
-<!--    <dependency>-->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+
+
+    <!--    <dependency>-->
 <!--      <groupId>io.springfox</groupId>-->
 <!--      <artifactId>springfox-boot-starter</artifactId>-->
 <!--      <version>3.0.0</version>-->

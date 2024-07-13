@@ -7,16 +7,11 @@ import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.WorkingHours;
-import dev.makeev.coworking_service_app.util.ConnectionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.sql.DataSource;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +24,11 @@ import java.util.Optional;
 @Component
 public class BookingDAOInBd implements BookingDAO {
 
-    private final ConnectionManager connectionManager;
+    private final DataSource dataSource;
 
     @Autowired
-    public BookingDAOInBd(ConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public BookingDAOInBd(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     /**
@@ -42,7 +37,7 @@ public class BookingDAOInBd implements BookingDAO {
     @LoggingTime
     @Override
     public void add(Booking newBooking) {
-        try (Connection connection = connectionManager.open()) {
+        try (Connection connection = dataSource.getConnection()) {
             setAutoCommit(connection, false);
             try {
                 long bookingId = addBooking(connection, newBooking);
@@ -169,7 +164,7 @@ public class BookingDAOInBd implements BookingDAO {
      * @return A {@link WorkingHours} object representing the working hours of the space.
      */
     private WorkingHours getWorkingHoursOfSpaceByName(String spaceName) {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement getWorkingHoursStatement =
                      connection.prepareStatement(SQLRequest.GET_WORKING_HOURS_OF_SPACE_BY_NAME_SQL.getQuery())) {
             getWorkingHoursStatement.setString(1, spaceName);
@@ -196,7 +191,7 @@ public class BookingDAOInBd implements BookingDAO {
     @LoggingTime
     @Override
     public List<Booking> getAllForUser(String login) {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      SQLRequest.GET_ALL_BOOKINGS_FOR_USER_SQL.getQuery())) {
             statement.setString(1, login);
@@ -212,7 +207,7 @@ public class BookingDAOInBd implements BookingDAO {
     @LoggingTime
     @Override
     public List<Booking> getAll() {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      SQLRequest.GET_ALL_BOOKINGS_SQL.getQuery())) {
             return getBookings(statement);
@@ -255,7 +250,7 @@ public class BookingDAOInBd implements BookingDAO {
     @LoggingTime
     @Override
     public Optional<Booking> getBookingById(long id) {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_BOOKING_BY_ID_SQL.getQuery())) {
 
             statement.setLong(1, id);
@@ -288,7 +283,7 @@ public class BookingDAOInBd implements BookingDAO {
     @LoggingTime
     @Override
     public void delete(long idOfBooking) {
-        try (Connection connection = connectionManager.open()) {
+        try (Connection connection = dataSource.getConnection()) {
             setAutoCommit(connection, false);
             try {
                 updateSlots(idOfBooking, connection);

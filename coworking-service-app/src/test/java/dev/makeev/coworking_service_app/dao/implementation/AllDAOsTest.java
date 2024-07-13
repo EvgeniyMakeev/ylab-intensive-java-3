@@ -5,8 +5,8 @@ import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.model.*;
 import dev.makeev.coworking_service_app.util.InitDb;
-import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
 import org.junit.jupiter.api.*;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -50,23 +50,17 @@ public class AllDAOsTest {
     static void setUpAll() {
         postgresContainer.start();
 
-        String jdbcUrl = postgresContainer.getJdbcUrl();
-        String username = postgresContainer.getUsername();
-        String password = postgresContainer.getPassword();
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(postgresContainer.getDriverClassName());
+        dataSource.setUrl(postgresContainer.getJdbcUrl());
+        dataSource.setUsername(postgresContainer.getUsername());
+        dataSource.setPassword(postgresContainer.getPassword());
 
-        ConnectionManagerImpl testConnectionManager = new ConnectionManagerImpl();
-        testConnectionManager.setUrl(jdbcUrl);
-        testConnectionManager.setUsername(username);
-        testConnectionManager.setPassword(password);
+        new InitDb(dataSource,"liquibase", "db/changelog/changelog.xml").initDb();
 
-        InitDb initDb = new InitDb(testConnectionManager);
-        initDb.setChangelog("db/changelog/changelog.xml");
-        initDb.setSchemaName("liquibase");
-        initDb.initDb();
-
-        userDAO = new UserDAOInBd(testConnectionManager);
-        spaceDAO = new SpaceDAOInBd(testConnectionManager);
-        bookingDAO = new BookingDAOInBd(testConnectionManager);
+        userDAO = new UserDAOInBd(dataSource);
+        spaceDAO = new SpaceDAOInBd(dataSource);
+        bookingDAO = new BookingDAOInBd(dataSource);
         TEST_SPACE = initNewSpace();
     }
 

@@ -3,7 +3,8 @@ package dev.makeev.coworking_service_app.service.implementation;
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
-import dev.makeev.coworking_service_app.dto.SlotsAvailableForBookingDTO;
+import dev.makeev.coworking_service_app.dto.SpaceDTO;
+import dev.makeev.coworking_service_app.model.SlotsAvailableForBooking;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
 import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
@@ -71,8 +72,29 @@ public class SpaceServiceImpl implements SpaceService {
     @LoggingTime
     @LoggingToDb
     @Override
-    public List<String> getNamesOfSpaces() {
-        return spaceDAO.getNamesOfSpaces();
+    public List<SpaceDTO> getSpaces() {
+        List<SpaceDTO> spaceDTOsList = new ArrayList<>();
+        long freeSlot = 0L;
+
+        spaceDAO.getNamesOfSpaces().forEach(s -> {
+            List<SlotsAvailableForBooking> availableSlots = new ArrayList<>();
+            spaceDAO.getSpaceByName(s).orElseThrow(SpaceNotFoundException::new).bookingSlots()
+                    .entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .forEachOrdered(dateEntry -> {
+                        List<String> slots = new ArrayList<>();
+                        dateEntry.getValue().keySet().stream()
+                                .filter(hour -> dateEntry.getValue().get(hour) == freeSlot)
+                                .sorted(Comparator.naturalOrder())
+                                .forEachOrdered(hour ->
+                                        slots.add(String.format("%02d:00 - %02d:00", hour, hour + 1)));
+                        availableSlots.add(new SlotsAvailableForBooking(dateEntry.getKey().toString(), slots));
+                    });
+            spaceDTOsList.add(new SpaceDTO(s, availableSlots));
+        });
+
+        return spaceDTOsList;
     }
 
     /**
@@ -85,27 +107,5 @@ public class SpaceServiceImpl implements SpaceService {
     public void deleteSpace(String nameOfSpace) throws SpaceNotFoundException {
         spaceDAO.getSpaceByName(nameOfSpace).orElseThrow(SpaceNotFoundException::new);
         spaceDAO.delete(nameOfSpace);
-    }
-
-    public List<SlotsAvailableForBookingDTO> getAvailableSlotsForBooking(String name) throws SpaceNotFoundException {
-        Space space = spaceDAO.getSpaceByName(name).orElseThrow(SpaceNotFoundException::new);
-
-        List<SlotsAvailableForBookingDTO> availableSlots = new ArrayList<>();
-
-        long freeSlot = 0L;
-
-        space.bookingSlots().entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .forEachOrdered(dateEntry -> {
-                    List<String> slots = new ArrayList<>();
-                    dateEntry.getValue().keySet().stream()
-                            .filter(hour -> dateEntry.getValue().get(hour) == freeSlot)
-                            .sorted(Comparator.naturalOrder())
-                            .forEachOrdered(hour ->
-                                    slots.add(String.format("%02d:00 - %02d:00", hour, hour + 1)));
-                    availableSlots.add(new SlotsAvailableForBookingDTO(dateEntry.getKey().toString(), slots));
-                });
-
-        return availableSlots;
     }
 }

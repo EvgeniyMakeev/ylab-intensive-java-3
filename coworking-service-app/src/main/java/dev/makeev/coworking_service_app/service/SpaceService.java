@@ -3,6 +3,7 @@ package dev.makeev.coworking_service_app.service;
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
+import dev.makeev.coworking_service_app.dto.SpaceDTO;
 import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
 
@@ -14,7 +15,7 @@ public interface SpaceService {
 
     @LoggingTime
     @LoggingToDb
-    List<String> getNamesOfSpaces();
+    List<SpaceDTO> getSpaces();
 
     @LoggingTime
     void deleteSpace(String nameOfSpace) throws SpaceNotFoundException;

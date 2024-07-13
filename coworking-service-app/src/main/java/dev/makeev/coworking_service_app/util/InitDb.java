@@ -1,7 +1,6 @@
 package dev.makeev.coworking_service_app.util;
 
 import dev.makeev.coworking_service_app.exceptions.DaoException;
-import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
@@ -11,40 +10,28 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import org.springframework.beans.factory.annotation.Value;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public final class InitDb {
 
-    @Value("${liquibase.defaultSchemaName}")
-    private String schemaName;
+    private final DataSource dataSource;
+    private final String schemaName;
+    private final String changelog;
 
-    @Value("${liquibase.changelogFile}")
-    private String changelog;
-
-    private ConnectionManager connectionManager = new ConnectionManagerImpl();
-
-    public InitDb() {
-    }
-
-    public InitDb(ConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
-    }
-
-    public void setChangelog(String changelog) {
+    public InitDb(DataSource dataSource, String schemaName, String changelog) {
+        this.dataSource = dataSource;
+        this.schemaName = schemaName;
         this.changelog = changelog;
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
-    }
 
     public void initDb() {
         createSchema(schemaName);
-        try (Connection connection = connectionManager.open()) {
+        try (Connection connection = dataSource.getConnection()) {
             Database database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(connection));
             database.setDefaultSchemaName(schemaName);
@@ -64,7 +51,7 @@ public final class InitDb {
     }
 
     private void createSchema(String schemaName) {
-        try (Connection connection = connectionManager.open()) {
+        try (Connection connection = dataSource.getConnection()) {
             String sql = "CREATE SCHEMA IF NOT EXISTS " + schemaName;
             Statement statement = connection.createStatement();
             statement.executeUpdate(sql);

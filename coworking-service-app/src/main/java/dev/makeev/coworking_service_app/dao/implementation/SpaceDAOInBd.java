@@ -6,10 +6,10 @@ import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
-import dev.makeev.coworking_service_app.util.ConnectionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.Date;
 import java.sql.*;
 import java.time.LocalDate;
@@ -23,11 +23,11 @@ import java.util.stream.IntStream;
 @Component
 public class SpaceDAOInBd implements SpaceDAO {
 
-    private final ConnectionManager connectionManager;
+    private final DataSource dataSource;
 
     @Autowired
-    public SpaceDAOInBd(ConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public SpaceDAOInBd(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     /**
@@ -36,7 +36,7 @@ public class SpaceDAOInBd implements SpaceDAO {
     @LoggingTime
     @Override
     public void add(Space newSpace) {
-        try (Connection connection = connectionManager.open()) {
+        try (Connection connection = dataSource.getConnection()) {
             setAutoCommit(connection, false);
             try {
                 addSpace(newSpace, connection);
@@ -129,7 +129,7 @@ public class SpaceDAOInBd implements SpaceDAO {
     @LoggingTime
     @Override
     public List<String> getNamesOfSpaces() {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_SPACES_SQL.getQuery())) {
             List<String> listNamesOfSpaces = new ArrayList<>();
             ResultSet resultSet = statement.executeQuery();
@@ -152,7 +152,7 @@ public class SpaceDAOInBd implements SpaceDAO {
     @LoggingTime
     @Override
     public Optional<Space> getSpaceByName(String nameOfSpace) {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement spaceStatement = connection.prepareStatement(SQLRequest.GET_SPACE_BY_NAME_SQL.getQuery());
              PreparedStatement slotsStatement = connection.prepareStatement(SQLRequest.GET_SLOTS_BY_SPACE_NAME_SQL.getQuery())) {
 
@@ -196,7 +196,7 @@ public class SpaceDAOInBd implements SpaceDAO {
     @LoggingTime
     @Override
     public void delete(String nameOfSpace) {
-        try (Connection connection = connectionManager.open()) {
+        try (Connection connection = dataSource.getConnection()) {
             setAutoCommit(connection, false);
             try {
                 deleteByName(connection, SQLRequest.DELETE_BOOKING_FOR_SPACE_SQL, nameOfSpace);

@@ -4,10 +4,10 @@ import dev.makeev.coworking_service_app.dao.LogDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.LogOfUserAction;
-import dev.makeev.coworking_service_app.util.ConnectionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,19 +15,20 @@ import java.util.List;
 @Component
 public class LogDaoInBd implements LogDAO {
 
-    private final ConnectionManager connectionManager;
+    private final DataSource dataSource;
 
     @Autowired
-    public LogDaoInBd(ConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public LogDaoInBd(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
+
 
     /**
      * {@inheritdoc}
      */
     @Override
     public void add(LogOfUserAction logOfUserAction) {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.ADD_LOG_SQL.getQuery())) {
             statement.setTimestamp(1, Timestamp.valueOf(logOfUserAction.localDateTime()));
             statement.setString(2, logOfUserAction.login());
@@ -43,7 +44,7 @@ public class LogDaoInBd implements LogDAO {
      */
     @Override
     public List<LogOfUserAction> getAll() {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_LOGS_SQL.getQuery())) {
 
             return getLogOfUserActions(statement);
@@ -58,7 +59,7 @@ public class LogDaoInBd implements LogDAO {
      */
     @Override
     public List<LogOfUserAction> getAllByLogin(String login) {
-        try (Connection connection = connectionManager.open();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_LOGS_FOR_USER_SQL.getQuery())) {
 
             statement.setString(1, login);
