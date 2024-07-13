@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/v1/log", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/log", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LogSController {
 
     private final LogService logService;

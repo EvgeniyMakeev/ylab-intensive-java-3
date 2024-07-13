@@ -1,11 +1,7 @@
 package dev.makeev.coworking_service_app.controller;
 
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
-import dev.makeev.coworking_service_app.dto.ApiResponse;
-import dev.makeev.coworking_service_app.dto.BookingAddDTO;
-import dev.makeev.coworking_service_app.dto.BookingDTO;
-import dev.makeev.coworking_service_app.dto.BookingRequestDTO;
-import dev.makeev.coworking_service_app.dto.UserRequestDTO;
+import dev.makeev.coworking_service_app.dto.*;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
 import dev.makeev.coworking_service_app.mappers.BookingMapper;
 import dev.makeev.coworking_service_app.model.Booking;
@@ -22,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping(value = "/v1/bookings", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/bookings", produces = MediaType.APPLICATION_JSON_VALUE)
 public class BookingController {
 
     private final BookingService bookingService;

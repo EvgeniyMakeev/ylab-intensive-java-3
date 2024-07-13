@@ -4,10 +4,10 @@ import dev.makeev.coworking_service_app.dao.LogDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.LogOfUserAction;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +15,10 @@ import java.util.List;
 @Component
 public class LogDaoInBd implements LogDAO {
 
-    private final DataSource dataSource;
+    private final BasicDataSource dataSource;
 
     @Autowired
-    public LogDaoInBd(DataSource dataSource) {
+    public LogDaoInBd(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 

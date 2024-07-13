@@ -7,10 +7,10 @@ import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.WorkingHours;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,10 +24,10 @@ import java.util.Optional;
 @Component
 public class BookingDAOInBd implements BookingDAO {
 
-    private final DataSource dataSource;
+    private final BasicDataSource dataSource;
 
     @Autowired
-    public BookingDAOInBd(DataSource dataSource) {
+    public BookingDAOInBd(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 

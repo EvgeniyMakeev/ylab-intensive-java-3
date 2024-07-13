@@ -5,10 +5,10 @@ import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.User;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,10 +22,10 @@ import java.util.Optional;
 @Component
 public class UserDAOInBd implements UserDAO {
 
-    private final DataSource dataSource;
+    private final BasicDataSource dataSource;
 
     @Autowired
-    public UserDAOInBd(DataSource dataSource) {
+    public UserDAOInBd(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 

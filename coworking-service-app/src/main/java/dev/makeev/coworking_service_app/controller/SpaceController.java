@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/v1/spaces", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/spaces", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SpaceController {
 
     private final SpaceService spaceService;

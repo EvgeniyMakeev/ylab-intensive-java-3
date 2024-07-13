@@ -1,10 +1,11 @@
-package dev.makeev.coworking_service_app.config;
+package dev.makeev.coworking_service_app;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletRegistration;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
 
 public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
@@ -13,8 +14,8 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
         context.scan("dev.makeev");
 
-        ServletRegistration.Dynamic registration = servletContext.addServlet("app", new DispatcherServlet(context));
+        ServletRegistration.Dynamic registration = servletContext.addServlet("dispatcher", new DispatcherServlet(context));
         registration.setLoadOnStartup(1);
-        registration.addMapping("/api/*");
+        registration.addMapping("/");
     }
 }

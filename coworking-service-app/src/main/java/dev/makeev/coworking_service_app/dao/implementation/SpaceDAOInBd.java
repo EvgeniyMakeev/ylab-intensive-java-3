@@ -6,10 +6,10 @@ import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.sql.Date;
 import java.sql.*;
 import java.time.LocalDate;
@@ -23,10 +23,10 @@ import java.util.stream.IntStream;
 @Component
 public class SpaceDAOInBd implements SpaceDAO {
 
-    private final DataSource dataSource;
+    private final BasicDataSource dataSource;
 
     @Autowired
-    public SpaceDAOInBd(DataSource dataSource) {
+    public SpaceDAOInBd(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 

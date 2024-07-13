@@ -5,8 +5,8 @@ import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.model.*;
 import dev.makeev.coworking_service_app.util.InitDb;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.jupiter.api.*;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -50,7 +50,7 @@ public class AllDAOsTest {
     static void setUpAll() {
         postgresContainer.start();
 
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(postgresContainer.getDriverClassName());
         dataSource.setUrl(postgresContainer.getJdbcUrl());
         dataSource.setUsername(postgresContainer.getUsername());
