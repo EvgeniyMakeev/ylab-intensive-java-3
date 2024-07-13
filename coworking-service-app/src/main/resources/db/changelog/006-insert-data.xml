@@ -86,13 +86,13 @@
         <insert tableName="user_activity_log" schemaName="non_public">
             <column name="timestamp" value="now()"/>
             <column name="login" value="User1"/>
-            <column name="action" value="Add new booking."/>
+            <column name="action" value="Add new booking Workplace No. 1 from 8:00 2024-06-27 to 12:00 2024-06-27"/>
         </insert>
 
         <insert tableName="user_activity_log" schemaName="non_public">
             <column name="timestamp" value="now()"/>
             <column name="login" value="User2"/>
-            <column name="action" value="Add new booking."/>
+            <column name="action" value="Add new booking Conference hall from 10:00 2024-06-28 to 14:00 2024-06-28."/>
         </insert>
     </changeSet>
 </databaseChangeLog>

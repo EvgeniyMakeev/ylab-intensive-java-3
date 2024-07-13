@@ -16,8 +16,8 @@ public record Booking(Long id,
     @Override
     public String toString() {
         return nameOfBookingSpace +
-                " from " + bookingRange.beginningBookingHour() + " " + bookingRange.beginningBookingDate() +
-                " to " + bookingRange.endingBookingHour() + " " + bookingRange.endingBookingDate();
+                " from " + bookingRange.beginningBookingHour() + ":00 " + bookingRange.beginningBookingDate() +
+                " to " + bookingRange.endingBookingHour() + ":00 " + bookingRange.endingBookingDate();
     }
 
     /**

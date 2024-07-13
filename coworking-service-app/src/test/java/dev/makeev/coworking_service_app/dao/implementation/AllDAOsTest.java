@@ -3,21 +3,10 @@ package dev.makeev.coworking_service_app.dao.implementation;
 import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.dao.UserDAO;
-import dev.makeev.coworking_service_app.model.Booking;
-import dev.makeev.coworking_service_app.model.BookingRange;
-import dev.makeev.coworking_service_app.model.Space;
-import dev.makeev.coworking_service_app.model.User;
-import dev.makeev.coworking_service_app.model.WorkingHours;
-import dev.makeev.coworking_service_app.util.ConnectionManager;
-import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
+import dev.makeev.coworking_service_app.model.*;
 import dev.makeev.coworking_service_app.util.InitDb;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import dev.makeev.coworking_service_app.util.implementation.ConnectionManagerImpl;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -65,9 +54,15 @@ public class AllDAOsTest {
         String username = postgresContainer.getUsername();
         String password = postgresContainer.getPassword();
 
-        ConnectionManager testConnectionManager = new ConnectionManagerImpl(jdbcUrl, username, password);
+        ConnectionManagerImpl testConnectionManager = new ConnectionManagerImpl();
+        testConnectionManager.setUrl(jdbcUrl);
+        testConnectionManager.setUsername(username);
+        testConnectionManager.setPassword(password);
 
-        new InitDb(testConnectionManager).initDb();
+        InitDb initDb = new InitDb(testConnectionManager);
+        initDb.setChangelog("db/changelog/changelog.xml");
+        initDb.setSchemaName("liquibase");
+        initDb.initDb();
 
         userDAO = new UserDAOInBd(testConnectionManager);
         spaceDAO = new SpaceDAOInBd(testConnectionManager);

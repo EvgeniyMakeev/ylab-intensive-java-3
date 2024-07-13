@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.config;
 
-import dev.makeev.coworking_service_app.util.InitDb;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletRegistration;
 import org.springframework.web.WebApplicationInitializer;
@@ -17,7 +16,5 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
         ServletRegistration.Dynamic registration = servletContext.addServlet("app", new DispatcherServlet(context));
         registration.setLoadOnStartup(1);
         registration.addMapping("/api/*");
-
-        new InitDb().initDb();
     }
 }

@@ -1,25 +1,22 @@
 package dev.makeev.coworking_service_app.util.implementation;
 
 import dev.makeev.coworking_service_app.util.ConnectionManager;
-import dev.makeev.coworking_service_app.util.PropertiesLoader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
-/**
- * The {@code ConnectionManagerImpl} class implements the {@link ConnectionManager} interface.
- * It provides methods to open a database connection using the JDBC DriverManager.
- */
 @Component
-public final class ConnectionManagerImpl implements ConnectionManager {
+public class ConnectionManagerImpl implements ConnectionManager {
 
-    private final String url;
-    private final String username;
-    private final String password;
+    @Value("${db.url}")
+    private String url;
+    @Value("${db.username}")
+    private String username;
+    @Value("${db.password}")
+    private String password;
 
     static {
         try {
@@ -29,35 +26,18 @@ public final class ConnectionManagerImpl implements ConnectionManager {
         }
     }
 
-    /**
-     * Constructs a new {@code ConnectionManagerImpl} and initializes it with database connection
-     * properties from the "application.properties" file on the classpath.
-     */
-    public ConnectionManagerImpl() {
-        Properties properties = PropertiesLoader.loadProperties();
-        this.url = properties.getProperty("db.url");
-        this.username = properties.getProperty("db.username");
-        this.password = properties.getProperty("db.password");
+    public void setUrl(String url) {
+        this.url = url;
     }
 
-    /**
-     * Constructs a new {@code ConnectionManagerImpl} with the specified database connection properties.
-     *
-     * @param url      The URL of the database to connect to.
-     * @param username The username for the database connection.
-     * @param password The password for the database connection.
-     */
-    public ConnectionManagerImpl(@Value("${db.url}") String url,
-                                 @Value("${db.username}") String username,
-                                 @Value("${db.password}") String password) {
-        this.url = url;
+    public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setPassword(String password) {
         this.password = password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     @Override
     public Connection open() {
         try {
