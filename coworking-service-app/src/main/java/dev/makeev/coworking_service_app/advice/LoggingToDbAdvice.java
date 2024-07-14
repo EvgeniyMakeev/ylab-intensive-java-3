@@ -12,7 +12,10 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import java.lang.reflect.Method;
 
-
+/**
+ * Advice for logging method actions to the database.
+ * This interceptor is triggered by methods annotated with {@link LoggingToDb}.
+ */
 @Configuration
 @EnableAspectJAutoProxy
 public class LoggingToDbAdvice implements AfterReturningAdvice {
@@ -24,12 +27,23 @@ public class LoggingToDbAdvice implements AfterReturningAdvice {
         this.logService = logService;
     }
 
+    /**
+     * Configures a pointcut advisor to intercept methods annotated with {@link LoggingToDb}.
+     * @return DefaultPointcutAdvisor configured with the logging to database advice.
+     */
     @Bean
     public DefaultPointcutAdvisor loggingToDbAdvisor() {
         AnnotationMatchingPointcut pointcut = new AnnotationMatchingPointcut(null, LoggingToDb.class);
         return new DefaultPointcutAdvisor(pointcut, this);
     }
 
+    /**
+     * Intercepts method execution after returning and logs the action to the database.
+     * @param returnValue The value returned by the method, if any.
+     * @param method The method that was called.
+     * @param args The arguments passed to the method.
+     * @param target The target object on which the method was called.
+     */
     @Override
     public void afterReturning(Object returnValue, Method method, Object[] args, Object target) {
         String loginArg = "No args";

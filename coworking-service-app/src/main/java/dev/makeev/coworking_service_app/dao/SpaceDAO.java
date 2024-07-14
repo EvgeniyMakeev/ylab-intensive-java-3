@@ -7,9 +7,10 @@ import java.util.Optional;
 
 
 /**
- * DAO interface for managing coworking spaces.
+ * SpaceDAO interface for managing coworking spaces.
  */
 public interface SpaceDAO {
+
     /**
      * Adds a new space.
      *

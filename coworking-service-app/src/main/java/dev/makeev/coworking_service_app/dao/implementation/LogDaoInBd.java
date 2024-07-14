@@ -8,10 +8,18 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The {@code LogDaoInBd} class implements the {@link LogDAO} interface.
+ * It provides methods to interact with the database to manage Log entities.
+ */
 @Component
 public class LogDaoInBd implements LogDAO {
 
@@ -47,22 +55,6 @@ public class LogDaoInBd implements LogDAO {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_LOGS_SQL.getQuery())) {
 
-            return getLogOfUserActions(statement);
-
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    @Override
-    public List<LogOfUserAction> getAllByLogin(String login) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_LOGS_FOR_USER_SQL.getQuery())) {
-
-            statement.setString(1, login);
             return getLogOfUserActions(statement);
 
         } catch (SQLException e) {

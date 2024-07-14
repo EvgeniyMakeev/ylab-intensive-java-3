@@ -12,20 +12,17 @@ The Coworking Service Application is a Java-based program designed to manage boo
 ## REST API
 The application is now a REST API that accepts requests and returns responses in JSON format.
 
-### UserServlet
-Handles user registration, login, and authentication. This servlet ensures that users can securely register for new accounts and log in with their credentials.
+### RegistrationController
+Handles user registration. This controller ensures that users can securely register for new accounts.
 
-### SpaceServlet
-Manages coworking spaces, including adding, updating, and deleting spaces. Administrators use this servlet to configure the availability and details of coworking spaces.
+### SpaceController
+Manages coworking spaces, including adding, updating, and deleting spaces. Administrators use this controller to configure the availability and details of coworking spaces.
 
-### BookingServlet
-Manages bookings, including viewing available slots, making reservations, and canceling bookings. Users interact with this servlet to book spaces and manage their reservations.
+### BookingController
+Manages bookings, including viewing available slots, making reservations, and canceling bookings. Users interact with this controller to book spaces and manage their reservations.
 
-### SlotsForBookingServlet
-Provides information about available slots for booking in specific coworking spaces. This servlet responds to requests for checking available booking times for a given space.
-
-### LogServlet
-Manages logs of user actions. This servlet allows administrators to view logs of user activities, which is useful for auditing and tracking purposes.
+### LogController
+Manages logs of user actions. This controller allows administrators to view logs of user activities, which is useful for auditing and tracking purposes.
 
 ## Installation
 
@@ -53,11 +50,24 @@ To run the Coworking Service Application, follow these steps:
 
 The application exposes a set of RESTful endpoints. Here are some examples of how to interact with the main features:
 
-- **Login or Register**:  Use the "/api/v1/users" endpoint to register for an account or log in with your existing credentials.
+- **Swagger-UI**:  Use the "/" endpoint to go swagger-ui.html.
+- **Login or Register**:  Use the "/api/v1/registration" endpoint to register for an account.
 - **View Available Spaces**: Use the /api/v1/spaces endpoint to see a list of available coworking spaces and their details.
 - **Book a Space**: Use the "/api/v1/bookings" endpoint to select a space, choose a date and time, and make a booking.
 - **Cancel Booking**: Use the "/api/v1/bookings" endpoint to view your existing bookings and cancel them if needed.
 - **Admin Functions**: Administrators have additional options to manage spaces, view bookings, view logs, and perform other administrative tasks.
+- **Logs of User actions**: Use the "/api/v1/logs" endpoint to view logs of user action. Available only for Admin.
+
+## Test Users
+
+Logins and passwords for testing:
+
+- **Administrator**:
+  - ***login:*** admin ***password:*** 1234
+- **Test Users**:  
+  - ***login:*** User1 ***password:*** pass1
+
+  - ***login:*** User2 ***password:*** pass2
 
 ## Contributing
 

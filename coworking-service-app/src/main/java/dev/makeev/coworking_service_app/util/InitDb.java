@@ -16,19 +16,31 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Utility class for initializing the database using Liquibase.
+ */
 public final class InitDb {
 
     private final DataSource dataSource;
     private final String schemaName;
     private final String changelog;
 
+    /**
+     * Constructs an InitDb object with the specified DataSource, schema name, and Liquibase changelog file.
+     *
+     * @param dataSource the DataSource to use for database connections
+     * @param schemaName the name of the schema to create or use
+     * @param changelog the path to the Liquibase changelog file
+     */
     public InitDb(DataSource dataSource, String schemaName, String changelog) {
         this.dataSource = dataSource;
         this.schemaName = schemaName;
         this.changelog = changelog;
     }
 
-
+    /**
+     * Initializes the database schema and performs Liquibase migration.
+     */
     public void initDb() {
         createSchema(schemaName);
         try (Connection connection = dataSource.getConnection()) {
@@ -50,6 +62,11 @@ public final class InitDb {
         }
     }
 
+    /**
+     * Creates the database schema if it does not already exist.
+     *
+     * @param schemaName the name of the schema to create
+     */
     private void createSchema(String schemaName) {
         try (Connection connection = dataSource.getConnection()) {
             String sql = "CREATE SCHEMA IF NOT EXISTS " + schemaName;

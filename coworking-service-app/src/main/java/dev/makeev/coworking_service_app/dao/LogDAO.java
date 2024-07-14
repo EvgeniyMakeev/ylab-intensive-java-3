@@ -9,10 +9,17 @@ import java.util.List;
  * of Log entities. It allows adding, retrieving, and querying logs of users action.
  */
 public interface LogDAO {
-
+    /**
+     * Adds a log.
+     *
+     * @param logOfUserAction the log to be added
+     */
     void add(LogOfUserAction logOfUserAction);
 
+    /**
+     * Retrieves all logs.
+     *
+     * @return a list of logOfUserAction
+     */
     List<LogOfUserAction> getAll();
-
-    List<LogOfUserAction> getAllByLogin(String login);
 }

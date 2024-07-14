@@ -9,9 +9,18 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+/**
+ * Configuration class for Swagger documentation setup.
+ */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
+
+    /**
+     * Configures Swagger Docket bean for API documentation.
+     *
+     * @return Configured Docket instance.
+     */
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -20,7 +29,7 @@ public class SwaggerConfig {
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(new ApiInfoBuilder()
-                        .title("Coworking service Api")
+                        .title("Coworking Service API")
                         .version("v1")
                         .description("The Coworking Service Application is program " +
                                 "to manage bookings and spaces in a coworking environment.")

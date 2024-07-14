@@ -71,6 +71,12 @@ public class BookingController {
         }
     }
 
+    /**
+     * Checks if the booking time is valid.
+     *
+     * @param bookingAddDTO the booking data to validate
+     * @return true if the booking time is valid, false otherwise
+     */
     private boolean isValidTime(BookingAddDTO bookingAddDTO) {
         int minHourOfBeginning = 0;
         int maxHourOfEnding = 24;

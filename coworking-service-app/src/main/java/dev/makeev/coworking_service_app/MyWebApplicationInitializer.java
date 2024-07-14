@@ -7,8 +7,16 @@ import org.springframework.web.servlet.DispatcherServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
+/**
+ * Configures the Spring MVC web application using Java configuration.
+ */
 public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
+    /**
+     * Initialize the Spring MVC web application.
+     *
+     * @param servletContext the ServletContext of the web application
+     */
     @Override
     public void onStartup(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();

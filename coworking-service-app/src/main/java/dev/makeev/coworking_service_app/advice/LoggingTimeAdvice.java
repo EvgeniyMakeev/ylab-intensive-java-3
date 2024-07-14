@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
+/**
+ * Advice for logging method execution time.
+ * This interceptor is triggered by methods annotated with {@link LoggingTime}.
+ */
 @Configuration
 @EnableAspectJAutoProxy
 public class LoggingTimeAdvice implements MethodInterceptor {
@@ -18,14 +22,24 @@ public class LoggingTimeAdvice implements MethodInterceptor {
     private final Output<String> output = new ConsoleOutput();
     private final ThreadLocal<Integer> callDepth = ThreadLocal.withInitial(() -> 0);
 
+    /**
+     * Configures a pointcut advisor to intercept methods annotated with {@link LoggingTime}.
+     * @return DefaultPointcutAdvisor configured with the logging time advice.
+     */
     @Bean
     public DefaultPointcutAdvisor loggingTimeAdvisor() {
         AnnotationMatchingPointcut pointcut = new AnnotationMatchingPointcut(null, LoggingTime.class);
         return new DefaultPointcutAdvisor(pointcut, this);
     }
 
+    /**
+     * Intercepts method execution to log the time taken for execution.
+     * @param invocation MethodInvocation object containing details about the method being invoked.
+     * @return The result of the method invocation.
+     * @throws Throwable If any error occurs during method invocation.
+     */
     @Override
-    public Object invoke(MethodInvocation invocation) {
+    public Object invoke(MethodInvocation invocation) throws Throwable {
         callDepth.set(callDepth.get() + 1);
         try {
             if (callDepth.get() == 1) {
@@ -39,8 +53,6 @@ public class LoggingTimeAdvice implements MethodInterceptor {
             } else {
                 return invocation.proceed();
             }
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
         } finally {
             callDepth.set(callDepth.get() - 1);
         }

@@ -1,9 +1,8 @@
-package dev.makeev.coworking_service_app.service;
+package dev.makeev.coworking_service_app.service.implementation;
 
 import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import dev.makeev.coworking_service_app.model.User;
-import dev.makeev.coworking_service_app.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

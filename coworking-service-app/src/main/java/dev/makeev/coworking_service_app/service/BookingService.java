@@ -10,18 +10,45 @@ import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
 
 import java.util.List;
 
+/**
+ * Service interface for managing bookings.
+ */
 public interface BookingService {
+
+    /**
+     * Adds a booking for a user.
+     *
+     * @param login the login of the user
+     * @param bookingAddDTO the bookingAddDTO
+     * @throws SpaceIsNotAvailableException if the space is not available for the specified date and time
+     */
     @LoggingTime
     @LoggingToDb
     void addBooking(String login, BookingAddDTO bookingAddDTO) throws SpaceIsNotAvailableException, SpaceNotFoundException;
 
+    /**
+     * Retrieves all bookings for a user.
+     *
+     * @param login the login of the user
+     * @return a list of formatted booking strings
+     */
     @LoggingTime
     @LoggingToDb
     List<BookingDTO> getAllBookingsForUser(String login);
 
+    /**
+     * Retrieves all bookings sorted by user.
+     *
+     * @return a list of formatted booking strings
+     */
     @LoggingTime
     List<BookingDTO> getAllBookingsSortedByUser();
 
+    /**
+     * Deletes a booking by its index in the user's booking list.
+     *
+     * @param bookingId the id of the booking for deleting
+     */
     @LoggingTime
     @LoggingToDb
     void deleteBookingById(String login, long bookingId) throws BookingNotFoundException;

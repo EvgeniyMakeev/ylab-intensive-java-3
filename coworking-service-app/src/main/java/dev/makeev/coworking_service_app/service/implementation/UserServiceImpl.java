@@ -13,9 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * The {@code UserService} class provides methods to manage user-related operations.
- * It encapsulates the business logic related to user management, such as adding users,
- * verifying credentials, and checking user roles.
+ * The {@code UserServiceImpl} class implements the {@link UserService} interface.
+ * It provides methods to manage Users.
  */
 @Service
 public class UserServiceImpl implements UserService {
@@ -35,7 +34,9 @@ public class UserServiceImpl implements UserService {
         this.userDAO = userDAO;
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
     @LoggingTime
     @LoggingToDb
     @Override
@@ -48,10 +49,7 @@ public class UserServiceImpl implements UserService {
 
 
     /**
-     * Verifies the credentials of a user.
-     *
-     * @param login    The login to verify.
-     * @param password The password to verify.
+     * {@inheritdoc}
      */
     @LoggingTime
     @Override
@@ -63,10 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Checks if a user is an admin.
-     *
-     * @param login The login of the user.
-     * @return {@code true} if the user is an admin, {@code false} otherwise.
+     * {@inheritdoc}
      */
     @LoggingTime
     @Override

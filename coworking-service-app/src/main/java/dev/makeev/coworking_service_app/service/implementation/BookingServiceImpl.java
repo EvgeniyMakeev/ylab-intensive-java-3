@@ -14,6 +14,7 @@ import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
+import dev.makeev.coworking_service_app.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +25,11 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
- * Service class for managing bookings.
+ * The {@code BookingServiceImpl} class implements the {@link BookingService} interface.
+ * It provides methods to manage Booking.
  */
 @Service
-public class BookingServiceImpl implements dev.makeev.coworking_service_app.service.BookingService {
+public class BookingServiceImpl implements BookingService {
 
     private final BookingDAO bookingDAO;
     private final SpaceDAO spaceDAO;
@@ -47,11 +49,7 @@ public class BookingServiceImpl implements dev.makeev.coworking_service_app.serv
     }
 
     /**
-     * Adds a booking for a user.
-     *
-     * @param login the login of the user
-     * @param bookingAddDTO the bookingAddDTO
-     * @throws SpaceIsNotAvailableException if the space is not available for the specified date and time
+     * {@inheritdoc}
      */
     @LoggingTime
     @LoggingToDb
@@ -110,10 +108,7 @@ public class BookingServiceImpl implements dev.makeev.coworking_service_app.serv
     }
 
     /**
-     * Retrieves all bookings for a user.
-     *
-     * @param login the login of the user
-     * @return a list of formatted booking strings
+     * {@inheritdoc}
      */
     @LoggingTime
     @LoggingToDb
@@ -126,9 +121,7 @@ public class BookingServiceImpl implements dev.makeev.coworking_service_app.serv
     }
 
     /**
-     * Retrieves all bookings sorted by user.
-     *
-     * @return a list of formatted booking strings
+     * {@inheritdoc}
      */
     @LoggingTime
     @Override
@@ -141,11 +134,8 @@ public class BookingServiceImpl implements dev.makeev.coworking_service_app.serv
                 .toList();
     }
 
-
     /**
-     * Deletes a booking by its index in the user's booking list.
-     *
-     * @param bookingId the id of the booking for deleting
+     * {@inheritdoc}
      */
     @LoggingTime
     @LoggingToDb

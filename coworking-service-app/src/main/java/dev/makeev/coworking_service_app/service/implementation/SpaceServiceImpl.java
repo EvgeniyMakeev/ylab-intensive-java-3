@@ -15,15 +15,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Service class for managing coworking spaces.
+ * The {@code SpaceServiceImpl} class implements the {@link SpaceService} interface.
+ * It provides methods to manage Spaces.
  */
 @Service
 public class SpaceServiceImpl implements SpaceService {
 
     private final SpaceDAO spaceDAO;
+
     /**
      * Constructs a new SpaceService.
      *
@@ -35,9 +41,7 @@ public class SpaceServiceImpl implements SpaceService {
     }
 
     /**
-     * Adds a new space or updates an existing space.
-     *
-     * @param spaceAddDTO the spaceDTO
+     * {@inheritdoc}
      */
     @LoggingTime
     @Override
@@ -65,9 +69,7 @@ public class SpaceServiceImpl implements SpaceService {
     }
 
     /**
-     * Retrieves a list of all spaces.
-     *
-     * @return a list of all spaces
+     * {@inheritdoc}
      */
     @LoggingTime
     @LoggingToDb
@@ -98,9 +100,7 @@ public class SpaceServiceImpl implements SpaceService {
     }
 
     /**
-     * Deletes a space by its name.
-     *
-     * @param nameOfSpace the name of the space to delete
+     * {@inheritdoc}
      */
     @LoggingTime
     @Override

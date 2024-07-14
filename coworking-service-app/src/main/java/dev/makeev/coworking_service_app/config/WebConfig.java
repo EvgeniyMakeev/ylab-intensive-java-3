@@ -10,10 +10,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
+/**
+ * Configuration class for Spring MVC setup.
+ */
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
+    /**
+     * Configures Jackson JSON message converters with indentation.
+     *
+     * @param converters List of HTTP message converters.
+     */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
@@ -21,6 +29,11 @@ public class WebConfig implements WebMvcConfigurer {
         converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
     }
 
+    /**
+     * Configures resource handlers for Swagger UI and webjars.
+     *
+     * @param registry ResourceHandlerRegistry instance to register resource handlers.
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("swagger-ui.html")
