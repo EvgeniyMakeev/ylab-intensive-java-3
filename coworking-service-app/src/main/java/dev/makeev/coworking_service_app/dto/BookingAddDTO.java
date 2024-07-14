@@ -9,4 +9,12 @@ public record BookingAddDTO(@NonNull String login,
                             @NonNull int beginningBookingHour,
                             @NonNull String endingBookingDate,
                             @NonNull int endingBookingHour) {
+
+    @Override
+    public String toString() {
+        return nameOfBookingSpace +
+                " from " + beginningBookingHour + ":00 " + beginningBookingDate +
+                " to " + endingBookingHour + ":00 " + endingBookingDate;
+    }
+
 }

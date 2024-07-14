@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface LogOfUserActionMapper {
 
-    @Mapping(target = "localDateTime", source = "logOfUserAction.localDateTime", dateFormat = "dd.MM.yyyy")
+    @Mapping(target = "localDateTime", source = "logOfUserAction.localDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "login", source = "logOfUserAction.login")
     @Mapping(target = "messageAboutAction", source = "logOfUserAction.messageAboutAction")
     LogOfUserActionDTO toLogOfUserActionDTO (LogOfUserAction logOfUserAction);

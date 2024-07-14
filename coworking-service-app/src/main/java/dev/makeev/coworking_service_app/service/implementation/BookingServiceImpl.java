@@ -4,9 +4,12 @@ import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
+import dev.makeev.coworking_service_app.dto.BookingAddDTO;
+import dev.makeev.coworking_service_app.dto.BookingDTO;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
 import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
+import dev.makeev.coworking_service_app.mappers.BookingMapper;
 import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.Space;
@@ -28,6 +31,7 @@ public class BookingServiceImpl implements dev.makeev.coworking_service_app.serv
 
     private final BookingDAO bookingDAO;
     private final SpaceDAO spaceDAO;
+    private final BookingMapper bookingMapper;
 
     /**
      * Constructs a new BookingService.
@@ -36,28 +40,27 @@ public class BookingServiceImpl implements dev.makeev.coworking_service_app.serv
      * @param spaceDAO the SpaceDAO to use for space operations
      */
     @Autowired
-    public BookingServiceImpl(BookingDAO bookingDAO, SpaceDAO spaceDAO) {
+    public BookingServiceImpl(BookingDAO bookingDAO, SpaceDAO spaceDAO, BookingMapper bookingMapper) {
         this.bookingDAO = bookingDAO;
         this.spaceDAO = spaceDAO;
+        this.bookingMapper = bookingMapper;
     }
 
     /**
      * Adds a booking for a user.
      *
      * @param login the login of the user
-     * @param booking the booking
+     * @param bookingAddDTO the bookingAddDTO
      * @throws SpaceIsNotAvailableException if the space is not available for the specified date and time
      */
     @LoggingTime
     @LoggingToDb
     @Override
-    public void addBooking(String login, Booking booking) throws SpaceIsNotAvailableException, SpaceNotFoundException {
-
-        Space bookingSpace = spaceDAO.getSpaceByName(booking.nameOfBookingSpace()).orElseThrow(SpaceNotFoundException::new);
-
+    public void addBooking(String login, BookingAddDTO bookingAddDTO) throws SpaceIsNotAvailableException, SpaceNotFoundException {
+        Space bookingSpace = spaceDAO.getSpaceByName(bookingAddDTO.nameOfBookingSpace()).orElseThrow(SpaceNotFoundException::new);
+        Booking booking = bookingMapper.toBooking(bookingAddDTO);
         if (isSpaceAvailableForBookingOnDateAndTime(bookingSpace, booking.bookingRange(), bookingSpace.workingHours())) {
             bookingDAO.add(booking);
-
         } else {
             throw new SpaceIsNotAvailableException();
         }
@@ -115,8 +118,11 @@ public class BookingServiceImpl implements dev.makeev.coworking_service_app.serv
     @LoggingTime
     @LoggingToDb
     @Override
-    public List<Booking> getAllBookingsForUser(String login) {
-        return bookingDAO.getAllForUser(login);
+    public List<BookingDTO> getAllBookingsForUser(String login) {
+        return bookingDAO.getAllForUser(login)
+                .stream()
+                .map(bookingMapper::toBookingDTO)
+                .toList();
     }
 
     /**
@@ -126,9 +132,12 @@ public class BookingServiceImpl implements dev.makeev.coworking_service_app.serv
      */
     @LoggingTime
     @Override
-    public List<Booking> getAllBookingsSortedByUser() {
+    public List<BookingDTO> getAllBookingsSortedByUser() {
         return bookingDAO.getAll().stream()
                 .sorted(Comparator.comparing(Booking::login))
+                .toList()
+                .stream()
+                .map(bookingMapper::toBookingDTO)
                 .toList();
     }
 

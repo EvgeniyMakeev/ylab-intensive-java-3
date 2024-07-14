@@ -1,10 +1,10 @@
 package dev.makeev.coworking_service_app.service;
 
-import dev.makeev.coworking_service_app.model.LogOfUserAction;
+import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
 
 import java.util.List;
 
 public interface LogService {
     void addLog(String login, String message);
-    List<LogOfUserAction> getLogs();
+    List<LogOfUserActionDTO> getLogs();
 }

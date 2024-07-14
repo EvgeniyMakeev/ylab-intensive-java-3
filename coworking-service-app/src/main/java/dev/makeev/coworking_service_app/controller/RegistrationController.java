@@ -14,17 +14,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for managing user registration.
+ */
 @RestController
 @RequestMapping(value = "/api/v1/registration", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RegistrationController {
 
     private final UserService userService;
 
+    /**
+     * Constructs a RegistrationController with the specified UserService.
+     *
+     * @param userService the user service
+     */
     @Autowired
     public RegistrationController(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Registers a new user.
+     *
+     * @param userRequestDTO the user data
+     * @return an ApiResponse indicating success or failure
+     */
     @LoggingTime
     @PostMapping
     public ResponseEntity<ApiResponse> addUser(@Validated @RequestBody UserRequestDTO userRequestDTO) {

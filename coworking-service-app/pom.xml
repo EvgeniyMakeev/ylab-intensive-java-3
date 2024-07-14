@@ -4,7 +4,7 @@
 
   <groupId>makeev</groupId>
   <artifactId>coworking-service-app</artifactId>
-  <version>4.3</version>
+  <version>4.4</version>
   <packaging>war</packaging>
 
   <name>coworking-service-app</name>
@@ -61,6 +61,13 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
       <version>${spring.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

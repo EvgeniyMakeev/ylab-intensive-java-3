@@ -12,14 +12,6 @@ public record Booking(Long id,
                       String login,
                       String nameOfBookingSpace,
                       BookingRange bookingRange) {
-
-    @Override
-    public String toString() {
-        return nameOfBookingSpace +
-                " from " + bookingRange.beginningBookingHour() + ":00 " + bookingRange.beginningBookingDate() +
-                " to " + bookingRange.endingBookingHour() + ":00 " + bookingRange.endingBookingDate();
-    }
-
     /**
      * Constructs a new Booking with the specified space and booking range.
      * The booking ID is automatically generated.

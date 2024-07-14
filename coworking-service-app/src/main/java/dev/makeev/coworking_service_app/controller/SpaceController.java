@@ -13,10 +13,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * REST controller for managing spaces.
+ */
 @RestController
 @RequestMapping(value = "/api/v1/spaces", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SpaceController {
@@ -24,22 +32,38 @@ public class SpaceController {
     private final SpaceService spaceService;
     private final UserService userService;
 
+    /**
+     * Constructs a SpaceController with the specified SpaceService and UserService.
+     *
+     * @param spaceService the space service
+     * @param userService the user service
+     */
     @Autowired
     public SpaceController(SpaceService spaceService, UserService userService) {
         this.spaceService = spaceService;
         this.userService = userService;
     }
 
+    /**
+     * Retrieves all spaces.
+     *
+     * @return a list of SpaceDTO
+     */
     @LoggingTime
     @GetMapping
     public ResponseEntity<List<SpaceDTO>> getSpaces() {
         return ResponseEntity.ok(spaceService.getSpaces());
     }
 
+    /**
+     * Adds a new space.
+     *
+     * @param spaceAddDTO the space data
+     * @return an ApiResponse indicating success or failure
+     */
     @LoggingTime
     @PostMapping
     public ResponseEntity<ApiResponse> addSpace(@Validated @RequestBody SpaceAddDTO spaceAddDTO) {
-        userService.checkCredentials(spaceAddDTO.login(), spaceAddDTO.password());
         if (isValid(spaceAddDTO)) {
             userService.checkCredentials(spaceAddDTO.login(), spaceAddDTO.password());
             spaceService.addSpace(spaceAddDTO);
@@ -49,6 +73,12 @@ public class SpaceController {
         }
     }
 
+    /**
+     * Validates the space data.
+     *
+     * @param spaceAddDTO the space data
+     * @return true if valid, false otherwise
+     */
     private boolean isValid(SpaceAddDTO spaceAddDTO) {
         if (userService.isAdmin(spaceAddDTO.login())) {
             int minHourOfBeginning = 0;
@@ -62,6 +92,12 @@ public class SpaceController {
         }
     }
 
+    /**
+     * Deletes a space.
+     *
+     * @param spaceDeleteDTO the space data
+     * @return an ApiResponse indicating success or failure
+     */
     @LoggingTime
     @DeleteMapping
     public ResponseEntity<ApiResponse> deleteSpace(@Validated @RequestBody SpaceDeleteDTO spaceDeleteDTO) {
@@ -71,6 +107,6 @@ public class SpaceController {
         } else {
             throw new NoAdminException();
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse("Booking deleted successfully"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse("Space deleted successfully"));
     }
 }

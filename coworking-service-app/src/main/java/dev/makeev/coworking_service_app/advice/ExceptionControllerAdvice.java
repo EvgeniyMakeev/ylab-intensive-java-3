@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExceptionControllerAdvice {
 
     @ExceptionHandler(VerificationException.class)
-    public ResponseEntity<ErrorDetails> handleLoginVerificationException(VerificationException e) {
+    public ResponseEntity<ErrorDetails> handleVerificationException(VerificationException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDetails(e.getMessage()));
     }
 

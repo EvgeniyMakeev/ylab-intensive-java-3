@@ -1,6 +1,8 @@
 package dev.makeev.coworking_service_app.dto;
 
-public record SpaceDeleteDTO(String login,
-                             String password,
-                             String name) {
+import org.springframework.lang.NonNull;
+
+public record SpaceDeleteDTO(@NonNull String login,
+                             @NonNull String password,
+                             @NonNull String name) {
 }

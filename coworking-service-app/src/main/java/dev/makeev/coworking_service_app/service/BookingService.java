@@ -2,24 +2,25 @@ package dev.makeev.coworking_service_app.service;
 
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
+import dev.makeev.coworking_service_app.dto.BookingAddDTO;
+import dev.makeev.coworking_service_app.dto.BookingDTO;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
 import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
-import dev.makeev.coworking_service_app.model.Booking;
 
 import java.util.List;
 
 public interface BookingService {
     @LoggingTime
     @LoggingToDb
-    void addBooking(String login, Booking booking) throws SpaceIsNotAvailableException, SpaceNotFoundException;
+    void addBooking(String login, BookingAddDTO bookingAddDTO) throws SpaceIsNotAvailableException, SpaceNotFoundException;
 
     @LoggingTime
     @LoggingToDb
-    List<Booking> getAllBookingsForUser(String login);
+    List<BookingDTO> getAllBookingsForUser(String login);
 
     @LoggingTime
-    List<Booking> getAllBookingsSortedByUser();
+    List<BookingDTO> getAllBookingsSortedByUser();
 
     @LoggingTime
     @LoggingToDb

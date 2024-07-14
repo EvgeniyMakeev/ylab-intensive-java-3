@@ -27,7 +27,8 @@ public class DatabaseConfig {
         dataSource.setUrl(env.getProperty("db.url"));
         dataSource.setUsername(env.getProperty("db.username"));
         dataSource.setPassword(env.getProperty("db.password"));
-
+        dataSource.setInitialSize(3);
+        dataSource.setMaxTotal(10);
         return dataSource;
     }
 

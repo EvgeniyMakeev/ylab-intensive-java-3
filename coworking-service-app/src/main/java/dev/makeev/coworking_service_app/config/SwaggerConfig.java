@@ -2,6 +2,7 @@ package dev.makeev.coworking_service_app.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -17,6 +18,12 @@ public class SwaggerConfig {
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("dev.makeev.coworking_service_app.controller"))
                 .paths(PathSelectors.any())
-                .build();
+                .build()
+                .apiInfo(new ApiInfoBuilder()
+                        .title("Coworking service Api")
+                        .version("v1")
+                        .description("The Coworking Service Application is program " +
+                                "to manage bookings and spaces in a coworking environment.")
+                        .build());
     }
 }

@@ -4,8 +4,6 @@ import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
 import dev.makeev.coworking_service_app.dto.UserRequestDTO;
 import dev.makeev.coworking_service_app.exceptions.NoAdminException;
-import dev.makeev.coworking_service_app.mappers.LogOfUserActionMapper;
-import dev.makeev.coworking_service_app.model.LogOfUserAction;
 import dev.makeev.coworking_service_app.service.LogService;
 import dev.makeev.coworking_service_app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,33 +17,40 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * REST controller for managing user logs.
+ */
 @RestController
 @RequestMapping(value = "/api/v1/log", produces = MediaType.APPLICATION_JSON_VALUE)
-public class LogSController {
+public class LogController {
 
     private final LogService logService;
     private final UserService userService;
-    private final LogOfUserActionMapper logOfUserActionMapper;
 
+    /**
+     * Constructs a LogController with the specified LogService, UserService, and LogOfUserActionMapper.
+     *
+     * @param logService the log service
+     * @param userService the user service
+     */
     @Autowired
-    public LogSController(LogService logService, UserService userService, LogOfUserActionMapper logOfUserActionMapper) {
+    public LogController(LogService logService, UserService userService) {
         this.logService = logService;
         this.userService = userService;
-        this.logOfUserActionMapper = logOfUserActionMapper;
     }
 
+    /**
+     * Retrieves logs of user actions.
+     *
+     * @param userRequestDTO the user credentials
+     * @return a list of LogOfUserActionDTO
+     */
     @LoggingTime
     @PutMapping
     public ResponseEntity<List<LogOfUserActionDTO>> getLog(@Validated @RequestBody UserRequestDTO userRequestDTO) {
         userService.checkCredentials(userRequestDTO.login(), userRequestDTO.password());
         if (userService.isAdmin(userRequestDTO.login())) {
-            List<LogOfUserAction> logOfUserActions = logService.getLogs();
-
-            List<LogOfUserActionDTO> logOfUserActionsDTOs = logOfUserActions
-                    .stream()
-                    .map(logOfUserActionMapper::toLogOfUserActionDTO)
-                    .toList();
-            return ResponseEntity.ok(logOfUserActionsDTOs);
+            return ResponseEntity.ok(logService.getLogs());
         } else {
             throw new NoAdminException();
         }
