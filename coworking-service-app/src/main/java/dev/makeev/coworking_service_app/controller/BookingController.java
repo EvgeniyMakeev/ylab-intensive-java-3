@@ -1,7 +1,11 @@
 package dev.makeev.coworking_service_app.controller;
 
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
-import dev.makeev.coworking_service_app.dto.*;
+import dev.makeev.coworking_service_app.dto.ApiResponse;
+import dev.makeev.coworking_service_app.dto.BookingAddDTO;
+import dev.makeev.coworking_service_app.dto.BookingDTO;
+import dev.makeev.coworking_service_app.dto.BookingRequestDTO;
+import dev.makeev.coworking_service_app.dto.UserRequestDTO;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
 import dev.makeev.coworking_service_app.service.BookingService;
 import dev.makeev.coworking_service_app.service.UserService;
@@ -10,7 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Objects;

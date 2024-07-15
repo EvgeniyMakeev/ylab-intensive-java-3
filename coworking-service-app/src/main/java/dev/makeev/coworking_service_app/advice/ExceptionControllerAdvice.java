@@ -1,7 +1,14 @@
 package dev.makeev.coworking_service_app.advice;
 
 import dev.makeev.coworking_service_app.dto.ErrorDetails;
-import dev.makeev.coworking_service_app.exceptions.*;
+import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
+import dev.makeev.coworking_service_app.exceptions.DaoException;
+import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
+import dev.makeev.coworking_service_app.exceptions.NoAdminException;
+import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
+import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
+import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
+import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
