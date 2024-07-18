@@ -8,7 +8,7 @@ import dev.makeev.coworking_service_app.dto.SpaceDeleteDTO;
 import dev.makeev.coworking_service_app.exceptions.NoAdminException;
 import dev.makeev.coworking_service_app.service.SpaceService;
 import dev.makeev.coworking_service_app.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,29 +20,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
  * REST controller for managing spaces.
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/spaces", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SpaceController {
 
     private final SpaceService spaceService;
     private final UserService userService;
-
-    /**
-     * Constructs a SpaceController with the specified SpaceService and UserService.
-     *
-     * @param spaceService the space service
-     * @param userService the user service
-     */
-    @Autowired
-    public SpaceController(SpaceService spaceService, UserService userService) {
-        this.spaceService = spaceService;
-        this.userService = userService;
-    }
 
     /**
      * Retrieves all spaces.
@@ -63,13 +53,16 @@ public class SpaceController {
      */
     @LoggingTime
     @PostMapping
-    public ResponseEntity<ApiResponse> addSpace(@Validated @RequestBody SpaceAddDTO spaceAddDTO) {
-        if (isValid(spaceAddDTO)) {
-            userService.checkCredentials(spaceAddDTO.login(), spaceAddDTO.password());
+    public ResponseEntity<ApiResponse> addSpace(HttpServletRequest request,
+                                                @Validated @RequestBody SpaceAddDTO spaceAddDTO) {
+        String login = (String) request.getAttribute("login");
+        if (isValid(login, spaceAddDTO)) {
             spaceService.addSpace(spaceAddDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Space added successfully"));
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiResponse("Space " + spaceAddDTO.name() + " added successfully"));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("All parameters are required"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse("All parameters are required"));
         }
     }
 
@@ -79,8 +72,8 @@ public class SpaceController {
      * @param spaceAddDTO the space data
      * @return true if valid, false otherwise
      */
-    private boolean isValid(SpaceAddDTO spaceAddDTO) {
-        if (userService.isAdmin(spaceAddDTO.login())) {
+    private boolean isValid(String login, SpaceAddDTO spaceAddDTO) {
+        if (userService.isAdmin(login)) {
             int minHourOfBeginning = 0;
             int maxHourOfEnding = 24;
 
@@ -100,13 +93,15 @@ public class SpaceController {
      */
     @LoggingTime
     @DeleteMapping
-    public ResponseEntity<ApiResponse> deleteSpace(@Validated @RequestBody SpaceDeleteDTO spaceDeleteDTO) {
-        userService.checkCredentials(spaceDeleteDTO.login(), spaceDeleteDTO.password());
-        if (userService.isAdmin(spaceDeleteDTO.login())) {
+    public ResponseEntity<ApiResponse> deleteSpace(HttpServletRequest request,
+                                                   @Validated @RequestBody SpaceDeleteDTO spaceDeleteDTO) {
+        String login = (String) request.getAttribute("login");
+        if (userService.isAdmin(login)) {
             spaceService.deleteSpace(spaceDeleteDTO.name());
         } else {
             throw new NoAdminException();
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse("Space deleted successfully"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(new ApiResponse("Space deleted successfully"));
     }
 }

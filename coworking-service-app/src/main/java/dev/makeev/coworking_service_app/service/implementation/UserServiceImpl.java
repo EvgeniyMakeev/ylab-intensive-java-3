@@ -7,7 +7,8 @@ import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import dev.makeev.coworking_service_app.model.User;
 import dev.makeev.coworking_service_app.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.makeev.coworking_service_app.util.TokenUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,6 +18,7 @@ import java.util.Optional;
  * It provides methods to manage Users.
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     /**
@@ -25,14 +27,19 @@ public class UserServiceImpl implements UserService {
     private final UserDAO userDAO;
 
     /**
-     * Constructs a {@code UserService} with the specified UserDAO instance.
-     *
-     * @param userDAO The UserDAO instance to use for data access.
+     * {@inheritdoc}
      */
-    @Autowired
-    public UserServiceImpl(UserDAO userDAO) {
-        this.userDAO = userDAO;
+    @LoggingTime
+    @LoggingToDb
+    @Override
+    public String addUser(String login, String password) throws LoginAlreadyExistsException {
+        if (userDAO.getByLogin(login).isPresent()){
+            throw new LoginAlreadyExistsException();
+        }
+        userDAO.add(new User(login, password));
+        return TokenUtil.generateToken(login);
     }
+
 
     /**
      * {@inheritdoc}
@@ -40,22 +47,11 @@ public class UserServiceImpl implements UserService {
     @LoggingTime
     @LoggingToDb
     @Override
-    public void addUser(String login, String password) throws LoginAlreadyExistsException {
-        if (userDAO.getByLogin(login).isPresent()){
-            throw new LoginAlreadyExistsException();
-        }
-        userDAO.add(new User(login, password));
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    @LoggingTime
-    @Override
-    public void checkCredentials(String login, String password) throws VerificationException {
+    public String checkCredentials(String login, String password) throws VerificationException {
         Optional<User> user = userDAO.getByLogin(login);
-        if (user.isEmpty() || !user.get().password().equals(password)) {
+        if (user.isPresent() && user.get().password().equals(password)) {
+            return TokenUtil.generateToken(login);
+        } else {
             throw new VerificationException();
         }
     }
@@ -65,7 +61,27 @@ public class UserServiceImpl implements UserService {
      */
     @LoggingTime
     @Override
+    public String validateToken(String token) throws VerificationException {
+        return TokenUtil.validateToken(token).orElseThrow(VerificationException::new);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    @LoggingTime
+    @LoggingToDb
+    @Override
+    public void logOut(String login) {
+        String token = TokenUtil.validateToken(login).orElseThrow(VerificationException::new);
+        TokenUtil.invalidateToken(token);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    @LoggingTime
+    @Override
     public boolean isAdmin(String login){
-        return userDAO.getByLogin(login).isPresent() ? userDAO.getByLogin(login).get().isAdmin() : false;
+        return userDAO.getByLogin(login).map(User::isAdmin).orElse(false);
     }
 }

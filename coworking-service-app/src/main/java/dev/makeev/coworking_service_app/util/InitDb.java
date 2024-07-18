@@ -10,6 +10,7 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import lombok.RequiredArgsConstructor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -19,24 +20,12 @@ import java.sql.Statement;
 /**
  * Utility class for initializing the database using Liquibase.
  */
+@RequiredArgsConstructor
 public final class InitDb {
 
     private final DataSource dataSource;
     private final String schemaName;
     private final String changelog;
-
-    /**
-     * Constructs an InitDb object with the specified DataSource, schema name, and Liquibase changelog file.
-     *
-     * @param dataSource the DataSource to use for database connections
-     * @param schemaName the name of the schema to create or use
-     * @param changelog the path to the Liquibase changelog file
-     */
-    public InitDb(DataSource dataSource, String schemaName, String changelog) {
-        this.dataSource = dataSource;
-        this.schemaName = schemaName;
-        this.changelog = changelog;
-    }
 
     /**
      * Initializes the database schema and performs Liquibase migration.

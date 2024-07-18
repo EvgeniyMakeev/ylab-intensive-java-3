@@ -5,8 +5,8 @@ import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.User;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -20,15 +20,10 @@ import java.util.Optional;
  * It provides methods to interact with the database to manage User entities.
  */
 @Component
+@RequiredArgsConstructor
 public class UserDAOInBd implements UserDAO {
 
     private final BasicDataSource dataSource;
-
-    @Autowired
-    public UserDAOInBd(BasicDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
 
     /**
      * {@inheritdoc}
@@ -56,17 +51,15 @@ public class UserDAOInBd implements UserDAO {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_USER_BY_LOGIN_SQL.getQuery())) {
             statement.setString(1, login);
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                User user = new User(login,
-                        resultSet.getString("password"),
-                        resultSet.getBoolean("admin"));
-                resultSet.close();
-                return Optional.of(user);
-            } else {
-                resultSet.close();
-                return Optional.empty();
+            try (ResultSet resultSet = statement.executeQuery()){
+                if (resultSet.next()) {
+                    User user = new User(login,
+                            resultSet.getString("password"),
+                            resultSet.getBoolean("admin"));
+                    return Optional.of(user);
+                } else {
+                    return Optional.empty();
+                }
             }
         } catch (SQLException e) {
             throw new DaoException(e);

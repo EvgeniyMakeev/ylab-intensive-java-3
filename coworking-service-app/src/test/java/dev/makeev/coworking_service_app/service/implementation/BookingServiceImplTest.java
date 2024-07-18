@@ -75,16 +75,15 @@ class BookingServiceImplTest {
     @DisplayName("BookingService test: Add Booking - Should add booking if space is available")
     void addBooking_shouldAddBookingIfSpaceIsAvailable() throws SpaceIsNotAvailableException, SpaceNotFoundException {
         when(spaceDAO.getSpaceByName(anyString())).thenReturn(Optional.of(mockSpace));
-        when(mockSpace.bookingSlots()).thenReturn(Map.of(LocalDate.of(2024, 7, 15), Map.of(10, 0L, 11, 0L)));
+        when(mockSpace.bookingSlots()).thenReturn(Map.of(LocalDate.of(2024, 8, 15), Map.of(10, 0L, 11, 0L)));
         when(mockSpace.workingHours()).thenReturn(mockWorkingHours);
         when(mockWorkingHours.hourOfBeginningWorkingDay()).thenReturn(8);
         when(mockWorkingHours.hourOfEndingWorkingDay()).thenReturn(18);
         when(mockBookingAddDTO.nameOfBookingSpace()).thenReturn(NAME_OF_SPACE);
         when(mockBookingAddDTO.beginningBookingHour()).thenReturn(10);
-        when(mockBookingAddDTO.beginningBookingDate()).thenReturn("2024-07-15");
+        when(mockBookingAddDTO.beginningBookingDate()).thenReturn("2024-08-15");
         when(mockBookingAddDTO.endingBookingHour()).thenReturn(11);
-        when(mockBookingAddDTO.endingBookingDate()).thenReturn("2024-07-15");
-
+        when(mockBookingAddDTO.endingBookingDate()).thenReturn("2024-08-15");
 
         bookingServiceImpl.addBooking(LOGIN, mockBookingAddDTO);
 
@@ -95,20 +94,16 @@ class BookingServiceImplTest {
     @DisplayName("BookingService test: Add Booking - Should throw exception if space is not available")
     void addBooking_shouldThrowExceptionIfSpaceIsNotAvailable() {
         when(spaceDAO.getSpaceByName(anyString())).thenReturn(Optional.of(mockSpace));
-        when(mockSpace.bookingSlots()).thenReturn(Map.of(LocalDate.of(2024, 7, 15), Map.of(10, 1L, 11, 1L)));
         when(mockSpace.workingHours()).thenReturn(mockWorkingHours);
-        when(mockWorkingHours.hourOfBeginningWorkingDay()).thenReturn(8);
-        when(mockWorkingHours.hourOfEndingWorkingDay()).thenReturn(18);
         when(mockBookingAddDTO.nameOfBookingSpace()).thenReturn(NAME_OF_SPACE);
-        when(mockBookingAddDTO.beginningBookingHour()).thenReturn(10);
+        when(mockWorkingHours.hourOfBeginningWorkingDay()).thenReturn(8);
         when(mockBookingAddDTO.beginningBookingDate()).thenReturn("2024-08-15");
-        when(mockBookingAddDTO.endingBookingHour()).thenReturn(11);
         when(mockBookingAddDTO.endingBookingDate()).thenReturn("2024-08-15");
 
         assertThatThrownBy(() -> bookingServiceImpl.addBooking(LOGIN, mockBookingAddDTO))
                 .isInstanceOf(SpaceIsNotAvailableException.class);
 
-        verify(bookingDAO, never()).add(mockBooking1);
+        verify(bookingDAO, never()).add(any(Booking.class));
     }
 
     @Test

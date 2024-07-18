@@ -1,7 +1,5 @@
 package dev.makeev.coworking_service_app.service;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
-import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dto.BookingAddDTO;
 import dev.makeev.coworking_service_app.dto.BookingDTO;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
@@ -22,8 +20,6 @@ public interface BookingService {
      * @param bookingAddDTO the bookingAddDTO
      * @throws SpaceIsNotAvailableException if the space is not available for the specified date and time
      */
-    @LoggingTime
-    @LoggingToDb
     void addBooking(String login, BookingAddDTO bookingAddDTO) throws SpaceIsNotAvailableException, SpaceNotFoundException;
 
     /**
@@ -32,8 +28,6 @@ public interface BookingService {
      * @param login the login of the user
      * @return a list of formatted booking strings
      */
-    @LoggingTime
-    @LoggingToDb
     List<BookingDTO> getAllBookingsForUser(String login);
 
     /**
@@ -41,15 +35,14 @@ public interface BookingService {
      *
      * @return a list of formatted booking strings
      */
-    @LoggingTime
     List<BookingDTO> getAllBookingsSortedByUser();
 
     /**
      * Deletes a booking by its index in the user's booking list.
      *
-     * @param bookingId the id of the booking for deleting
+     * @param id the id of the booking for deleting
      */
-    @LoggingTime
-    @LoggingToDb
-    void deleteBookingById(String login, long bookingId) throws BookingNotFoundException;
+    void deleteBookingById(String login, long id) throws BookingNotFoundException;
+
+    void deleteBookingByIdByAdmin(String login, long id) throws BookingNotFoundException;
 }

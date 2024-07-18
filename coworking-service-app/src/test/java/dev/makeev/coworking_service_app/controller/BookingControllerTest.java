@@ -1,11 +1,13 @@
 package dev.makeev.coworking_service_app.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.makeev.coworking_service_app.advice.ExceptionControllerAdvice;
 import dev.makeev.coworking_service_app.dto.BookingAddDTO;
 import dev.makeev.coworking_service_app.dto.BookingDTO;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
 import dev.makeev.coworking_service_app.service.BookingService;
 import dev.makeev.coworking_service_app.service.UserService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,13 +25,13 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,8 +40,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BookingControllerTest {
 
     private static final String LOGIN = "TestUser";
-    private static final String PASSWORD = "TestPassword";
     private static final String SPACE_NAME = "Test Space";
+
+    private static ObjectMapper objectMapper;
 
     @Mock
     private BookingService bookingService;
@@ -56,118 +59,84 @@ class BookingControllerTest {
     @Mock
     private MockMvc mockMvc;
 
+    @BeforeAll
+    static void beforeAll() {
+        objectMapper = new ObjectMapper();
+    }
+
     @BeforeEach
     public void setUp() {
+        objectMapper = new ObjectMapper();
         mockMvc = MockMvcBuilders.standaloneSetup(bookingController)
                 .setControllerAdvice(new ExceptionControllerAdvice())
                 .build();
     }
 
     @Test
-    @DisplayName("PUT /api/v1/bookings - Should get bookings for a user")
+    @DisplayName("Should get bookings for a user")
     void testGetBookings_ValidRequest() throws Exception {
         List<BookingDTO> bookings = List.of(mockBookingDTO);
         when(mockBookingDTO.nameOfBookingSpace()).thenReturn(SPACE_NAME);
-        doNothing().when(userService).checkCredentials(LOGIN, PASSWORD);
         when(userService.isAdmin(LOGIN)).thenReturn(false);
         when(bookingService.getAllBookingsForUser(LOGIN)).thenReturn(bookings);
 
-        String jsonRequest = """
-                        {
-                            "login": "TestUser",
-                            "password": "TestPassword"
-                        }
-                        """;
-
-        mockMvc.perform(put("/api/v1/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+        mockMvc.perform(get("/api/v1/bookings")
+                        .requestAttr("login", LOGIN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(SPACE_NAME)));
 
-        verify(userService, times(1)).checkCredentials(LOGIN, PASSWORD);
         verify(userService, times(1)).isAdmin(LOGIN);
         verify(bookingService, times(1)).getAllBookingsForUser(LOGIN);
     }
 
     @Test
-    @DisplayName("POST /api/v1/bookings - Should add booking if parameters are valid")
+    @DisplayName("Should add booking if parameters are valid")
     void testAddBooking_ValidRequest() throws Exception {
-        doNothing().when(userService).checkCredentials(anyString(), anyString());
         doNothing().when(bookingService).addBooking(anyString(), any(BookingAddDTO.class));
 
-        String jsonRequest = """
-            {
-                "login": "TestUser",
-                "password": "TestPassword",
-                "nameOfBookingSpace": "NewSpace2",
-                "beginningBookingDate": "2024-07-13",
-                "beginningBookingHour": "14",
-                "endingBookingDate": "2024-07-14",
-                "endingBookingHour": "12"
-            }
-            """;
+        String jsonRequest = objectMapper
+                .writeValueAsString(new BookingAddDTO("NewSpace2",
+                        "2024-07-13",14,
+                        "2024-07-14", 12));
 
         mockMvc.perform(post("/api/v1/bookings")
+                        .requestAttr("login", LOGIN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString("Booking added successfully")));
 
-        verify(userService, times(1)).checkCredentials(anyString(), anyString());
         verify(bookingService, times(1)).addBooking(anyString(), any(BookingAddDTO.class));
     }
 
 
 
     @Test
-    @DisplayName("DELETE /api/v1/bookings - Should delete booking if user is admin")
+    @DisplayName("Should delete booking if user is admin")
     void testDeleteBooking_ValidRequest_Admin() throws Exception {
-        doNothing().when(userService).checkCredentials("TestAdmin", "AdminPass");
         when(userService.isAdmin("TestAdmin")).thenReturn(true);
-        doNothing().when(bookingService).deleteBookingById("TestAdmin", 1L);
 
-        String jsonRequest = """
-            {
-                "login": "TestAdmin",
-                "password": "AdminPass",
-                "id": 1
-            }
-            """;
-
-        mockMvc.perform(delete("/api/v1/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+        mockMvc.perform(delete("/api/v1/bookings/1")
+                        .requestAttr("login", "TestAdmin"))
                 .andExpect(status().isNoContent());
 
-        verify(userService, times(1)).checkCredentials("TestAdmin", "AdminPass");
-        verify(bookingService, times(1)).deleteBookingById("TestAdmin", 1L);
+        verify(bookingService, times(1)).deleteBookingByIdByAdmin("TestAdmin", 1L);
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/bookings - Should return not found if booking does not exist for user")
+    @DisplayName("Should return not found if booking does not exist for user")
     void testDeleteBooking_NotFound() throws Exception {
-        doNothing().when(userService).checkCredentials(LOGIN, PASSWORD);
         when(userService.isAdmin(LOGIN)).thenReturn(false);
+        doThrow(new BookingNotFoundException()).when(bookingService).deleteBookingById(LOGIN,999L);
 
-        String jsonRequest = """
-            {
-                "login": "TestUser",
-                "password": "TestPassword",
-                "id": 999
-            }
-            """;
-
-        mockMvc.perform(delete("/api/v1/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+        mockMvc.perform(delete("/api/v1/bookings/999")
+                        .requestAttr("login", LOGIN))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(new BookingNotFoundException().getMessage())));
 
-        verify(userService, times(1)).checkCredentials(LOGIN, PASSWORD);
-        verify(bookingService, never()).deleteBookingById(LOGIN, 999L);
+        verify(bookingService, times(1)).deleteBookingById(LOGIN, 999L);
     }
 }

@@ -21,12 +21,11 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LogControllerTest {
 
     private static final String ADMIN_LOGIN = "TestAdmin";
-    private static final String ADMIN_PASS = "AdminPass";
     private static final String LOGIN = "TestUser";
     private static final String ACTION = "TestAction";
     private static final String DATE = "2024-07-14 18:00:00";
@@ -64,56 +62,37 @@ class LogControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/v1/log - Should get log if user is admin")
+    @DisplayName("Should get log if user is admin")
     void testGetLog_AdminUser() throws Exception {
-        doNothing().when(userService).checkCredentials(ADMIN_LOGIN, ADMIN_PASS);
         when(userService.isAdmin(ADMIN_LOGIN)).thenReturn(true);
         when(logService.getLogs()).thenReturn(List.of(LOG_OF_USER_ACTION_DTO));
 
-        String jsonRequest = """
-                        {
-                            "login": "TestAdmin",
-                            "password":"AdminPass"
-                        }
-                        """;
-
-        mockMvc.perform(put("/api/v1/log")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+        mockMvc.perform(get("/api/v1/log")
+                        .requestAttr("login", ADMIN_LOGIN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(DATE)))
                 .andExpect(content().string(containsString(LOGIN)))
                 .andExpect(content().string(containsString(ACTION)));
 
-        verify(userService, times(1)).checkCredentials(ADMIN_LOGIN, ADMIN_PASS);
         verify(userService, times(1)).isAdmin(ADMIN_LOGIN);
         verify(logService, times(1)).getLogs();
     }
 
     @Test
-    @DisplayName("PUT /api/v1/log - Should throw NoAdminException if user is not admin")
+    @DisplayName("Should throw NoAdminException if user is not admin")
     void testGetLog_NonAdminUser() throws Exception {
-        doNothing().when(userService).checkCredentials(LOGIN, "TestPass");
         when(userService.isAdmin(LOGIN)).thenReturn(false);
 
-        String jsonRequest = """
-                        {
-                            "login": "TestUser",
-                            "password":"TestPass"
-                        }
-                        """;
-
-        mockMvc.perform(put("/api/v1/log")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+        mockMvc.perform(get("/api/v1/log")
+                        .requestAttr("login", LOGIN))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(new NoAdminException().getMessage())));
 
-        verify(userService, times(1)).checkCredentials(LOGIN, "TestPass");
         verify(userService, times(1)).isAdmin(LOGIN);
         verify(logService, never()).getLogs();
         verify(logOfUserActionMapper, never()).toLogOfUserActionDTO(any());
     }
+
 }

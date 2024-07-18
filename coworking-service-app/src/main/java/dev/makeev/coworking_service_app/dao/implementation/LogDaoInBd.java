@@ -4,8 +4,8 @@ import dev.makeev.coworking_service_app.dao.LogDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.LogOfUserAction;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -21,15 +21,10 @@ import java.util.List;
  * It provides methods to interact with the database to manage Log entities.
  */
 @Component
+@RequiredArgsConstructor
 public class LogDaoInBd implements LogDAO {
 
     private final BasicDataSource dataSource;
-
-    @Autowired
-    public LogDaoInBd(BasicDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
 
     /**
      * {@inheritdoc}
@@ -63,17 +58,17 @@ public class LogDaoInBd implements LogDAO {
     }
 
     private List<LogOfUserAction> getLogOfUserActions(PreparedStatement statement) throws SQLException {
-        List<LogOfUserAction> userActions = new ArrayList<>();
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            userActions.add(
-                    new LogOfUserAction(
-                            resultSet.getTimestamp("timestamp").toLocalDateTime(),
-                            resultSet.getString("login"),
-                            resultSet.getString("action"))
-            );
+        try (ResultSet resultSet = statement.executeQuery()){
+            List<LogOfUserAction> userActions = new ArrayList<>();
+            while (resultSet.next()) {
+                userActions.add(
+                        new LogOfUserAction(
+                                resultSet.getTimestamp("timestamp").toLocalDateTime(),
+                                resultSet.getString("login"),
+                                resultSet.getString("action"))
+                );
+            }
+            return userActions;
         }
-        resultSet.close();
-        return userActions;
     }
 }

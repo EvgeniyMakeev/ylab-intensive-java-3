@@ -2,7 +2,7 @@ package dev.makeev.coworking_service_app.advice;
 
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.out.Output;
-import dev.makeev.coworking_service_app.out.implementation.ConsoleOutput;
+import lombok.RequiredArgsConstructor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -17,9 +17,10 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  */
 @Configuration
 @EnableAspectJAutoProxy
+@RequiredArgsConstructor
 public class LoggingTimeAdvice implements MethodInterceptor {
 
-    private final Output<String> output = new ConsoleOutput();
+    private final Output<String> output;
     private final ThreadLocal<Integer> callDepth = ThreadLocal.withInitial(() -> 0);
 
     /**

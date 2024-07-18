@@ -6,8 +6,8 @@ import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -28,14 +28,10 @@ import java.util.stream.IntStream;
  * It provides methods to interact with the database to manage Space entities.
  */
 @Component
+@RequiredArgsConstructor
 public class SpaceDAOInBd implements SpaceDAO {
 
     private final BasicDataSource dataSource;
-
-    @Autowired
-    public SpaceDAOInBd(BasicDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     /**
      * {@inheritdoc}
@@ -137,16 +133,12 @@ public class SpaceDAOInBd implements SpaceDAO {
     @Override
     public List<String> getNamesOfSpaces() {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_SPACES_SQL.getQuery())) {
+             PreparedStatement statement = connection.prepareStatement(SQLRequest.GET_ALL_SPACES_SQL.getQuery());
+             ResultSet resultSet = statement.executeQuery()) {
             List<String> listNamesOfSpaces = new ArrayList<>();
-            ResultSet resultSet = statement.executeQuery();
-
             while (resultSet.next()) {
                 listNamesOfSpaces.add(resultSet.getString("name"));
             }
-
-            resultSet.close();
-
             return listNamesOfSpaces;
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -164,34 +156,30 @@ public class SpaceDAOInBd implements SpaceDAO {
              PreparedStatement slotsStatement = connection.prepareStatement(SQLRequest.GET_SLOTS_BY_SPACE_NAME_SQL.getQuery())) {
 
             spaceStatement.setString(1, nameOfSpace);
-            ResultSet spaceStatementResultSet = spaceStatement.executeQuery();
+            try (ResultSet spaceStatementResultSet = spaceStatement.executeQuery()) {
+                if (spaceStatementResultSet.next()) {
+                    WorkingHours workingHours = new WorkingHours(
+                            spaceStatementResultSet.getInt("hour_of_beginning_working_day"),
+                            spaceStatementResultSet.getInt("hour_of_ending_working_day"));
 
-            if (spaceStatementResultSet.next()) {
-                WorkingHours workingHours = new WorkingHours(
-                        spaceStatementResultSet.getInt("hour_of_beginning_working_day"),
-                        spaceStatementResultSet.getInt("hour_of_ending_working_day"));
+                    slotsStatement.setString(1, nameOfSpace);
+                    try (ResultSet slotsStatementResultSet = slotsStatement.executeQuery()){
+                        Map<LocalDate, Map<Integer, Long>> bookingSlots = new HashMap<>();
+                        while (slotsStatementResultSet.next()) {
+                            LocalDate date = slotsStatementResultSet.getDate("date").toLocalDate();
+                            int hour = slotsStatementResultSet.getInt("hour");
+                            long bookingId = slotsStatementResultSet.getLong("booking_id");
 
-                slotsStatement.setString(1, nameOfSpace);
-                ResultSet slotsStatementResultSet = slotsStatement.executeQuery();
-
-                Map<LocalDate, Map<Integer, Long>> bookingSlots = new HashMap<>();
-                while (slotsStatementResultSet.next()) {
-                    LocalDate date = slotsStatementResultSet.getDate("date").toLocalDate();
-                    int hour = slotsStatementResultSet.getInt("hour");
-                    long bookingId = slotsStatementResultSet.getLong("booking_id");
-
-                    bookingSlots
-                            .computeIfAbsent(date, k -> new HashMap<>())
-                            .put(hour, bookingId);
+                            bookingSlots
+                                    .computeIfAbsent(date, k -> new HashMap<>())
+                                    .put(hour, bookingId);
+                        }
+                        return Optional.of(new Space(nameOfSpace, workingHours, bookingSlots));
+                    }
+                } else {
+                    return Optional.empty();
                 }
-
-                spaceStatementResultSet.close();
-                return Optional.of(new Space(nameOfSpace, workingHours, bookingSlots));
-            } else {
-                spaceStatementResultSet.close();
-                return Optional.empty();
             }
-
         } catch (SQLException e) {
             throw new DaoException("Error retrieving space by name", e);
         }

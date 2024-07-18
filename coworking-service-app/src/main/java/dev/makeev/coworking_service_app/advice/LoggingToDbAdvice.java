@@ -2,10 +2,10 @@ package dev.makeev.coworking_service_app.advice;
 
 import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.service.LogService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -18,14 +18,10 @@ import java.lang.reflect.Method;
  */
 @Configuration
 @EnableAspectJAutoProxy
+@RequiredArgsConstructor
 public class LoggingToDbAdvice implements AfterReturningAdvice {
 
     private final LogService logService;
-
-    @Autowired
-    public LoggingToDbAdvice(LogService logService) {
-        this.logService = logService;
-    }
 
     /**
      * Configures a pointcut advisor to intercept methods annotated with {@link LoggingToDb}.
@@ -58,6 +54,8 @@ public class LoggingToDbAdvice implements AfterReturningAdvice {
         String methodName = method.getName();
         switch (method.getName()) {
             case "addUser" -> methodName = "Registered.";
+            case "checkCredentials" -> methodName = "Login in.";
+            case "logOut" -> methodName = "Login out.";
             case "addBooking" -> methodName = "Add new booking " + args[1].toString();
             case "getAllBookingsForUser" -> methodName = "Looked at a bookings.";
             case "deleteBookingById" -> methodName = "Cancelled a booking with ID: " + args[1].toString();

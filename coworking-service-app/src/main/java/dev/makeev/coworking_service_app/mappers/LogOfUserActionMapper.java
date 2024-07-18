@@ -9,7 +9,5 @@ import org.mapstruct.Mapping;
 public interface LogOfUserActionMapper {
 
     @Mapping(target = "localDateTime", source = "logOfUserAction.localDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "login", source = "logOfUserAction.login")
-    @Mapping(target = "messageAboutAction", source = "logOfUserAction.messageAboutAction")
     LogOfUserActionDTO toLogOfUserActionDTO (LogOfUserAction logOfUserAction);
 }

@@ -9,21 +9,16 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
 
-    @Mapping(target = "id", source = "booking.id")
-    @Mapping(target = "login", source = "booking.login")
-    @Mapping(target = "nameOfBookingSpace", source = "booking.nameOfBookingSpace")
     @Mapping(target = "beginningBookingDate", source = "booking.bookingRange.beginningBookingDate", dateFormat = "yyyy-MM-dd")
     @Mapping(target = "beginningBookingHour", source = "booking.bookingRange.beginningBookingHour")
     @Mapping(target = "endingBookingDate", source = "booking.bookingRange.endingBookingDate", dateFormat = "yyyy-MM-dd")
     @Mapping(target = "endingBookingHour", source = "booking.bookingRange.endingBookingHour")
     BookingDTO toBookingDTO(Booking booking);
 
-    @Mapping(target = "id", ignore = true, source = "bookingAddDTO.password")
-    @Mapping(target = "login", source = "bookingAddDTO.login")
-    @Mapping(target = "nameOfBookingSpace", source = "bookingAddDTO.nameOfBookingSpace")
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "bookingRange.beginningBookingDate", dateFormat = "yyyy-MM-dd", source = "bookingAddDTO.beginningBookingDate")
     @Mapping(target = "bookingRange.beginningBookingHour", source = "bookingAddDTO.beginningBookingHour")
     @Mapping(target = "bookingRange.endingBookingDate", dateFormat = "yyyy-MM-dd", source = "bookingAddDTO.endingBookingDate")
     @Mapping(target = "bookingRange.endingBookingHour", source = "bookingAddDTO.endingBookingHour")
-    Booking toBooking(BookingAddDTO bookingAddDTO);
+    Booking toBooking(String login, BookingAddDTO bookingAddDTO);
 }

@@ -1,17 +1,16 @@
 package dev.makeev.coworking_service_app.service.implementation;
 
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
-import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
-import dev.makeev.coworking_service_app.dto.SpaceDTO;
-import dev.makeev.coworking_service_app.model.SlotsAvailableForBooking;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
+import dev.makeev.coworking_service_app.dto.SpaceDTO;
 import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
+import dev.makeev.coworking_service_app.model.SlotsAvailableForBooking;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.service.SpaceService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,19 +25,10 @@ import java.util.Map;
  * It provides methods to manage Spaces.
  */
 @Service
+@RequiredArgsConstructor
 public class SpaceServiceImpl implements SpaceService {
 
     private final SpaceDAO spaceDAO;
-
-    /**
-     * Constructs a new SpaceService.
-     *
-     * @param spaceDAO the SpaceDAO to use for space operations
-     */
-    @Autowired
-    public SpaceServiceImpl(SpaceDAO spaceDAO) {
-        this.spaceDAO = spaceDAO;
-    }
 
     /**
      * {@inheritdoc}
@@ -72,7 +62,6 @@ public class SpaceServiceImpl implements SpaceService {
      * {@inheritdoc}
      */
     @LoggingTime
-    @LoggingToDb
     @Override
     public List<SpaceDTO> getSpaces() {
         List<SpaceDTO> spaceDTOsList = new ArrayList<>();

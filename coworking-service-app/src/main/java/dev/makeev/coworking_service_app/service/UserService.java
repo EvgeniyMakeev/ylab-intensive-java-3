@@ -1,7 +1,6 @@
 package dev.makeev.coworking_service_app.service;
 
 import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
-import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 
@@ -9,9 +8,8 @@ import dev.makeev.coworking_service_app.exceptions.VerificationException;
  * UserService interface for managing users.
  */
 public interface UserService {
-    @LoggingTime
-    @LoggingToDb
-    void addUser(String login, String password) throws LoginAlreadyExistsException;
+
+    String addUser(String login, String password) throws LoginAlreadyExistsException;
 
     /**
      * Verifies the credentials of a user.
@@ -19,8 +17,13 @@ public interface UserService {
      * @param login    The login to verify.
      * @param password The password to verify.
      */
+    String checkCredentials(String login, String password) throws VerificationException;
+
     @LoggingTime
-    void checkCredentials(String login, String password) throws VerificationException;
+    String validateToken(String token) throws VerificationException;
+
+    @LoggingTime
+    void logOut(String token);
 
     /**
      * Checks if a user is an admin.
@@ -28,6 +31,5 @@ public interface UserService {
      * @param login The login of the user.
      * @return {@code true} if the user is an admin, {@code false} otherwise.
      */
-    @LoggingTime
     boolean isAdmin(String login);
 }

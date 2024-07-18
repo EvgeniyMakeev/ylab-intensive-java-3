@@ -5,24 +5,18 @@ import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
 import dev.makeev.coworking_service_app.mappers.LogOfUserActionMapper;
 import dev.makeev.coworking_service_app.model.LogOfUserAction;
 import dev.makeev.coworking_service_app.service.LogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class LogServiceImpl implements LogService {
 
     private final LogDAO logDAO;
     private final LogOfUserActionMapper logOfUserActionMapper;
-
-
-    @Autowired
-    public LogServiceImpl(LogDAO logDAO, LogOfUserActionMapper logOfUserActionMapper) {
-        this.logDAO = logDAO;
-        this.logOfUserActionMapper = logOfUserActionMapper;
-    }
 
     @Override
     public void addLog(String login, String message) {

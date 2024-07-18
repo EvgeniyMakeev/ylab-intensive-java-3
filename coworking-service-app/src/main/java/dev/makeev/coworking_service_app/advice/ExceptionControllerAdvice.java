@@ -1,6 +1,7 @@
 package dev.makeev.coworking_service_app.advice;
 
 import dev.makeev.coworking_service_app.dto.ErrorDetails;
+import dev.makeev.coworking_service_app.exceptions.AuthorizationHeaderException;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
@@ -8,6 +9,7 @@ import dev.makeev.coworking_service_app.exceptions.NoAdminException;
 import dev.makeev.coworking_service_app.exceptions.SpaceAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.SpaceIsNotAvailableException;
 import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
+import dev.makeev.coworking_service_app.exceptions.TokenVerificationException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,22 @@ public class ExceptionControllerAdvice {
      */
     @ExceptionHandler(VerificationException.class)
     public ResponseEntity<ErrorDetails> handleVerificationException(VerificationException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDetails(e.getMessage()));
+    }
+
+    /**
+     * Handles AuthorizationHeaderException and maps it to HTTP 401 UNAUTHORIZED status.
+     */
+    @ExceptionHandler(AuthorizationHeaderException.class)
+    public ResponseEntity<ErrorDetails> handleAuthorizationHeaderException(AuthorizationHeaderException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDetails(e.getMessage()));
+    }
+
+    /**
+     * Handles TokenVerificationException and maps it to HTTP 401 UNAUTHORIZED status.
+     */
+    @ExceptionHandler(TokenVerificationException.class)
+    public ResponseEntity<ErrorDetails> handleTokenVerificationException(TokenVerificationException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDetails(e.getMessage()));
     }
 

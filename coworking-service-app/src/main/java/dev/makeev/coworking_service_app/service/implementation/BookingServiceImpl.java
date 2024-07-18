@@ -15,7 +15,7 @@ import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.service.BookingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,24 +29,12 @@ import java.util.stream.IntStream;
  * It provides methods to manage Booking.
  */
 @Service
+@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
     private final BookingDAO bookingDAO;
     private final SpaceDAO spaceDAO;
     private final BookingMapper bookingMapper;
-
-    /**
-     * Constructs a new BookingService.
-     *
-     * @param bookingDAO the BookingDAO to use for booking operations
-     * @param spaceDAO the SpaceDAO to use for space operations
-     */
-    @Autowired
-    public BookingServiceImpl(BookingDAO bookingDAO, SpaceDAO spaceDAO, BookingMapper bookingMapper) {
-        this.bookingDAO = bookingDAO;
-        this.spaceDAO = spaceDAO;
-        this.bookingMapper = bookingMapper;
-    }
 
     /**
      * {@inheritdoc}
@@ -56,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void addBooking(String login, BookingAddDTO bookingAddDTO) throws SpaceIsNotAvailableException, SpaceNotFoundException {
         Space bookingSpace = spaceDAO.getSpaceByName(bookingAddDTO.nameOfBookingSpace()).orElseThrow(SpaceNotFoundException::new);
-        Booking booking = bookingMapper.toBooking(bookingAddDTO);
+        Booking booking = bookingMapper.toBooking(login, bookingAddDTO);
         if (isSpaceAvailableForBookingOnDateAndTime(bookingSpace, booking.bookingRange(), bookingSpace.workingHours())) {
             bookingDAO.add(booking);
         } else {
@@ -126,10 +114,9 @@ public class BookingServiceImpl implements BookingService {
     @LoggingTime
     @Override
     public List<BookingDTO> getAllBookingsSortedByUser() {
-        return bookingDAO.getAll().stream()
-                .sorted(Comparator.comparing(Booking::login))
-                .toList()
+        return bookingDAO.getAll()
                 .stream()
+                .sorted(Comparator.comparing(Booking::login))
                 .map(bookingMapper::toBookingDTO)
                 .toList();
     }
@@ -140,11 +127,24 @@ public class BookingServiceImpl implements BookingService {
     @LoggingTime
     @LoggingToDb
     @Override
-    public void deleteBookingById(String login, long bookingId) throws BookingNotFoundException {
-        if (bookingDAO.getBookingById(bookingId).isPresent()) {
-            bookingDAO.delete(bookingId);
-        } else {
+    public void deleteBookingById(String login, long id) throws BookingNotFoundException {
+        bookingDAO.getBookingById(id).orElseThrow(BookingNotFoundException::new);
+        bookingDAO.delete(id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    @LoggingTime
+    @LoggingToDb
+    @Override
+    public void deleteBookingByIdByAdmin(String login, long id) throws BookingNotFoundException {
+        Booking booking = bookingDAO.getBookingById(id).orElseThrow(BookingNotFoundException::new);
+
+        if (!booking.login().equals(login)) {
             throw new BookingNotFoundException();
         }
+
+        bookingDAO.delete(id);
     }
 }
