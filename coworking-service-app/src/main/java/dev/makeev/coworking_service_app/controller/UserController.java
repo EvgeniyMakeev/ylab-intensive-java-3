@@ -5,6 +5,9 @@ import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.dto.TokenResponse;
 import dev.makeev.coworking_service_app.dto.UserRequestDTO;
 import dev.makeev.coworking_service_app.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,14 +19,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * REST controller for managing user registration.
  */
+@Tag(name = "User", description = "User API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/user", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/user", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
     private final UserService userService;
@@ -34,6 +36,7 @@ public class UserController {
      * @param userRequestDTO the user data
      * @return an ApiResponse indicating success or failure
      */
+    @Operation(summary = "Registration new user")
     @LoggingTime
     @PostMapping("/registration")
     public ResponseEntity<TokenResponse> addUser(@Validated @RequestBody UserRequestDTO userRequestDTO) {
@@ -42,6 +45,7 @@ public class UserController {
                 .body(new TokenResponse("Space added successfully", token));
     }
 
+    @Operation(summary = "Login in")
     @LoggingTime
     @PutMapping("/login")
     public ResponseEntity<TokenResponse> logIn(@Validated @RequestBody UserRequestDTO userRequestDTO) {
@@ -50,6 +54,7 @@ public class UserController {
                 .body(new TokenResponse("Login success", token));
     }
 
+    @Operation(summary = "Login out")
     @LoggingTime
     @PutMapping("/logout")
     public ResponseEntity<ApiResponse> logOut(HttpServletRequest request) {

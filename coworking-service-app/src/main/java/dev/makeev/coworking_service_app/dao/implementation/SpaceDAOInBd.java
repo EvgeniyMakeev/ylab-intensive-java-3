@@ -7,9 +7,9 @@ import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -31,7 +31,7 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class SpaceDAOInBd implements SpaceDAO {
 
-    private final BasicDataSource dataSource;
+    private final DataSource dataSource;
 
     /**
      * {@inheritdoc}

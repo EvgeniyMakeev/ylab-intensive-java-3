@@ -8,9 +8,9 @@ import dev.makeev.coworking_service_app.model.Booking;
 import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -30,7 +30,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BookingDAOInBd implements BookingDAO {
 
-    private final BasicDataSource dataSource;
+    private final DataSource dataSource;
 
     /**
      * {@inheritdoc}

@@ -1,9 +1,0 @@
-db:
-  driver: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:55432/coworking_service_db
-  username: user
-  password: 1234
-
-liquibase:
-  changelogFile: db/changelog/changelog.xml
-  defaultSchemaName: liquibase

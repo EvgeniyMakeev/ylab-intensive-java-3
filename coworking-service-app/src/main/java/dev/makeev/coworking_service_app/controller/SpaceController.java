@@ -8,6 +8,10 @@ import dev.makeev.coworking_service_app.dto.SpaceDeleteDTO;
 import dev.makeev.coworking_service_app.exceptions.NoAdminException;
 import dev.makeev.coworking_service_app.service.SpaceService;
 import dev.makeev.coworking_service_app.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,12 +24,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
  * REST controller for managing spaces.
  */
+@SecurityRequirement(name = "apiKeyScheme")
+@Tag(name = "Spaces", description = "Spaces API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/spaces", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,6 +44,7 @@ public class SpaceController {
      *
      * @return a list of SpaceDTO
      */
+    @Operation(summary = "Get all Spaces", description = "Spaces with free slots")
     @LoggingTime
     @GetMapping
     public ResponseEntity<List<SpaceDTO>> getSpaces() {
@@ -51,6 +57,7 @@ public class SpaceController {
      * @param spaceAddDTO the space data
      * @return an ApiResponse indicating success or failure
      */
+    @Operation(summary = "Add new Space", description = "Available only for Admin")
     @LoggingTime
     @PostMapping
     public ResponseEntity<ApiResponse> addSpace(HttpServletRequest request,
@@ -91,6 +98,7 @@ public class SpaceController {
      * @param spaceDeleteDTO the space data
      * @return an ApiResponse indicating success or failure
      */
+    @Operation(summary = "Space bookings by Name", description = "Available only for Admin")
     @LoggingTime
     @DeleteMapping
     public ResponseEntity<ApiResponse> deleteSpace(HttpServletRequest request,

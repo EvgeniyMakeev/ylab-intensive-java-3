@@ -6,6 +6,10 @@ import dev.makeev.coworking_service_app.dto.BookingAddDTO;
 import dev.makeev.coworking_service_app.dto.BookingDTO;
 import dev.makeev.coworking_service_app.service.BookingService;
 import dev.makeev.coworking_service_app.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,9 +23,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+@SecurityRequirement(name = "apiKeyScheme")
+@Tag(name = "Bookings", description = "Bookings API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/bookings", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -30,6 +35,7 @@ public class BookingController {
     private final BookingService bookingService;
     private final UserService userService;
 
+    @Operation(summary = "Get all bookings")
     @LoggingTime
     @GetMapping
     public ResponseEntity<List<BookingDTO>> getBookings(HttpServletRequest request) {
@@ -41,6 +47,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingsDTOs);
     }
 
+    @Operation(summary = "Add new bookings")
     @LoggingTime
     @PostMapping
     public ResponseEntity<ApiResponse> addBooking(HttpServletRequest request,
@@ -71,6 +78,7 @@ public class BookingController {
                 && bookingAddDTO.endingBookingHour() <= maxHourOfEnding;
     }
 
+    @Operation(summary = "Delete bookings by ID")
     @LoggingTime
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteBookings(HttpServletRequest request,

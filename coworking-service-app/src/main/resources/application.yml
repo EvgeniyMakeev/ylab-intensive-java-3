@@ -1,0 +1,15 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/changelog.xml
+    default-schema: non_public
+    liquibase-schema: liquibase
+    clear-checksums: true
+  mvc:
+    servlet:
+      path: "/"
+  docker:
+    compose:
+      enabled: true
+      file: coworking-service-app/docker-compose.yml
+      lifecycle-management: start_only

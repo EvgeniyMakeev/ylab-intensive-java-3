@@ -5,9 +5,9 @@ import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.model.LogOfUserAction;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LogDaoInBd implements LogDAO {
 
-    private final BasicDataSource dataSource;
+    private final DataSource dataSource;
 
     /**
      * {@inheritdoc}
