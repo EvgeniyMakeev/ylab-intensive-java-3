@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.service.implementation;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.UserDAO;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
@@ -8,6 +7,7 @@ import dev.makeev.coworking_service_app.model.User;
 import dev.makeev.coworking_service_app.service.UserService;
 import dev.makeev.coworking_service_app.util.TokenUtil;
 import dev.makeev.logging_time_starter.advice.annotations.LoggingTime;
+import dev.makeev.logging_to_db_starter.advice.annotations.LoggingToDb;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

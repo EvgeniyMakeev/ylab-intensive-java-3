@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>makeev</groupId>
   <artifactId>coworking-service-app</artifactId>
-  <version>5.1</version>
+  <version>5.2</version>
 
   <name>coworking-service-app</name>
   <url>https://github.com/EvgeniyMakeev/ylab-intensive-java-3</url>
@@ -41,6 +41,12 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>dev.makeev</groupId>
+      <artifactId>logging-to-db-starter</artifactId>
+      <version>1.0</version>
+    </dependency>
+
     <dependency>
       <groupId>dev.makeev</groupId>
       <artifactId>logging-time-starter</artifactId>

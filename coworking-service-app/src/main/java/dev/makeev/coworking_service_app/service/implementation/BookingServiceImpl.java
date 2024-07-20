@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.service.implementation;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingToDb;
 import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.dto.BookingAddDTO;
@@ -15,6 +14,7 @@ import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.service.BookingService;
 import dev.makeev.logging_time_starter.advice.annotations.LoggingTime;
+import dev.makeev.logging_to_db_starter.advice.annotations.LoggingToDb;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

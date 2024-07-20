@@ -2,7 +2,7 @@ package dev.makeev.coworking_service_app.controller;
 
 import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
 import dev.makeev.coworking_service_app.exceptions.NoAdminException;
-import dev.makeev.coworking_service_app.service.LogService;
+import dev.makeev.coworking_service_app.service.LogGetService;
 import dev.makeev.coworking_service_app.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping(value = "/api/v1/log", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LogController {
 
-    private final LogService logService;
+    private final LogGetService logService;
     private final UserService userService;
 
     /**
