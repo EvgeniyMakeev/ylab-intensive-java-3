@@ -66,7 +66,6 @@ class BookingControllerTest {
 
     @BeforeEach
     public void setUp() {
-        objectMapper = new ObjectMapper();
         mockMvc = MockMvcBuilders.standaloneSetup(bookingController)
                 .setControllerAdvice(new ExceptionControllerAdvice())
                 .build();

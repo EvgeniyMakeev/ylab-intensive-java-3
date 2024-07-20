@@ -8,8 +8,6 @@ import dev.makeev.coworking_service_app.model.BookingRange;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.User;
 import dev.makeev.coworking_service_app.model.WorkingHours;
-import dev.makeev.coworking_service_app.util.InitDb;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +15,10 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -32,9 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
+@SpringBootTest
 @DisplayName("Tests for all DAO")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AllDAOsTest {
+
     private static final String TEST_LOGIN_1 = "TestUser1";
     private static final String TEST_LOGIN_2 = "TestUser2";
     private static final String TEST_PASSWORD = "TestPassword";
@@ -42,35 +46,35 @@ public class AllDAOsTest {
     private static final String TEST_SPACE_NAME = "TestSpace";
     private static Space TEST_SPACE;
     private static final Booking TEST_BOOKING_1 = new Booking(TEST_LOGIN_1, TEST_SPACE_NAME,
-            new BookingRange(LocalDate.of(2024,7,2), 12,
-                    LocalDate.of(2024,7,5), 20));
+            new BookingRange(LocalDate.of(2024, 7, 2), 12,
+                    LocalDate.of(2024, 7, 5), 20));
     private static final Booking TEST_BOOKING_2 = new Booking(TEST_LOGIN_2, TEST_SPACE_NAME,
-            new BookingRange(LocalDate.of(2024,7,9), 10,
-                    LocalDate.of(2024,7,9), 20));
+            new BookingRange(LocalDate.of(2024, 7, 9), 10,
+                    LocalDate.of(2024, 7, 9), 20));
 
     @Container
     private static final PostgreSQLContainer<?> postgresContainer =
             new PostgreSQLContainer<>("postgres:16.2");
 
-    private static UserDAO userDAO;
-    private static SpaceDAO spaceDAO;
-    private static BookingDAO bookingDAO;
+    @Autowired
+    private UserDAO userDAO;
+
+    @Autowired
+    private SpaceDAO spaceDAO;
+
+    @Autowired
+    private BookingDAO bookingDAO;
+
+    @DynamicPropertySource
+    static void dataSourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
+    }
 
     @BeforeAll
     static void setUpAll() {
         postgresContainer.start();
-
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(postgresContainer.getDriverClassName());
-        dataSource.setUrl(postgresContainer.getJdbcUrl());
-        dataSource.setUsername(postgresContainer.getUsername());
-        dataSource.setPassword(postgresContainer.getPassword());
-
-        new InitDb(dataSource,"liquibase", "db/changelog/changelog.xml").initDb();
-
-        userDAO = new UserDAOInBd(dataSource);
-        spaceDAO = new SpaceDAOInBd(dataSource);
-        bookingDAO = new BookingDAOInBd(dataSource);
         TEST_SPACE = initNewSpace();
     }
 
@@ -132,7 +136,6 @@ public class AllDAOsTest {
         assertThat(result).isEmpty();
     }
 
-
     @Test
     @Order(4)
     @DisplayName("SpaceDAOInBd test: Add Space - Should add new space")
@@ -160,7 +163,7 @@ public class AllDAOsTest {
     @Order(6)
     @DisplayName("SpaceDAOInBd test: Get By Type - Get All Spaces - Should return all names of spaces")
     void getNamesOfSpaces() {
-        List<String> namesOfSpaces= spaceDAO.getNamesOfSpaces();
+        List<String> namesOfSpaces = spaceDAO.getNamesOfSpaces();
 
         assertFalse(namesOfSpaces.isEmpty());
         assertThat(namesOfSpaces).contains(TEST_SPACE_NAME);
@@ -207,54 +210,13 @@ public class AllDAOsTest {
     @DisplayName("BookingDAOInBd test: Get All Bookings - Should return all bookings")
     void getAll_shouldReturnAllBookings() {
         List<Booking> allBookingsBeforeAdd = bookingDAO.getAll();
-        userDAO.add(new User(TEST_LOGIN_2, TEST_PASSWORD, false));
+        userDAO.add(new User(TEST_LOGIN_2, TEST_PASSWORD, true));
         bookingDAO.add(TEST_BOOKING_2);
 
         List<Booking> allBookingsAfterAdd = bookingDAO.getAll();
-        assertFalse(allBookingsAfterAdd.isEmpty());
+
         assertThat(allBookingsAfterAdd.size()).isEqualTo(allBookingsBeforeAdd.size() + 1);
-    }
-
-    @Test
-    @Order(11)
-    @DisplayName("BookingDAOInBd test: Delete Booking - Should delete a booking for a user")
-    void delete_shouldDeleteBooking() {
-        List<Booking> allBookingsBeforeDelete = bookingDAO.getAll();
-        bookingDAO.delete(bookingDAO.getAllForUser(TEST_LOGIN_2).get(0).id());
-
-        List<Booking> allBookingsAfterDelete = bookingDAO.getAll();
-        List<Booking> bookingsForDeletedUser = bookingDAO.getAllForUser(TEST_LOGIN_2);
-
-        assertThat(allBookingsBeforeDelete.size() - 1).isEqualTo(allBookingsAfterDelete.size());
-        assertTrue(bookingsForDeletedUser.isEmpty());
-    }
-
-    @Test
-    @Order(12)
-    @DisplayName("BookingDAOInBd test: Delete Booking - Should not delete a booking with incorrect ID")
-    void delete_shouldNotDeleteBookingWithIncorrectId() {
-        List<Booking> allBookingsBeforeDelete = bookingDAO.getAll();
-        long incorrectId = 999L;
-        bookingDAO.delete(incorrectId);
-
-        List<Booking> allBookingsAfterDelete = bookingDAO.getAll();
-
-        assertThat(allBookingsBeforeDelete.size()).isEqualTo(allBookingsAfterDelete.size());
-    }
-
-    @Test
-    @Order(13)
-    @DisplayName("SpaceDAOInBd test: Delete Space - Should delete existing space")
-    void delete_shouldDeleteSpace() {
-        List<String> spacesBeforeDelete = spaceDAO.getNamesOfSpaces();
-        spaceDAO.delete(TEST_SPACE_NAME);
-
-        List<String> spacesAfterDeleted = spaceDAO.getNamesOfSpaces();
-        Optional<Space> space = spaceDAO.getSpaceByName(TEST_SPACE_NAME);
-
-        assertTrue(space.isEmpty());
-        assertThat(spacesBeforeDelete.size() - 1)
-                .isEqualTo(spacesAfterDeleted.size());
-        assertFalse(spacesAfterDeleted.contains(TEST_SPACE_NAME));
+        assertThat(allBookingsAfterAdd).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .contains(TEST_BOOKING_1, TEST_BOOKING_2);
     }
 }

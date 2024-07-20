@@ -44,6 +44,7 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
+    @Mock
     private MockMvc mockMvc;
 
     @BeforeAll
@@ -64,13 +65,15 @@ class UserControllerTest {
         when(userService.addUser(LOGIN, PASSWORD)).thenReturn(TOKEN);
         String jsonRequest = objectMapper.writeValueAsString(userRequestDTO);
 
-        mockMvc.perform(post("/api/user/registration")
+        mockMvc.perform(post("/api/v1/user/registration")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(containsString("Space added successfully")))
-                .andExpect(content().string(containsString(TOKEN)));
+                .andExpectAll(
+                        status().isCreated(),
+                        content().contentType(MediaType.APPLICATION_JSON),
+                        content().string(containsString("User added successfully")),
+                        content().string(containsString(TOKEN))
+                );
 
         verify(userService, times(1)).addUser(LOGIN, PASSWORD);
     }
@@ -81,7 +84,7 @@ class UserControllerTest {
         doThrow(new LoginAlreadyExistsException()).when(userService).addUser(LOGIN, PASSWORD);
         String jsonRequest = objectMapper.writeValueAsString(userRequestDTO);
 
-        mockMvc.perform(post("/api/user/registration")
+        mockMvc.perform(post("/api/v1/user/registration")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isConflict())
@@ -97,7 +100,7 @@ class UserControllerTest {
         when(userService.checkCredentials(LOGIN, PASSWORD)).thenReturn(TOKEN);
         String jsonRequest = objectMapper.writeValueAsString(userRequestDTO);
 
-        mockMvc.perform(put("/api/user/login")
+        mockMvc.perform(put("/api/v1/user/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isOk())
@@ -111,7 +114,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Should log out user")
     void testLogOut_ShouldLogOutUser() throws Exception {
-        mockMvc.perform(put("/api/user/logout")
+        mockMvc.perform(put("/api/v1/user/logout")
                         .requestAttr("login", LOGIN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

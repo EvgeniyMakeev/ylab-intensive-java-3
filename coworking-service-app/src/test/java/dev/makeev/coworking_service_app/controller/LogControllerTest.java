@@ -4,7 +4,7 @@ import dev.makeev.coworking_service_app.advice.ExceptionControllerAdvice;
 import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
 import dev.makeev.coworking_service_app.exceptions.NoAdminException;
 import dev.makeev.coworking_service_app.mappers.LogOfUserActionMapper;
-import dev.makeev.coworking_service_app.service.LogService;
+import dev.makeev.coworking_service_app.service.LogGetService;
 import dev.makeev.coworking_service_app.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +40,7 @@ class LogControllerTest {
     private static final LogOfUserActionDTO LOG_OF_USER_ACTION_DTO = new LogOfUserActionDTO(DATE, LOGIN, ACTION);
 
     @Mock
-    private LogService logService;
+    private LogGetService logGetService;
 
     @Mock
     private UserService userService;
@@ -65,7 +65,7 @@ class LogControllerTest {
     @DisplayName("Should get log if user is admin")
     void testGetLog_AdminUser() throws Exception {
         when(userService.isAdmin(ADMIN_LOGIN)).thenReturn(true);
-        when(logService.getLogs()).thenReturn(List.of(LOG_OF_USER_ACTION_DTO));
+        when(logGetService.getLogs()).thenReturn(List.of(LOG_OF_USER_ACTION_DTO));
 
         mockMvc.perform(get("/api/v1/log")
                         .requestAttr("login", ADMIN_LOGIN))
@@ -76,7 +76,7 @@ class LogControllerTest {
                 .andExpect(content().string(containsString(ACTION)));
 
         verify(userService, times(1)).isAdmin(ADMIN_LOGIN);
-        verify(logService, times(1)).getLogs();
+        verify(logGetService, times(1)).getLogs();
     }
 
     @Test
@@ -91,7 +91,7 @@ class LogControllerTest {
                 .andExpect(content().string(containsString(new NoAdminException().getMessage())));
 
         verify(userService, times(1)).isAdmin(LOGIN);
-        verify(logService, never()).getLogs();
+        verify(logGetService, never()).getLogs();
         verify(logOfUserActionMapper, never()).toLogOfUserActionDTO(any());
     }
 
