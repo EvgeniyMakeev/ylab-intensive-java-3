@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.controller;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.dto.TokenResponse;
 import dev.makeev.coworking_service_app.dto.UserRequestDTO;
@@ -37,16 +36,14 @@ public class UserController {
      * @return an ApiResponse indicating success or failure
      */
     @Operation(summary = "Registration new user")
-    @LoggingTime
     @PostMapping("/registration")
     public ResponseEntity<TokenResponse> addUser(@Validated @RequestBody UserRequestDTO userRequestDTO) {
         String token = userService.addUser(userRequestDTO.login(), userRequestDTO.password());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new TokenResponse("Space added successfully", token));
+                .body(new TokenResponse("User added successfully", token));
     }
 
     @Operation(summary = "Login in")
-    @LoggingTime
     @PutMapping("/login")
     public ResponseEntity<TokenResponse> logIn(@Validated @RequestBody UserRequestDTO userRequestDTO) {
         String token = userService.checkCredentials(userRequestDTO.login(), userRequestDTO.password());
@@ -55,7 +52,6 @@ public class UserController {
     }
 
     @Operation(summary = "Login out")
-    @LoggingTime
     @PutMapping("/logout")
     public ResponseEntity<ApiResponse> logOut(HttpServletRequest request) {
         String login = (String) request.getAttribute("login");

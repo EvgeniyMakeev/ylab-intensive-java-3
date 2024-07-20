@@ -13,3 +13,4 @@ spring:
       enabled: true
       file: coworking-service-app/docker-compose.yml
       lifecycle-management: start_only
+

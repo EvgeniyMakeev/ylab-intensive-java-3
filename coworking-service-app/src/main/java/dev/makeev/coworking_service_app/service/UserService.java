@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.service;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 
@@ -19,10 +18,8 @@ public interface UserService {
      */
     String checkCredentials(String login, String password) throws VerificationException;
 
-    @LoggingTime
     String validateToken(String token) throws VerificationException;
 
-    @LoggingTime
     void logOut(String token);
 
     /**

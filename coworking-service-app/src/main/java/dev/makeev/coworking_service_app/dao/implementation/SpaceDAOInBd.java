@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.dao.implementation;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
@@ -36,7 +35,6 @@ public class SpaceDAOInBd implements SpaceDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public void add(Space newSpace) {
         try (Connection connection = dataSource.getConnection()) {
@@ -129,7 +127,6 @@ public class SpaceDAOInBd implements SpaceDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public List<String> getNamesOfSpaces() {
         try (Connection connection = dataSource.getConnection();
@@ -148,7 +145,6 @@ public class SpaceDAOInBd implements SpaceDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public Optional<Space> getSpaceByName(String nameOfSpace) {
         try (Connection connection = dataSource.getConnection();
@@ -188,7 +184,6 @@ public class SpaceDAOInBd implements SpaceDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public void delete(String nameOfSpace) {
         try (Connection connection = dataSource.getConnection()) {

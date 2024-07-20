@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>makeev</groupId>
   <artifactId>coworking-service-app</artifactId>
-  <version>5.0</version>
+  <version>5.1</version>
 
   <name>coworking-service-app</name>
   <url>https://github.com/EvgeniyMakeev/ylab-intensive-java-3</url>
@@ -28,6 +28,8 @@
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
+    <liquibase-core.version>4.28.0</liquibase-core.version>
     <mockito.version>5.12.0</mockito.version>
     <assertj-core.version>3.26.0</assertj-core.version>
     <mockito-junit-jupiter.version>5.12.0</mockito-junit-jupiter.version>
@@ -40,19 +42,19 @@
 
   <dependencies>
     <dependency>
+      <groupId>dev.makeev</groupId>
+      <artifactId>logging-time-starter</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jdbc</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
-      <version>3.2.0</version>
     </dependency>
 
     <dependency>
@@ -70,11 +72,6 @@
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-aop</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-docker-compose</artifactId>
       <optional>true</optional>
     </dependency>
@@ -82,7 +79,7 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>2.6.0</version>
+      <version>${springdoc-openapi.version}</version>
     </dependency>
 
     <dependency>
@@ -113,7 +110,7 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>4.28.0</version>
+      <version>${liquibase-core.version}</version>
     </dependency>
 
     <dependency>

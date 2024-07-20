@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.controller;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.dto.BookingAddDTO;
 import dev.makeev.coworking_service_app.dto.BookingDTO;
@@ -36,7 +35,6 @@ public class BookingController {
     private final UserService userService;
 
     @Operation(summary = "Get all bookings")
-    @LoggingTime
     @GetMapping
     public ResponseEntity<List<BookingDTO>> getBookings(HttpServletRequest request) {
         String login = (String) request.getAttribute("login");
@@ -48,7 +46,6 @@ public class BookingController {
     }
 
     @Operation(summary = "Add new bookings")
-    @LoggingTime
     @PostMapping
     public ResponseEntity<ApiResponse> addBooking(HttpServletRequest request,
                                                   @Validated @RequestBody BookingAddDTO bookingAddDTO) {
@@ -79,7 +76,6 @@ public class BookingController {
     }
 
     @Operation(summary = "Delete bookings by ID")
-    @LoggingTime
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteBookings(HttpServletRequest request,
                                                       @PathVariable long id) {

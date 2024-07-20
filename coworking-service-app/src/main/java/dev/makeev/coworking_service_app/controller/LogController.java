@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.controller;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dto.LogOfUserActionDTO;
 import dev.makeev.coworking_service_app.exceptions.NoAdminException;
 import dev.makeev.coworking_service_app.service.LogService;
@@ -37,7 +36,6 @@ public class LogController {
      * @return a list of LogOfUserActionDTO
      */
     @Operation(summary = "Get all Logs", description = "Available only for Admin")
-    @LoggingTime
     @GetMapping
     public ResponseEntity<List<LogOfUserActionDTO>> getLog(HttpServletRequest request) {
         String login = (String) request.getAttribute("login");

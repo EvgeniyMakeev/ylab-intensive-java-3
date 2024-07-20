@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.controller;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
 import dev.makeev.coworking_service_app.dto.SpaceDTO;
@@ -45,7 +44,6 @@ public class SpaceController {
      * @return a list of SpaceDTO
      */
     @Operation(summary = "Get all Spaces", description = "Spaces with free slots")
-    @LoggingTime
     @GetMapping
     public ResponseEntity<List<SpaceDTO>> getSpaces() {
         return ResponseEntity.ok(spaceService.getSpaces());
@@ -58,7 +56,6 @@ public class SpaceController {
      * @return an ApiResponse indicating success or failure
      */
     @Operation(summary = "Add new Space", description = "Available only for Admin")
-    @LoggingTime
     @PostMapping
     public ResponseEntity<ApiResponse> addSpace(HttpServletRequest request,
                                                 @Validated @RequestBody SpaceAddDTO spaceAddDTO) {
@@ -99,7 +96,6 @@ public class SpaceController {
      * @return an ApiResponse indicating success or failure
      */
     @Operation(summary = "Space bookings by Name", description = "Available only for Admin")
-    @LoggingTime
     @DeleteMapping
     public ResponseEntity<ApiResponse> deleteSpace(HttpServletRequest request,
                                                    @Validated @RequestBody SpaceDeleteDTO spaceDeleteDTO) {

@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.dao.implementation;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.BookingDAO;
 import dev.makeev.coworking_service_app.enums.SQLRequest;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
@@ -35,7 +34,6 @@ public class BookingDAOInBd implements BookingDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public void add(Booking newBooking) {
         try (Connection connection = dataSource.getConnection()) {
@@ -188,7 +186,6 @@ public class BookingDAOInBd implements BookingDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public List<Booking> getAllForUser(String login) {
         try (Connection connection = dataSource.getConnection();
@@ -204,7 +201,6 @@ public class BookingDAOInBd implements BookingDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public List<Booking> getAll() {
         try (Connection connection = dataSource.getConnection();
@@ -243,7 +239,6 @@ public class BookingDAOInBd implements BookingDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public Optional<Booking> getBookingById(long id) {
         try (Connection connection = dataSource.getConnection();
@@ -273,7 +268,6 @@ public class BookingDAOInBd implements BookingDAO {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public void delete(long idOfBooking) {
         try (Connection connection = dataSource.getConnection()) {

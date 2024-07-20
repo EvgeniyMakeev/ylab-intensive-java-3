@@ -1,6 +1,5 @@
 package dev.makeev.coworking_service_app.service.implementation;
 
-import dev.makeev.coworking_service_app.advice.annotations.LoggingTime;
 import dev.makeev.coworking_service_app.dao.SpaceDAO;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
 import dev.makeev.coworking_service_app.dto.SpaceDTO;
@@ -10,6 +9,7 @@ import dev.makeev.coworking_service_app.model.SlotsAvailableForBooking;
 import dev.makeev.coworking_service_app.model.Space;
 import dev.makeev.coworking_service_app.model.WorkingHours;
 import dev.makeev.coworking_service_app.service.SpaceService;
+import dev.makeev.logging_time_starter.advice.annotations.LoggingTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,6 @@ public class SpaceServiceImpl implements SpaceService {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public void addSpace(SpaceAddDTO spaceAddDTO) throws SpaceAlreadyExistsException, SpaceNotFoundException {
         WorkingHours workingHours = new WorkingHours(spaceAddDTO.hourOfBeginningWorkingDay(), spaceAddDTO.hourOfEndingWorkingDay());
@@ -91,7 +90,6 @@ public class SpaceServiceImpl implements SpaceService {
     /**
      * {@inheritdoc}
      */
-    @LoggingTime
     @Override
     public void deleteSpace(String nameOfSpace) throws SpaceNotFoundException {
         spaceDAO.getSpaceByName(nameOfSpace).orElseThrow(SpaceNotFoundException::new);
