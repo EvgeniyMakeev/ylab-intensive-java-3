@@ -2,6 +2,7 @@ package dev.makeev.coworking_service_app.advice;
 
 import dev.makeev.coworking_service_app.dto.ErrorDetails;
 import dev.makeev.coworking_service_app.exceptions.AuthorizationHeaderException;
+import dev.makeev.coworking_service_app.exceptions.BadRequestException;
 import dev.makeev.coworking_service_app.exceptions.BookingNotFoundException;
 import dev.makeev.coworking_service_app.exceptions.DaoException;
 import dev.makeev.coworking_service_app.exceptions.LoginAlreadyExistsException;
@@ -12,8 +13,8 @@ import dev.makeev.coworking_service_app.exceptions.SpaceNotFoundException;
 import dev.makeev.coworking_service_app.exceptions.TokenVerificationException;
 import dev.makeev.coworking_service_app.exceptions.VerificationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
@@ -26,80 +27,99 @@ public class ExceptionControllerAdvice {
     /**
      * Handles VerificationException and maps it to HTTP 401 UNAUTHORIZED status.
      */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(VerificationException.class)
-    public ResponseEntity<ErrorDetails> handleVerificationException(VerificationException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleVerificationException(VerificationException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles AuthorizationHeaderException and maps it to HTTP 401 UNAUTHORIZED status.
      */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthorizationHeaderException.class)
-    public ResponseEntity<ErrorDetails> handleAuthorizationHeaderException(AuthorizationHeaderException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleAuthorizationHeaderException(AuthorizationHeaderException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles TokenVerificationException and maps it to HTTP 401 UNAUTHORIZED status.
      */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(TokenVerificationException.class)
-    public ResponseEntity<ErrorDetails> handleTokenVerificationException(TokenVerificationException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleTokenVerificationException(TokenVerificationException e) {
+        return new ErrorDetails(e.getMessage());
+    }
+
+    /**
+     * Handles BadRequestException and maps it to HTTP 400 UNAUTHORIZED status.
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    ErrorDetails handleBadRequestException(BadRequestException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles NoAdminException and maps it to HTTP 401 UNAUTHORIZED status.
      */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(NoAdminException.class)
-    public ResponseEntity<ErrorDetails> handleNoAdminException(NoAdminException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleNoAdminException(NoAdminException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles LoginAlreadyExistsException and maps it to HTTP 409 CONFLICT status.
      */
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(LoginAlreadyExistsException.class)
-    public ResponseEntity<ErrorDetails> handleLoginAlreadyExistsException(LoginAlreadyExistsException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleLoginAlreadyExistsException(LoginAlreadyExistsException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles SpaceAlreadyExistsException and maps it to HTTP 409 CONFLICT status.
      */
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(SpaceAlreadyExistsException.class)
-    public ResponseEntity<ErrorDetails> handleSpaceAlreadyExistsException(SpaceAlreadyExistsException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleSpaceAlreadyExistsException(SpaceAlreadyExistsException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles BookingNotFoundException and maps it to HTTP 404 NOT_FOUND status.
      */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(BookingNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleBookingNotFoundException(BookingNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleBookingNotFoundException(BookingNotFoundException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles SpaceNotFoundException and maps it to HTTP 404 NOT_FOUND status.
      */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(SpaceNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleSpaceNotFoundException(SpaceNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleSpaceNotFoundException(SpaceNotFoundException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles SpaceIsNotAvailableException and maps it to HTTP 409 CONFLICT status.
      */
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(SpaceIsNotAvailableException.class)
-    public ResponseEntity<ErrorDetails> handleSpaceIsNotAvailableException(SpaceIsNotAvailableException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleSpaceIsNotAvailableException(SpaceIsNotAvailableException e) {
+        return new ErrorDetails(e.getMessage());
     }
 
     /**
      * Handles DaoException and maps it to HTTP 500 INTERNAL_SERVER_ERROR status.
      */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DaoException.class)
-    public ResponseEntity<ErrorDetails> handleInternalServerError(DaoException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDetails(e.getMessage()));
+    ErrorDetails handleInternalServerError(DaoException e) {
+        return new ErrorDetails(e.getMessage());
     }
 }

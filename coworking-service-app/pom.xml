@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>makeev</groupId>
   <artifactId>coworking-service-app</artifactId>
-  <version>5.2</version>
+  <version>5.3</version>
 
   <name>coworking-service-app</name>
   <url>https://github.com/EvgeniyMakeev/ylab-intensive-java-3</url>

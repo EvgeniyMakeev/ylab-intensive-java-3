@@ -71,8 +71,7 @@ public class UserServiceImpl implements UserService {
     @LoggingTime
     @LoggingToDb
     @Override
-    public void logOut(String login) {
-        String token = TokenUtil.validateToken(login).orElseThrow(VerificationException::new);
+    public void logOut(String token) {
         TokenUtil.invalidateToken(token);
     }
 

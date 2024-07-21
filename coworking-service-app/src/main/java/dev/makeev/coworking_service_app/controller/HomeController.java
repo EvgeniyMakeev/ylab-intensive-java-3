@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Hidden
 public class HomeController {
     @RequestMapping("/")
-    public String index() {
+    String index() {
         return "redirect:/swagger-ui/index.html";
     }
 }

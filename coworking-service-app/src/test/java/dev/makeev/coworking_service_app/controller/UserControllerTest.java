@@ -115,11 +115,11 @@ class UserControllerTest {
     @DisplayName("Should log out user")
     void testLogOut_ShouldLogOutUser() throws Exception {
         mockMvc.perform(put("/api/v1/user/logout")
-                        .requestAttr("login", LOGIN))
+                        .header("Authorization", TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString("Successfully logged out.")));
 
-        verify(userService, times(1)).logOut(LOGIN);
+        verify(userService, times(1)).logOut(TOKEN);
     }
 }

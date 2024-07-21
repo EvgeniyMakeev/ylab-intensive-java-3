@@ -4,6 +4,7 @@ import dev.makeev.coworking_service_app.dto.ApiResponse;
 import dev.makeev.coworking_service_app.dto.SpaceAddDTO;
 import dev.makeev.coworking_service_app.dto.SpaceDTO;
 import dev.makeev.coworking_service_app.dto.SpaceDeleteDTO;
+import dev.makeev.coworking_service_app.exceptions.BadRequestException;
 import dev.makeev.coworking_service_app.exceptions.NoAdminException;
 import dev.makeev.coworking_service_app.service.SpaceService;
 import dev.makeev.coworking_service_app.service.UserService;
@@ -14,13 +15,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -44,9 +45,10 @@ public class SpaceController {
      * @return a list of SpaceDTO
      */
     @Operation(summary = "Get all Spaces", description = "Spaces with free slots")
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public ResponseEntity<List<SpaceDTO>> getSpaces() {
-        return ResponseEntity.ok(spaceService.getSpaces());
+    List<SpaceDTO> getSpaces() {
+        return spaceService.getSpaces();
     }
 
     /**
@@ -56,17 +58,16 @@ public class SpaceController {
      * @return an ApiResponse indicating success or failure
      */
     @Operation(summary = "Add new Space", description = "Available only for Admin")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<ApiResponse> addSpace(HttpServletRequest request,
-                                                @Validated @RequestBody SpaceAddDTO spaceAddDTO) {
+    ApiResponse addSpace(HttpServletRequest request,
+                                @Validated @RequestBody SpaceAddDTO spaceAddDTO) {
         String login = (String) request.getAttribute("login");
         if (isValid(login, spaceAddDTO)) {
             spaceService.addSpace(spaceAddDTO);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse("Space " + spaceAddDTO.name() + " added successfully"));
+            return new ApiResponse("Space " + spaceAddDTO.name() + " added successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse("All parameters are required"));
+            throw new BadRequestException();
         }
     }
 
@@ -96,16 +97,16 @@ public class SpaceController {
      * @return an ApiResponse indicating success or failure
      */
     @Operation(summary = "Space bookings by Name", description = "Available only for Admin")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
-    public ResponseEntity<ApiResponse> deleteSpace(HttpServletRequest request,
-                                                   @Validated @RequestBody SpaceDeleteDTO spaceDeleteDTO) {
+    ApiResponse deleteSpace(HttpServletRequest request,
+                                   @Validated @RequestBody SpaceDeleteDTO spaceDeleteDTO) {
         String login = (String) request.getAttribute("login");
         if (userService.isAdmin(login)) {
             spaceService.deleteSpace(spaceDeleteDTO.name());
         } else {
             throw new NoAdminException();
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(new ApiResponse("Space deleted successfully"));
+        return new ApiResponse("Space deleted successfully");
     }
 }

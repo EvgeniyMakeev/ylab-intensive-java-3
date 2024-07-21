@@ -10,12 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -36,27 +36,27 @@ public class UserController {
      * @return an ApiResponse indicating success or failure
      */
     @Operation(summary = "Registration new user")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/registration")
-    public ResponseEntity<TokenResponse> addUser(@Validated @RequestBody UserRequestDTO userRequestDTO) {
+    TokenResponse addUser(@Validated @RequestBody UserRequestDTO userRequestDTO) {
         String token = userService.addUser(userRequestDTO.login(), userRequestDTO.password());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new TokenResponse("User added successfully", token));
+        return new TokenResponse("User added successfully", token);
     }
 
     @Operation(summary = "Login in")
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/login")
-    public ResponseEntity<TokenResponse> logIn(@Validated @RequestBody UserRequestDTO userRequestDTO) {
+    TokenResponse logIn(@Validated @RequestBody UserRequestDTO userRequestDTO) {
         String token = userService.checkCredentials(userRequestDTO.login(), userRequestDTO.password());
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new TokenResponse("Login success", token));
+        return new TokenResponse("Login success", token);
     }
 
     @Operation(summary = "Login out")
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/logout")
-    public ResponseEntity<ApiResponse> logOut(HttpServletRequest request) {
-        String login = (String) request.getAttribute("login");
-        userService.logOut(login);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse("Successfully logged out."));
+    ApiResponse logOut(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        userService.logOut(token);
+        return new ApiResponse("Successfully logged out.");
     }
 }
