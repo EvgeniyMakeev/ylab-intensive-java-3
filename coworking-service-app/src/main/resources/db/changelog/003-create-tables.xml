@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.28.xsd"
+        logicalFilePath="db/changelog/changelog.xml">
+
+    <changeSet id="003-create-table" author="evgeniy_makeev">
+        <createTable tableName="users"
+                     schemaName="non_public"
+                     remarks="Table for storing user information">
+            <column name="login"
+                    type="VARCHAR(255)"
+                    remarks="User login">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="password"
+                    type="VARCHAR(255)"
+                    remarks="User password">
+                <constraints nullable="false"/>
+            </column>
+            <column name="admin"
+                    type="BOOLEAN"
+                    defaultValueBoolean="false"
+                    remarks="Flag indicating if the user is an admin">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="spaces"
+                     schemaName="non_public"
+                     remarks="Table for storing spaces">
+            <column name="name"
+                    type="VARCHAR(255)"
+                    remarks="Name of space">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="hour_of_beginning_working_day"
+                    type="INT"
+                    remarks="Hour of beginning working day">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hour_of_ending_working_day"
+                    type="INT"
+                    remarks="Hour of ending working day">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="bookings"
+                     schemaName="non_public"
+                     remarks="Table for storing bookings">
+            <column name="id"
+                    type="BIGINT"
+                    defaultValueComputed="nextval('non_public.booking_id_seq')"
+                    remarks="Primary key for bookings">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login"
+                    type="VARCHAR(255)"
+                    remarks="Foreign key for login of user">
+                <constraints foreignKeyName="bookings_login_users_login"
+                             references="non_public.users(login)" referencedTableSchemaName="non_public"/>
+            </column>
+            <column name="name_of_space"
+                    type="VARCHAR(255)"
+                    remarks="Foreign key for space of booking">
+                <constraints foreignKeyName="bookings_name_of_space_spaces_name"
+                             references="non_public.spaces(name)" referencedTableSchemaName="non_public"/>
+            </column>
+            <column name="beginning_booking_date"
+                    type="DATE"
+                    remarks="Date of beginning booking">
+                <constraints nullable="false"/>
+            </column>
+            <column name="beginning_booking_hour"
+                    type="INT"
+                    remarks="Hour of beginning booking">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ending_booking_date"
+                    type="DATE"
+                    remarks="Date of end booking">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ending_booking_hour"
+                    type="INT"
+                    remarks="Hour of end booking">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="slots_for_booking"
+                     schemaName="non_public"
+                     remarks="Table for storing slots for booking">
+            <column name="name_of_space"
+                    type="VARCHAR(255)"
+                    remarks="Foreign key for space of booking">
+                <constraints foreignKeyName="slots_for_booking_bookings_name_of_space_spaces_name"
+                             references="non_public.spaces(name)" referencedTableSchemaName="non_public"/>
+            </column>
+            <column name="date"
+                    type="DATE"
+                    remarks="Date of booking slot">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hour"
+                    type="INT"
+                    remarks="Hour of booking slot">
+                <constraints nullable="false"/>
+            </column>
+            <column name="booking_id"
+                    type="BIGINT"
+                    defaultValue="0"
+                    remarks="Flag indicating if the hour is available for booking">
+            </column>
+        </createTable>
+
+        <createTable tableName="user_activity_log"
+                     schemaName="non_public"
+                     remarks="Table for storing log of users activity">
+            <column name="timestamp"
+                    type="TIMESTAMP"
+                    remarks="Timestamp of user action">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login"
+                    type="VARCHAR(255)"
+                    remarks="Login of user">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action"
+                    type="VARCHAR(255)"
+                    defaultValue="0"
+                    remarks="User action">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

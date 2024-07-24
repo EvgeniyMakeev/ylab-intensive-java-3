@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.28.xsd"
+        logicalFilePath="db/changelog/changelog.xml">
+
+    <changeSet id="006-insert-data" author="evgeniy_makeev">
+        <insert tableName="bookings" schemaName="non_public">
+            <column name="id" valueSequenceNext="booking_id_seq"/>
+            <column name="login" value="User1"/>
+            <column name="name_of_space" value="Workplace No. 1"/>
+            <column name="beginning_booking_date" value="2024-07-18"/>
+            <column name="beginning_booking_hour" value="8"/>
+            <column name="ending_booking_date" value="2024-07-18"/>
+            <column name="ending_booking_hour" value="12"/>
+        </insert>
+
+        <insert tableName="bookings" schemaName="non_public">
+            <column name="id" valueSequenceNext="booking_id_seq"/>
+            <column name="login" value="User2"/>
+            <column name="name_of_space" value="Conference hall"/>
+            <column name="beginning_booking_date" value="2024-07-16"/>
+            <column name="beginning_booking_hour" value="10"/>
+            <column name="ending_booking_date" value="2024-07-16"/>
+            <column name="ending_booking_hour" value="14"/>
+        </insert>
+
+        <insert tableName="slots_for_booking" schemaName="non_public">
+            <column name="name_of_space" value="Workplace No. 1"/>
+            <column name="date" value="2024-07-18"/>
+            <column name="hour" value="8"/>
+            <column name="booking_id" value="1"/>
+        </insert>
+
+        <insert tableName="slots_for_booking" schemaName="non_public">
+            <column name="name_of_space" value="Workplace No. 1"/>
+            <column name="date" value="2024-07-18"/>
+            <column name="hour" value="9"/>
+            <column name="booking_id" value="1"/>
+        </insert>
+
+        <insert tableName="slots_for_booking" schemaName="non_public">
+            <column name="name_of_space" value="Workplace No. 1"/>
+            <column name="date" value="2024-07-18"/>
+            <column name="hour" value="10"/>
+            <column name="booking_id" value="1"/>
+        </insert>
+
+        <insert tableName="slots_for_booking" schemaName="non_public">
+            <column name="name_of_space" value="Workplace No. 1"/>
+            <column name="date" value="2024-07-18"/>
+            <column name="hour" value="11"/>
+            <column name="booking_id" value="1"/>
+        </insert>
+
+        <insert tableName="slots_for_booking" schemaName="non_public">
+            <column name="name_of_space" value="Conference hall"/>
+            <column name="date" value="2024-07-16"/>
+            <column name="hour" value="10"/>
+            <column name="booking_id" value="2"/>
+        </insert>
+
+        <insert tableName="slots_for_booking" schemaName="non_public">
+            <column name="name_of_space" value="Conference hall"/>
+            <column name="date" value="2024-07-16"/>
+            <column name="hour" value="11"/>
+            <column name="booking_id" value="2"/>
+        </insert>
+
+        <insert tableName="slots_for_booking" schemaName="non_public">
+            <column name="name_of_space" value="Conference hall"/>
+            <column name="date" value="2024-07-16"/>
+            <column name="hour" value="12"/>
+            <column name="booking_id" value="2"/>
+        </insert>
+
+        <insert tableName="slots_for_booking" schemaName="non_public">
+            <column name="name_of_space" value="Conference hall"/>
+            <column name="date" value="2024-07-16"/>
+            <column name="hour" value="13"/>
+            <column name="booking_id" value="2"/>
+        </insert>
+
+        <insert tableName="user_activity_log" schemaName="non_public">
+            <column name="timestamp" value="now()"/>
+            <column name="login" value="User1"/>
+            <column name="action" value="Add new booking Workplace No. 1 from 8:00 2024-07-18 to 12:00 2024-07-18"/>
+        </insert>
+
+        <insert tableName="user_activity_log" schemaName="non_public">
+            <column name="timestamp" value="now()"/>
+            <column name="login" value="User2"/>
+            <column name="action" value="Add new booking Conference hall from 10:00 2024-07-16 to 14:00 2024-07-16."/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
